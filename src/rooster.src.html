@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f5f7fc">
+<meta name="apple-mobile-web-app-title" content="__APP_TITLE__">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,__ICON_SVG__" data-file-only>
+<link rel="apple-touch-icon" href="data:image/png;base64,__ICON_PNG__" data-file-only>
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg" data-web-only>
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" data-web-only>
+<link rel="manifest" href="__MANIFEST__" data-web-only>
+<script>document.documentElement.classList.remove('static')</script>
+<title>Mijn lessenrooster · PXL</title>
+<style>
+:root{--ink:#17223b;--muted:#65718a;--line:#e4e9f1;--bg:#f5f7fc;--white:#fff;--blue:#4169e1;--blue-ink:#3150ae;--blue-soft:#e8edff;--chip:#f2f5fb;--shadow:0 14px 40px rgba(26,44,83,.08);--hour:90px;--track:855px}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,select{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #9fb3ff;outline-offset:2px}
+.shell{max-width:1300px;margin:auto;padding:28px 24px 72px}
+
+/* Kop */
+.top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}
+.eyebrow{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:var(--blue)}
+h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-.04em}
+.subtitle{color:var(--muted);margin:0}
+.pill{background:var(--blue-soft);border:1px solid #ced8ff;color:var(--blue-ink);border-radius:100px;padding:9px 14px;font-size:13px;font-weight:700;white-space:nowrap}
+
+/* Werkbalk (blijft bovenaan staan tijdens het scrollen) */
+.toolbar{position:sticky;top:10px;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;background:rgba(255,255,255,.95);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:var(--shadow);border:1px solid var(--line);border-radius:18px;padding:10px;margin-bottom:14px}
+.nav{display:flex;align-items:center;gap:8px;margin-right:auto;min-width:0}
+.iconbtn{display:grid;place-items:center;width:42px;height:42px;flex:none;padding:0;background:var(--chip);border:1px solid var(--line);border-radius:11px;color:var(--ink)}
+.iconbtn svg{width:20px;height:20px}
+.iconbtn:hover,.btn:hover{background:#e7edfa}
+.iconbtn:disabled{opacity:.35;cursor:default;background:var(--chip)}
+.weekname{appearance:none;-webkit-appearance:none;height:42px;min-width:250px;padding:0 30px 0 10px;border:1px solid transparent;border-radius:10px;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='m2 4 4 4 4-4' fill='none' stroke='%2365718a' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 9px center;font-size:17px;font-weight:800;text-align:center;text-align-last:center;cursor:pointer}
+.weekname:hover{background-color:var(--chip)}
+.btn{height:42px;padding:0 14px;background:var(--chip);border:1px solid var(--line);border-radius:11px;font-weight:700;white-space:nowrap}
+.switch{display:flex;gap:4px;background:var(--chip);padding:4px;border:1px solid var(--line);border-radius:12px}
+.switch button{height:32px;padding:0 13px;border:0;border-radius:8px;background:none;color:var(--muted);font-weight:700;white-space:nowrap}
+.switch button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 2px 8px #1a2c5317}
+
+/* Tandwiel + menu */
+.gearWrap{position:relative;flex:none}
+.gear svg{width:22px;height:22px;transition:transform .45s ease}
+.gear:hover svg{transform:rotate(45deg)}
+.gear[aria-expanded=true]{background:var(--blue-soft);border-color:#b8c7ff;color:var(--blue-ink)}
+.gear[aria-expanded=true] svg{transform:rotate(90deg)}
+.menu{position:absolute;right:0;top:calc(100% + 8px);z-index:40;width:min(300px,calc(100vw - 24px));display:grid;gap:2px;padding:6px;background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:0 15px 40px #17223b2b}
+.menuhead{padding:8px 12px 3px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;background:none;border:0;border-radius:9px;text-align:left;font-weight:700}
+.menu button:hover{background:var(--chip)}
+.menu .ico{width:22px;flex:none;text-align:center}
+.switchmark{position:relative;flex:none;width:36px;height:20px;margin-left:auto;border-radius:20px;background:#d5dbe6;transition:background .2s}
+.switchmark::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:transform .2s}
+.menu [aria-checked=true] .switchmark{background:var(--blue)}
+.menu [aria-checked=true] .switchmark::after{transform:translateX(16px)}
+.menu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
+.menu .tip{padding:6px 12px 8px;font-size:12px;color:var(--muted)}
+
+/* Legende + uitleg */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:5px 11px 5px 9px;background:#fff;border:1px solid var(--line);border-radius:100px;font-size:13px;font-weight:700}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.chip small{color:var(--muted);font-weight:600}
+.hint{color:var(--muted);font-size:13px;margin:0 0 16px}
+#single{scroll-margin-top:84px}
+
+/* Weekrooster (pc) */
+.board{display:grid;grid-template-columns:52px repeat(5,minmax(0,1fr));gap:8px}
+.hours{position:relative;height:var(--track);margin-top:68px}
+.hours span{position:absolute;right:6px;transform:translateY(-50%);color:#8b96a9;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.day{min-width:0}
+.dayhead{display:flex;flex-direction:column;justify-content:center;align-items:center;height:60px;margin-bottom:8px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.dayhead strong{font-size:15px}
+.dayhead small{font-size:12px;color:var(--muted)}
+.day.today .dayhead{background:#edf1ff;border-color:#9fb3ff}
+.day.today .dayhead small{color:var(--blue-ink);font-weight:700}
+.track{position:relative;height:var(--track);overflow:hidden;border:1px solid var(--line);border-radius:15px;background-color:#fff;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--hour) - 1px),#e9edf4 calc(var(--hour) - 1px),#e9edf4 var(--hour))}
+.day.today .track{border-color:#c5d2ff}
+.event{position:absolute;left:5px;right:5px;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;overflow:hidden;padding:8px 9px;border:0;border-left:4px solid var(--accent);border-radius:12px;background:var(--soft);box-shadow:0 3px 10px #14213d12;color:var(--ink);font:inherit;text-align:left}
+button.event{cursor:pointer;transition:transform .15s,box-shadow .15s}
+button.event:hover{transform:translateY(-1px);box-shadow:0 8px 20px #14213d22}
+.event>span{display:block}
+.event .time{font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.event .name{margin:3px 0;font-size:14px;line-height:1.2;font-weight:800}
+.event .room{font-size:12px;font-weight:700}
+.event .old{font-weight:500;opacity:.72}
+.event .group{margin-top:1px;font-size:11px;opacity:.7}
+.event .state{margin-top:4px;font-size:11px;font-weight:800;color:var(--accent)}
+.event.short{padding:6px 8px}
+.event.short .name{margin:1px 0;font-size:13px}
+.event.short .group{display:none}
+.event.short .state{margin-top:2px;font-size:10px}
+.event.tiny{padding:4px 8px}
+.event.tiny .name{font-size:12px}
+.event.tiny .state{display:none}
+.empty{display:grid;place-items:center;height:100%;padding:10px;color:#9aa5b6;font-size:13px;text-align:center}
+.nowline{position:absolute;left:0;right:0;z-index:2;height:2px;background:#e5484d;pointer-events:none}
+.nowline::before{content:"";position:absolute;left:-1px;top:-4px;width:10px;height:10px;border-radius:50%;background:#e5484d}
+
+/* Lijst (gsm, tablet en "Alle weken") */
+.list{display:none}
+.listday{margin:0 0 12px;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:16px;scroll-margin-top:90px}
+.listday.today{border-color:#9fb3ff;box-shadow:0 0 0 3px #e3e9ff}
+.listhead{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#f9faff;font-weight:800}
+.listday.today .listhead{background:#edf1ff}
+.listhead small{color:var(--muted)}
+.badge{margin-left:6px;padding:2px 8px;border-radius:100px;background:var(--blue);color:#fff;font-size:11px;font-style:normal;font-weight:800;vertical-align:2px}
+.listitem{display:grid;grid-template-columns:95px minmax(0,1fr);gap:12px;padding:14px 16px;border-top:1px solid var(--line);border-left:4px solid var(--accent)}
+.listitem .when{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+.listitem .title{font-weight:800}
+.listitem .detail{margin-top:3px;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.listempty{padding:15px 18px;color:var(--muted)}
+.allweeks .weeksection{margin:0 0 28px;scroll-margin-top:90px}
+.allweeks h2{margin:18px 0 10px;font-size:21px;letter-spacing:-.02em}
+.allweeks .list{display:block}
+.note{margin:23px 0 0;padding:15px 18px;background:#fff;border:1px solid var(--line);border-radius:14px;color:var(--muted);font-size:13px}
+.note strong{color:var(--ink)}
+
+/* Lessen volgen / niet volgen */
+.skipped{background:#edf0f3!important;color:#6e7888!important;opacity:.67}
+.skipped .name,.skipped .title{text-decoration:line-through}
+.skipped .state{color:#5d6779}
+.attend{display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:3px 0;font-size:12px;font-weight:700;color:var(--ink);cursor:pointer}
+.attend input,.largeAttend input{width:18px;height:18px;accent-color:var(--blue)}
+
+/* Dialogen */
+.editor{width:min(420px,calc(100vw - 30px));padding:22px;border:1px solid var(--line);border-radius:20px;color:var(--ink);box-shadow:0 20px 70px #14213d44}
+.editor::backdrop{background:#17223b88}
+.editor h2{margin:0;font-size:22px}
+.editor p{color:var(--muted);font-size:13px}
+.dialogtop{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dialogtop button{padding:7px 11px;border:0;border-radius:9px;background:var(--chip)}
+.colorRow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line);font-weight:750}
+.colorRow small{display:block;color:var(--muted);font-size:11px}
+.colorRow input{width:55px;height:36px;border:0;background:none;cursor:pointer}
+.dialogactions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.dialogactions button{padding:9px 13px;border:1px solid var(--line);border-radius:10px;background:var(--chip)}
+.dialogactions .primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.largeAttend{display:flex;align-items:center;gap:10px;padding:14px;background:#f3f6fc;border-radius:12px;font-weight:800;cursor:pointer}
+.homeinfo{width:min(480px,calc(100vw - 30px));max-height:calc(100vh - 40px);overflow:auto}
+.homehead{display:flex;align-items:center;gap:14px;margin:14px 0 2px}
+.homehead img{width:64px;height:64px;border-radius:15px;box-shadow:0 6px 16px #3a2a8a33}
+.homehead strong{display:block;font-size:16px}
+.homehead small{color:var(--muted)}
+.homeinfo h3{margin:18px 0 6px;font-size:15px}
+.steps{margin:0;padding-left:22px;font-size:14px;line-height:1.5}
+.steps li{margin:5px 0}
+.homeinfo .small{margin:8px 0 0;font-size:12px}
+.linkbtn{padding:0;border:0;background:none;color:var(--blue);font-weight:700;text-decoration:underline;cursor:pointer}
+.qrblock{display:flex;gap:16px;align-items:center;margin:14px 0 4px;padding:14px;background:#f3f6fc;border-radius:14px}
+.qr{flex:none;display:grid;place-items:center;width:136px;height:136px;padding:8px;background:#fff;border-radius:10px;color:var(--muted);font-size:12px;text-align:center}
+.qr svg{display:block;width:100%;height:100%}
+.editor .qrblock p{margin:0 0 8px;color:var(--ink);font-size:14px}
+.toast{position:fixed;left:50%;bottom:24px;z-index:60;transform:translateX(-50%);max-width:calc(100vw - 32px);padding:12px 18px;border-radius:12px;background:var(--ink);color:#fff;font-weight:700;box-shadow:0 10px 30px #0004}
+@media(max-width:420px){.qrblock{flex-direction:column;text-align:center}}
+
+/* Vaste weergave zonder JavaScript (bv. "Snelle weergave" op iPhone) */
+.staticonly{display:none}
+.static .toolbar,.static .legend,.static .hint,.static #single,.static .attend,.static .badge,.static #saveHint{display:none!important}
+.static #allweeks{display:block!important}
+.static .staticonly{display:block}
+.static .listday.today{border-color:var(--line);box-shadow:none}
+.static .listday.today .listhead{background:#f9faff}
+.note.staticonly{margin:0 0 14px}
+
+/* Lijstweergave: altijd op smallere schermen, of gekozen via het tandwiel */
+body.forceList .board,body.forceList .legend{display:none}
+body.forceList .list{display:block}
+@media(max-width:999px){
+ .board,.legend,.listoption{display:none!important}
+ .list{display:block}
+ .shell{padding:20px 14px 55px}
+}
+@media(max-width:640px){
+ .shell{padding:12px 12px 44px}
+ .top{display:block;margin-bottom:12px}
+ .eyebrow{font-size:10px;letter-spacing:.11em}
+ h1{font-size:26px;margin:4px 0}
+ .subtitle{font-size:13px;line-height:1.3}
+ .pill,.hint{display:none}
+ .toolbar{top:6px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;padding:8px;margin-bottom:10px;border-radius:15px}
+ .nav{grid-column:1/-1;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:6px;margin:0}
+ .iconbtn{width:44px;height:44px}
+ .weekname{width:100%;min-width:0;padding:0 24px 0 6px;background-position:right 6px center;font-size:15px}
+ .btn{height:44px;padding:0 12px}
+ .switch{min-width:0}
+ .switch button{flex:1;height:34px;padding:0 8px;font-size:14px}
+ .listday{margin-bottom:9px;border-radius:14px;scroll-margin-top:130px}
+ .allweeks .weeksection,#single{scroll-margin-top:130px}
+ .listhead{padding:10px 13px}
+ .listitem{grid-template-columns:72px minmax(0,1fr);gap:8px;padding:11px 12px}
+ .listitem .title{font-size:15px;line-height:1.25}
+ .attend{margin-top:6px;font-size:13px;min-height:30px}
+ .allweeks h2{margin:16px 0 9px;font-size:18px}
+ .note{margin-top:12px}
+}
+@media(max-width:360px){
+ .btn{padding:0 9px;font-size:14px}
+ .switch button{padding:0 6px;font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+@media print{
+ body{background:#fff}
+ .shell{padding:0;max-width:none}
+ .top{margin-bottom:15px}
+ .toolbar,.legend,.hint,.note,.pill,.attend,.state,dialog,#single{display:none!important}
+ #allweeks{display:block!important}
+ .allweeks .weeksection{break-inside:avoid;page-break-inside:avoid}
+ h1{font-size:26px}
+ .skipped{opacity:.6}
+}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="top"><div><div class="eyebrow">PXL · Graduaat Programmeren</div><h1>Mijn lessenrooster</h1><p class="subtitle">21 september – 26 oktober 2026 · alleen jouw klasgroepen</p></div><div class="pill">Offline beschikbaar</div></header>
+<p class="note staticonly">Je ziet een vaste weergave van alle weken. Grijs en doorgestreept = een les die je niet volgt. Om van week te wisselen of lessen aan te passen, open je het bestand in een browser.</p>
+<nav class="toolbar" aria-label="Roosternavigatie">
+<div class="nav"><button class="iconbtn" id="prev" aria-label="Vorige week" title="Vorige week (←)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><select class="weekname" id="weekname" aria-label="Kies week"></select><button class="iconbtn" id="next" aria-label="Volgende week" title="Volgende week (→)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button></div>
+<button class="btn" id="todayBtn" type="button" title="Spring naar vandaag (T)">Vandaag</button>
+<div class="switch" role="group" aria-label="Weergave"><button id="one" type="button" aria-pressed="true">Week</button><button id="all" type="button" aria-pressed="false">Alle weken</button></div>
+<div class="gearWrap"><button class="iconbtn gear" id="gearBtn" type="button" aria-label="Instellingen" title="Instellingen" aria-haspopup="true" aria-expanded="false" aria-controls="gearMenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><div class="menu" id="gearMenu" role="menu" hidden></div></div>
+</nav>
+<div class="legend" id="legend" aria-label="Vakken"></div>
+<p class="hint">De nieuwe lokaalnaam staat vet, de code tussen haakjes is de oude lokaalnaam. Wissel van week met de pijlen, de pijltjestoetsen of door te swipen op je gsm.</p>
+<p class="hint" data-tymo-only>Klik op een les om ze aan of uit te zetten. Een vinkje wijzigen geldt ook voor hetzelfde lesblok in de volgende weken.</p>
+<div id="single"><div class="board" id="board"></div><div class="list" id="list"></div></div>
+<div class="allweeks" id="allweeks" hidden></div>
+<p class="note" id="saveHint" data-tymo-only data-file-only>Je keuzes worden op dit apparaat bewaard. Gebruik ⚙ → “Download met mijn keuzes” om je huidige kleuren en leskeuzes mee te sturen naar je gsm, en ⚙ → “Zet op je beginscherm” om het rooster met een eigen icoontje op je gsm te zetten. Raadpleeg TimeEdit voor wijzigingen.</p>
+<p class="note" id="saveHint" data-tymo-only data-web-only>Je keuzes worden op dit toestel bewaard. Via ⚙ → “Zet op je gsm” scan je een QR-code, dan gaan je vinkjes en kleuren mee naar je gsm. Raadpleeg TimeEdit voor wijzigingen.</p>
+<p class="note" data-tymo-only><strong>Let op:</strong> Dit overzicht komt uit je TimeEdit-roosters van 21 en 28 september 2026. Lessen kunnen later wijzigen. C# Essentials monitoraat is weggelaten. C# Advanced 2PROA komt in deze periode niet voor. De laatste week bevat in de aangeleverde bron alleen maandag 26 oktober.</p>
+<dialog id="colorsDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Kleuren van vakken</h2><button aria-label="Sluiten">✕</button></div><p>Kies een kleur per vak. Alle lessen van dat vak veranderen mee.</p><div id="colorRows"></div><div class="dialogactions"><button type="button" id="resetColors">Standaardkleuren</button><button class="primary">Klaar</button></div></form></dialog>
+<dialog id="lessonDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2 id="lessonTitle"></h2><button aria-label="Sluiten">✕</button></div><p id="lessonMeta"></p><label class="largeAttend"><input type="checkbox" id="lessonAttend"> Ik volg deze les</label><p>Dit wijzigt ook hetzelfde lesblok in alle volgende weken. Eerdere weken blijven zoals ze waren.</p><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
+<!--@web-->
+<dialog id="phoneDialog" class="editor homeinfo"><form method="dialog"><div class="dialogtop"><h2>Zet op je gsm</h2><button aria-label="Sluiten">✕</button></div>
+<div class="qrblock"><div class="qr" id="qrBox"></div><div>
+<p><b>Scan deze code met de camera van je gsm.</b> Je vinkjes en kleuren gaan mee.</p>
+<button type="button" class="linkbtn" id="copyLink">Kopieer de link</button></div></div>
+<h3>iPhone</h3>
+<ol class="steps">
+<li>Open de link in <b>Safari</b>.</li>
+<li>Tik op de deelknop → <b>Zet op beginscherm</b> → <b>Voeg toe</b>.</li>
+</ol>
+<h3>Android</h3>
+<ol class="steps">
+<li>Open de link in <b>Chrome</b>.</li>
+<li>Tik op <b>⋮</b> → <b>App installeren</b> of <b>Toevoegen aan startscherm</b>.</li>
+</ol>
+<p class="small">Daarna staat het rooster met zijn eigen icoontje op je beginscherm en werkt het ook zonder internet. Wijzigingen in het rooster komen vanzelf door zodra je online bent.</p>
+<div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
+<!--@/web-->
+<!--@file-->
+<dialog id="homeDialog" class="editor homeinfo"><form method="dialog"><div class="dialogtop"><h2>Op je beginscherm</h2><button aria-label="Sluiten">✕</button></div>
+<div class="homehead"><img id="homeIcon" alt="Icoontje van het lessenrooster"><div><strong>Lessenrooster</strong><small>Werkt ook zonder internet</small></div></div>
+<h3>iPhone</h3>
+<ol class="steps">
+<li data-tymo-only>Kies ⚙ → <b>Download met mijn keuzes</b> en stuur dat bestand naar je iPhone (AirDrop, mail of WhatsApp).</li>
+<li data-parent-only>Stuur dit bestand naar je iPhone (AirDrop, mail of WhatsApp).</li>
+<li>Stuur ook het icoontje mee en bewaar het op je iPhone in <b>Foto's</b>: <button type="button" class="linkbtn" id="iconDownload">download icoontje</button></li>
+<li>Bewaar het rooster in de app <b>Bestanden</b>, bv. in iCloud Drive.</li>
+<li>Open de app <b>Opdrachten</b> → <b>+</b>. Voeg de taak <b>Bestand</b> toe en kies je rooster. Voeg daarna de taak <b>Snelle weergave</b> toe.</li>
+<li>Tik op de deelknop → <b>Zet op beginscherm</b> → tik op het icoon → <b>Kies foto</b> → kies het icoontje → <b>Voeg toe</b>.</li>
+</ol>
+<h3>Android</h3>
+<ol class="steps">
+<li>Bewaar het bestand op je gsm (bij Downloads).</li>
+<li>Samsung: open <b>Mijn bestanden</b>, houd het bestand ingedrukt → <b>Meer</b> → <b>Toevoegen aan startscherm</b>.</li>
+</ol>
+<p class="small">Op Android kiest je gsm zelf het icoon van de snelkoppeling. Opent het rooster als vaste lijst van alle weken? Dan voert je gsm geen JavaScript uit in die weergave; alles blijft wel zichtbaar.</p>
+<div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
+<!--@/file-->
+</main>
+<script id="embeddedSettings" type="application/json" data-instance="original">{}</script>
+<script>
+const PARENT=false; // true = alleen-bekijken versie voor de ouders
+const WEB=false; // true = versie op GitHub Pages (installeerbaar als app, werkt offline)
+const DAY_START=510,DAY_END=1080; // 08:30 en 18:00
+let S=1.4; // pixels per minuut: zo gekozen dat de hele dag op het scherm past
+function fitScale(){
+ let next=Math.round(Math.min(1.6,Math.max(1.15,(innerHeight-175)/(DAY_END-DAY_START)))*100)/100;
+ let changed=next!==S;S=next;
+ document.documentElement.style.setProperty('--hour',60*S+'px');
+ document.documentElement.style.setProperty('--track',(DAY_END-DAY_START)*S+'px');
+ return changed;
+}
+fitScale();
+
+const subjects={web:{name:'Web Essentials',group:'1PROA',color:'#4377df'},cs:{name:'C# Essentials',group:'1PROA',color:'#8859c9'},it:{name:'IT Organisation',group:'1PROA',color:'#d68a27'},data:{name:'Data Expert',group:'2PROA',color:'#24977b'},pm:{name:'Project Management',group:'2PROB',color:'#d35f78'}};
+const E=(day,start,end,key,room,old)=>({day,start,end,key,room,old});
+const base=[E(0,'08:30','10:30','pm','DH.z1v01.04','DB107'),E(0,'10:45','12:45','web','DH.z1v02.11','DB211'),E(0,'13:45','15:45','data','DH.z1v01.07','DB102'),E(2,'08:30','10:30','cs','DH.z1v01.04','DB107'),E(2,'10:45','11:45','cs','DH.z1v01.04','DB107'),E(3,'14:45','15:45','it','DH.z2v02.20','DD204'),E(3,'16:00','18:00','it','DH.z2v01.41','DE102'),E(4,'08:30','10:30','web','DH.z1v01.21','DA104'),E(4,'10:45','12:45','cs','DH.z1v01.21','DA104'),E(4,'16:00','18:00','pm','Online','Online DIG')];
+const weeks=[{num:39,start:'2026-09-21',end:'2026-09-25',events:[...base.filter(e=>!(e.day===0&&e.key==='pm')&&!(e.day===0&&e.key==='data')),E(0,'13:45','15:45','data','DH.z1v01.07','DB102')]},{num:40,start:'2026-09-28',end:'2026-10-02',events:base},{num:41,start:'2026-10-05',end:'2026-10-09',events:base},{num:42,start:'2026-10-12',end:'2026-10-16',events:base},{num:43,start:'2026-10-19',end:'2026-10-23',events:base},{num:44,start:'2026-10-26',end:'2026-10-26',events:base.filter(e=>e.day===0)}];
+const days=['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag'];
+const pad=n=>String(n).padStart(2,'0');
+function localDate(iso,delta=0){let [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d+delta)}
+function shortDate(x){return `${pad(x.getDate())}/${pad(x.getMonth()+1)}`}
+function longDate(x){return `${x.getDate()} ${['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'][x.getMonth()]}`}
+function mins(s){let [h,m]=s.split(':').map(Number);return h*60+m}
+function label(w){return `Week ${w.num} · ${longDate(localDate(w.start))} – ${longDate(localDate(w.end))}`}
+function isToday(date){return date.toDateString()===new Date().toDateString()}
+const $=id=>document.getElementById(id);
+
+// Instellingen: ingebakken in het bestand (na "Download met mijn keuzes") of bewaard op dit toestel
+const embeddedNode=$('embeddedSettings');
+const instanceId=embeddedNode.dataset.instance||'original';
+const storeKey=(PARENT?'pxl-ouders-rooster-2026-v1-':'pxl-tymo-rooster-2026-v1-')+instanceId;
+let settings={colors:{},skipped:{},listView:false};
+function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},skipped:o.skipped||{},listView:!!o.listView}}
+try{useSettings(JSON.parse(embeddedNode.textContent||'{}'))}catch(err){}
+try{let raw=localStorage.getItem(storeKey)||(!PARENT&&instanceId==='original'?localStorage.getItem('pxl-tymo-rooster-2026-v1'):null);if(raw)useSettings(JSON.parse(raw))}catch(err){}
+function save(){try{localStorage.setItem(storeKey,JSON.stringify(settings))}catch(err){let hint=$('saveHint');if(hint)hint.textContent='Je browser bewaart wijzigingen in dit bestand niet automatisch.'}}
+function downloadCurrent(){
+ const copy=document.documentElement.cloneNode(true);
+ copy.classList.add('static'); // toont alle weken als lijst wanneer de gsm geen JavaScript uitvoert
+ copy.querySelector('#homeIcon').removeAttribute('src'); // icoon staat al in de <head>
+ const embedded=copy.querySelector('#embeddedSettings');
+ embedded.dataset.instance=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
+ embedded.textContent=JSON.stringify(settings).replace(/</g,'\\u003c');
+ const blob=new Blob(['<!doctype html>\n',copy.outerHTML],{type:'text/html;charset=utf-8'});
+ const url=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=url;link.download='Lessenrooster_Tymo_met_mijn_keuzes.html';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+}
+
+function lessonId(w,e){return `${w.start}|${e.day}|${e.start}|${e.key}`}
+function isSkipped(id){return !PARENT&&!!settings.skipped[id]}
+function colorFor(key){let v=settings.colors[key];return /^#[0-9a-fA-F]{6}$/.test(v||'')?v:subjects[key].color}
+function styleFor(e,id){let skipped=isSkipped(id),color=skipped?'#8a94a5':colorFor(e.key);return `--accent:${color};--soft:${skipped?'#edf0f3':color+'20'}`}
+function roomHtml(e){return e.room==='Online'?'Online':`<strong>${e.room}</strong> (${e.old})`}
+
+// Deze week; in het weekend al de volgende week
+const todayIdx=(()=>{let now=new Date(),i=weeks.findIndex(w=>now<localDate(w.start,5));return i<0?weeks.length-1:i})();
+let idx=todayIdx,mode='one';
+
+function legendHtml(){return Object.entries(subjects).map(([key,s])=>`<span class="chip" style="--accent:${colorFor(key)}"><i></i>${s.name} <small>${s.group}</small></span>`).join('')}
+function listItemHtml(w,e){let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id);return `<div class="listitem${skipped?' skipped':''}" style="${styleFor(e,id)}"><div class="when">${e.start}<br>– ${e.end}</div><div><div class="title">${s.name}</div><div class="detail">${s.group} · ${roomHtml(e)}</div>${PARENT?'':`<label class="attend"><input type="checkbox" data-lesson="${id}" ${skipped?'':'checked'}> Ik volg deze les</label>`}</div></div>`}
+function listHtml(w){return days.map((d,i)=>{let date=localDate(w.start,i);if(date>localDate(w.end))return '';let events=w.events.filter(e=>e.day===i),today=isToday(date);return `<section class="listday${today?' today':''}"${today?' data-today':''}><div class="listhead"><span>${d}${today?'<em class="badge">Vandaag</em>':''}</span><small>${shortDate(date)}</small></div>${events.length?events.map(e=>listItemHtml(w,e)).join(''):'<div class="listempty">Geen les van jouw vakken</div>'}</section>`}).join('')}
+function eventHtml(w,e,i,date){
+ let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id),top=(mins(e.start)-DAY_START)*S+2,height=(mins(e.end)-mins(e.start))*S-4;
+ let inner=`<span class="time">${e.start}–${e.end}</span><span class="name">${s.name}</span><span class="room">${e.room==='Online'?'Online':`${e.room} <span class="old">(${e.old})</span>`}</span><span class="group">${s.group}</span>${PARENT?'':`<span class="state">${skipped?'Volg ik niet':'Volg ik'} · bewerk</span>`}`;
+ let attrs=`class="event${height<120?' short':''}${height<80?' tiny':''}${skipped?' skipped':''}" style="top:${top}px;height:${height}px;${styleFor(e,id)}" title="${s.name} · ${e.start}–${e.end} · ${e.room}${e.room==='Online'?'':` (${e.old})`}"`;
+ return PARENT?`<div ${attrs}>${inner}</div>`:`<button type="button" ${attrs} data-edit="${id}" aria-label="Bewerk ${s.name} op ${days[i]} ${shortDate(date)} om ${e.start}">${inner}</button>`;
+}
+function boardHtml(w){
+ let marks=['08:30','09:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:00'];
+ let html=`<div class="hours" aria-hidden="true">${marks.map(t=>`<span style="top:${(mins(t)-DAY_START)*S}px">${t}</span>`).join('')}</div>`;
+ for(let i=0;i<5;i++){
+  let date=localDate(w.start,i),inRange=date<=localDate(w.end),today=isToday(date),events=inRange?w.events.filter(e=>e.day===i):[];
+  html+=`<section class="day${today?' today':''}"><div class="dayhead"><strong>${days[i]}</strong><small>${inRange?shortDate(date):'—'}${today?' · vandaag':''}</small></div><div class="track">${events.map(e=>eventHtml(w,e,i,date)).join('')}${events.length?'':'<div class="empty">Geen les</div>'}${today?'<div class="nowline" hidden></div>':''}</div></section>`;
+ }
+ return html;
+}
+function menuHtml(){
+ let item=(action,ico,text)=>`<button type="button" role="menuitem" data-action="${action}"><span class="ico" aria-hidden="true">${ico}</span>${text}</button>`;
+ return `<div class="menuhead">Weergave</div><button type="button" role="menuitemcheckbox" class="listoption" data-action="list" aria-checked="false"><span class="ico" aria-hidden="true">☰</span>Toon als lijst<span class="switchmark" aria-hidden="true"></span></button>${item('today','📅','Ga naar vandaag')}${PARENT?'':`<hr><div class="menuhead">Aanpassen</div>${item('colors','🎨','Kleuren aanpassen')}${item('reset','↺','Alle lessen weer volgen')}${WEB?'':item('download','⬇','Download met mijn keuzes')}`}<hr>${item('home','📱',WEB?'Zet op je gsm':'Zet op je beginscherm')}${item('print','🖨','Print / bewaar als PDF')}<div class="tip">Tip: wissel van week met ← → op je toetsenbord of swipe op je gsm. Toets T springt naar vandaag.</div>`;
+}
+
+function updateNow(){let now=new Date(),m=now.getHours()*60+now.getMinutes();document.querySelectorAll('.nowline').forEach(line=>{line.hidden=m<DAY_START||m>DAY_END;line.style.top=(m-DAY_START)*S+'px'})}
+function render(){
+ let w=weeks[idx];
+ $('weekname').value=String(idx);
+ $('legend').innerHTML=legendHtml();
+ $('board').innerHTML=boardHtml(w);
+ $('list').innerHTML=listHtml(w);
+ $('allweeks').innerHTML=weeks.map((week,i)=>`<section class="weeksection" id="week-${i}"><h2>${label(week)}${i===todayIdx?'<em class="badge">Deze week</em>':''}</h2><div class="list">${listHtml(week)}</div></section>`).join('');
+ $('prev').disabled=idx===0;$('next').disabled=idx===weeks.length-1;
+ $('single').hidden=mode!=='one';$('allweeks').hidden=mode!=='all';
+ $('one').setAttribute('aria-pressed',mode==='one');$('all').setAttribute('aria-pressed',mode==='all');
+ document.body.classList.toggle('forceList',settings.listView);
+ $('gearMenu').querySelector('[data-action=list]').setAttribute('aria-checked',settings.listView);
+ updateNow();
+}
+function visible(node){return node&&node.offsetParent!==null}
+function scrollToWeekOrToday(){
+ let scope=mode==='all'?$('week-'+idx):$('single');
+ let today=[...scope.querySelectorAll('[data-today]')].find(visible);
+ (today||scope).scrollIntoView({block:'start'});
+}
+function goTo(i){if(i<0||i>=weeks.length)return;idx=i;render();if(mode==='all')$('week-'+idx).scrollIntoView({block:'start'})}
+function goToday(){idx=todayIdx;render();scrollToWeekOrToday()}
+function setMenu(open){$('gearMenu').hidden=!open;$('gearBtn').setAttribute('aria-expanded',open);if(open)$('gearMenu').querySelector('button').focus()}
+
+$('weekname').innerHTML=weeks.map((w,i)=>`<option value="${i}">${label(w)}</option>`).join('');
+$('weekname').onchange=e=>goTo(Number(e.target.value));
+$('prev').onclick=()=>goTo(idx-1);
+$('next').onclick=()=>goTo(idx+1);
+$('todayBtn').onclick=goToday;
+$('one').onclick=()=>{mode='one';render()};
+$('all').onclick=()=>{mode='all';render();$('week-'+idx).scrollIntoView({block:'start'})};
+$('gearMenu').innerHTML=menuHtml();
+$('gearBtn').onclick=()=>setMenu($('gearMenu').hidden);
+$('gearMenu').addEventListener('click',event=>{
+ let button=event.target.closest('[data-action]');if(!button)return;
+ let action=button.dataset.action;
+ if(action==='list'){settings.listView=!settings.listView;save();render();return}
+ setMenu(false);
+ if(action==='today')goToday();
+ if(action==='print')window.print();
+ if(action==='home'){if(WEB)openPhoneDialog();else{$('homeIcon').src=iconUrl();$('homeDialog').showModal()}}
+ if(action==='colors'){renderColors();$('colorsDialog').showModal()}
+ if(action==='download')downloadCurrent();
+ if(action==='reset'&&confirm('Alle lessen weer op “Ik volg deze les” zetten?')){settings.skipped={};save();render()}
+});
+document.addEventListener('click',event=>{if(!event.target.closest('.gearWrap'))setMenu(false)});
+function iconUrl(){return document.querySelector('link[rel=apple-touch-icon]').href}
+if(!WEB)$('iconDownload').onclick=()=>{let link=document.createElement('a');link.href=iconUrl();link.download='Lessenrooster_icoon.png';document.body.appendChild(link);link.click();link.remove()};
+function toast(text){let el=document.createElement('div');el.className='toast';el.setAttribute('role','status');el.textContent=text;document.body.appendChild(el);setTimeout(()=>el.remove(),4000)}
+
+// Keuzes meenemen naar een ander toestel via een link (of QR-code): #s=<overgeslagen lessen als bits in hex>&c=<kleuren>&t=<tijdstip>
+function shareUrl(){
+ let url=location.href.split('#')[0];
+ if(PARENT)return url;
+ let bits='',hex='',params=new URLSearchParams();
+ for(let w of weeks)for(let e of w.events)bits+=settings.skipped[lessonId(w,e)]?'1':'0';
+ for(let i=0;i<bits.length;i+=4)hex+=parseInt(bits.slice(i,i+4).padEnd(4,'0'),2).toString(16);
+ hex=hex.replace(/0+$/,'');
+ if(hex)params.set('s',hex);
+ let colors=Object.entries(settings.colors).filter(([key,value])=>subjects[key]&&/^#[0-9a-f]{6}$/i.test(value)&&value.toLowerCase()!==subjects[key].color).map(([key,value])=>key+'-'+value.slice(1).toLowerCase());
+ if(colors.length)params.set('c',colors.join('.'));
+ params.set('t',Date.now().toString(36));
+ return url+'#'+params;
+}
+function importFromLink(){
+ let params=new URLSearchParams(location.hash.slice(1)),stamp=params.get('t');
+ if(PARENT||!stamp)return;
+ let doneKey=storeKey+'-import';
+ try{if(localStorage.getItem(doneKey)===stamp)return}catch(err){}
+ let hex=params.get('s')||'',i=0,skipped={},colors={};
+ for(let w of weeks)for(let e of w.events){if(parseInt(hex[i>>2]||'0',16)&(8>>(i&3)))skipped[lessonId(w,e)]=true;i++}
+ (params.get('c')||'').split('.').forEach(pair=>{let [key,value]=pair.split('-');if(subjects[key]&&/^[0-9a-f]{6}$/i.test(value||''))colors[key]='#'+value.toLowerCase()});
+ settings={...settings,skipped,colors};save();
+ try{localStorage.setItem(doneKey,stamp)}catch(err){}
+ toast('Je vinkjes en kleuren van je andere toestel zijn overgenomen ✓');
+}
+function loadQrLibrary(){return window.qrcode?Promise.resolve():new Promise((resolve,reject)=>{let script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';script.onload=resolve;script.onerror=reject;document.head.appendChild(script)})}
+function openPhoneDialog(){
+ let url=shareUrl(),box=$('qrBox');
+ $('phoneDialog').dataset.url=url;
+ box.textContent='QR-code laden…';
+ loadQrLibrary().then(()=>{let qr=qrcode(0,'M');qr.addData(url);qr.make();box.innerHTML=qr.createSvgTag({cellSize:4,margin:0,scalable:true,alt:'QR-code met de link naar het rooster'})}).catch(()=>{box.textContent='Geen internet: gebruik “Kopieer de link”.'});
+ $('phoneDialog').showModal();
+}
+if(WEB)$('copyLink').onclick=async()=>{let url=$('phoneDialog').dataset.url;try{await navigator.clipboard.writeText(url);toast('Link gekopieerd')}catch(err){prompt('Kopieer deze link:',url)}};
+if(WEB&&'serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='127.0.0.1'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&!$('gearMenu').hidden){setMenu(false);$('gearBtn').focus();return}
+ if(document.querySelector('dialog[open]')||event.altKey||event.ctrlKey||event.metaKey)return;
+ if(['INPUT','SELECT','TEXTAREA'].includes(event.target.tagName))return;
+ if(event.key==='ArrowLeft')goTo(idx-1);
+ else if(event.key==='ArrowRight')goTo(idx+1);
+ else if(event.key==='t'||event.key==='T')goToday();
+});
+// Swipen op gsm: links = volgende week, rechts = vorige week
+let touchX=null,touchY=0;
+$('single').addEventListener('touchstart',event=>{if(event.touches.length!==1){touchX=null;return}touchX=event.touches[0].clientX;touchY=event.touches[0].clientY},{passive:true});
+$('single').addEventListener('touchend',event=>{if(touchX===null)return;let dx=event.changedTouches[0].clientX-touchX,dy=event.changedTouches[0].clientY-touchY;touchX=null;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5)goTo(idx+(dx<0?1:-1))},{passive:true});
+
+if(!PARENT){
+ function findLesson(id){for(let w of weeks)for(let e of w.events)if(lessonId(w,e)===id)return {w,e};return null}
+ function setAttendanceFromHere(id,attending){let found=findLesson(id);if(!found)return;let {w:startWeek,e:source}=found;for(let w of weeks){if(w.start<startWeek.start)continue;for(let e of w.events){if(e.key===source.key&&e.day===source.day&&e.start===source.start&&e.end===source.end)settings.skipped[lessonId(w,e)]=!attending}}save();render()}
+ function openLesson(id){let found=findLesson(id);if(!found)return;let {w,e}=found,s=subjects[e.key],date=localDate(w.start,e.day);$('lessonTitle').textContent=s.name;$('lessonMeta').textContent=`${days[e.day]} ${shortDate(date)} · ${e.start}–${e.end} · ${s.group} · ${e.room}${e.room==='Online'?'':` (${e.old})`}`;let input=$('lessonAttend');input.dataset.lesson=id;input.checked=!settings.skipped[id];$('lessonDialog').showModal()}
+ window.renderColors=function(){$('colorRows').innerHTML=Object.entries(subjects).map(([key,s])=>`<label class="colorRow"><span>${s.name}<small>${s.group}</small></span><input type="color" data-color="${key}" value="${colorFor(key)}" aria-label="Kleur voor ${s.name}"></label>`).join('')};
+ $('resetColors').onclick=()=>{settings.colors={};save();renderColors();render()};
+ document.addEventListener('change',event=>{let t=event.target;if(t.dataset.lesson)setAttendanceFromHere(t.dataset.lesson,t.checked);if(t.dataset.color){settings.colors[t.dataset.color]=t.value;save();render()}});
+ document.addEventListener('click',event=>{let button=event.target.closest('[data-edit]');if(button)openLesson(button.dataset.edit)});
+}
+
+if(WEB){importFromLink();addEventListener('hashchange',()=>{importFromLink();render()})}
+render();
+setInterval(updateNow,60000);
+let resizeTimer;
+addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(fitScale())render()},150)});
+// Op gsm/tablet meteen naar de dag van vandaag scrollen (niet nodig op maandag)
+let firstToday=[...$('list').querySelectorAll('[data-today]')].find(visible);
+if(firstToday&&firstToday.previousElementSibling){document.documentElement.style.scrollBehavior='auto';firstToday.scrollIntoView({block:'start'});document.documentElement.style.scrollBehavior=''}
+</script>
+</body>
+</html>
