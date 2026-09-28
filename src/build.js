@@ -51,7 +51,8 @@ self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys
 self.addEventListener('fetch',event=>{
  const request=event.request;
  if(request.method!=='GET'||new URL(request.url).origin!==location.origin)return;
- event.respondWith(fetch(request).then(response=>{
+ // no-cache: altijd bij GitHub nagaan of er een nieuwere versie is (anders kan de browser tot 10 minuten een oude tonen)
+ event.respondWith(fetch(request.url,{cache:'no-cache'}).then(response=>{
   if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy))}
   return response;
  }).catch(()=>caches.match(request,{ignoreSearch:true}).then(hit=>hit||caches.match('index.html'))));
