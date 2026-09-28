@@ -73,8 +73,8 @@ function variant({web,parent}){
  s=s.split('__MANIFEST__').join(parent?'ouders.webmanifest':'manifest.webmanifest');
  s=replaceOnce(s,'__APP_TITLE__',parent?'Rooster Tymo':'Lessenrooster');
  if(parent){
-  s=replaceOnce(s,'<title>Mijn lessenrooster · PXL</title>','<title>Lessenrooster voor ouders · PXL</title>');
-  s=replaceOnce(s,'<h1>Mijn lessenrooster</h1>','<h1>Lessenrooster voor mijn ouders</h1>');
+  s=replaceOnce(s,'<title>Mijn lessenrooster · PXL</title>','<title>Lessenrooster · PXL</title>');
+  s=replaceOnce(s,'<h1>Mijn lessenrooster</h1>','<h1>Lessenrooster</h1>');
   s=replaceOnce(s,'const PARENT=false;','const PARENT=true;');
   s=replaceOnce(s,' Grijs en doorgestreept = een les die je niet volgt.','');
   if(web)s=replaceOnce(s,' Je vinkjes en kleuren gaan mee.','');
