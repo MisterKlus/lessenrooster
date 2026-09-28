@@ -103,8 +103,9 @@ button.event:hover{transform:translateY(-1px);box-shadow:0 8px 20px #14213d22}
 .event.tiny .name{font-size:12px}
 .event.tiny .state{display:none}
 .empty{display:grid;place-items:center;height:100%;padding:10px;color:#9aa5b6;font-size:13px;text-align:center}
-.nowline{position:absolute;left:0;right:0;z-index:2;height:2px;background:#e5484d;pointer-events:none}
-.nowline::before{content:"";position:absolute;left:-1px;top:-4px;width:10px;height:10px;border-radius:50%;background:#e5484d}
+.nowline,.listnow{position:absolute;left:0;right:0;z-index:2;height:2px;background:#e5484d;pointer-events:none}
+.nowline::before,.listnow::before{content:"";position:absolute;left:-1px;top:-4px;width:10px;height:10px;border-radius:50%;background:#e5484d}
+.nowline::after,.listnow::after{content:attr(data-time);position:absolute;right:6px;top:-9px;padding:0 6px;border-radius:6px;background:#e5484d;color:#fff;font-size:11px;font-weight:800;line-height:18px;font-variant-numeric:tabular-nums}
 
 /* Lijst (gsm, tablet en "Alle weken") */
 .list{display:none}
@@ -114,7 +115,10 @@ button.event:hover{transform:translateY(-1px);box-shadow:0 8px 20px #14213d22}
 .listday.today .listhead{background:#edf1ff}
 .listhead small{color:var(--muted)}
 .badge{margin-left:6px;padding:2px 8px;border-radius:100px;background:var(--blue);color:#fff;font-size:11px;font-style:normal;font-weight:800;vertical-align:2px}
-.listitem{display:grid;grid-template-columns:95px minmax(0,1fr);gap:12px;padding:14px 16px;border-top:1px solid var(--line);border-left:4px solid var(--accent)}
+.listitem{position:relative;display:grid;grid-template-columns:95px minmax(0,1fr);gap:12px;padding:14px 16px;border-top:1px solid var(--line);border-left:4px solid var(--accent)}
+.listitem .listnow{left:-4px}
+.listnow.between{position:relative;height:2px}
+.listitem.now .title::after{content:"Nu bezig";display:inline-block;margin-left:8px;padding:2px 7px;border-radius:100px;background:#fde8e8;color:#c9303a;font-size:11px;font-weight:800;vertical-align:2px;white-space:nowrap}
 .listitem .when{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
 .listitem .title{font-weight:800}
 .listitem .detail{margin-top:3px;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
@@ -170,6 +174,7 @@ button.event:hover{transform:translateY(-1px);box-shadow:0 8px 20px #14213d22}
 .static .staticonly{display:block}
 .static .listday.today{border-color:var(--line);box-shadow:none}
 .static .listday.today .listhead{background:#f9faff}
+.static .nowline,.static .listnow,.static .listitem.now .title::after{display:none!important}
 .note.staticonly{margin:0 0 14px}
 
 /* Lijstweergave: altijd op smallere schermen, of gekozen via het tandwiel */
@@ -212,7 +217,8 @@ body.forceList .list{display:block}
  body{background:#fff}
  .shell{padding:0;max-width:none}
  .top{margin-bottom:15px}
- .toolbar,.legend,.hint,.note,.pill,.attend,.state,dialog,#single{display:none!important}
+ .toolbar,.legend,.hint,.note,.pill,.attend,.state,dialog,#single,.nowline,.listnow{display:none!important}
+ .listitem.now .title::after{display:none}
  #allweeks{display:block!important}
  .allweeks .weeksection{break-inside:avoid;page-break-inside:avoid}
  h1{font-size:26px}
@@ -340,7 +346,7 @@ const todayIdx=(()=>{let now=new Date(),i=weeks.findIndex(w=>now<localDate(w.sta
 let idx=todayIdx,mode='one';
 
 function legendHtml(){return Object.entries(subjects).map(([key,s])=>`<span class="chip" style="--accent:${colorFor(key)}"><i></i>${s.name} <small>${s.group}</small></span>`).join('')}
-function listItemHtml(w,e){let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id);return `<div class="listitem${skipped?' skipped':''}" style="${styleFor(e,id)}"><div class="when">${e.start}<br>– ${e.end}</div><div><div class="title">${s.name}</div><div class="detail">${s.group} · ${roomHtml(e)}</div>${PARENT?'':`<label class="attend"><input type="checkbox" data-lesson="${id}" ${skipped?'':'checked'}> Ik volg deze les</label>`}</div></div>`}
+function listItemHtml(w,e){let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id);return `<div class="listitem${skipped?' skipped':''}" style="${styleFor(e,id)}" data-start="${mins(e.start)}" data-end="${mins(e.end)}"><div class="when">${e.start}<br>– ${e.end}</div><div><div class="title">${s.name}</div><div class="detail">${s.group} · ${roomHtml(e)}</div>${PARENT?'':`<label class="attend"><input type="checkbox" data-lesson="${id}" ${skipped?'':'checked'}> Ik volg deze les</label>`}</div></div>`}
 function listHtml(w){return days.map((d,i)=>{let date=localDate(w.start,i);if(date>localDate(w.end))return '';let events=w.events.filter(e=>e.day===i),today=isToday(date);return `<section class="listday${today?' today':''}"${today?' data-today':''}><div class="listhead"><span>${d}${today?'<em class="badge">Vandaag</em>':''}</span><small>${shortDate(date)}</small></div>${events.length?events.map(e=>listItemHtml(w,e)).join(''):'<div class="listempty">Geen les van jouw vakken</div>'}</section>`}).join('')}
 function eventHtml(w,e,i,date){
  let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id),top=(mins(e.start)-DAY_START)*S+2,height=(mins(e.end)-mins(e.start))*S-4;
@@ -357,12 +363,28 @@ function boardHtml(w){
  }
  return html;
 }
+// Op een gsm/tablet of in de app op het beginscherm is "Zet op je gsm" overbodig
+const ON_PHONE=matchMedia('(hover:none) and (pointer:coarse)').matches||matchMedia('(display-mode:standalone)').matches||navigator.standalone===true;
 function menuHtml(){
  let item=(action,ico,text)=>`<button type="button" role="menuitem" data-action="${action}"><span class="ico" aria-hidden="true">${ico}</span>${text}</button>`;
- return `<div class="menuhead">Weergave</div><button type="button" role="menuitemcheckbox" class="listoption" data-action="list" aria-checked="false"><span class="ico" aria-hidden="true">☰</span>Toon als lijst<span class="switchmark" aria-hidden="true"></span></button>${item('today','📅','Ga naar vandaag')}${PARENT?'':`<hr><div class="menuhead">Aanpassen</div>${item('colors','🎨','Kleuren aanpassen')}${item('reset','↺','Alle lessen weer volgen')}${WEB?'':item('download','⬇','Download met mijn keuzes')}`}<hr>${item('home','📱',WEB?'Zet op je gsm':'Zet op je beginscherm')}${item('print','🖨','Print / bewaar als PDF')}<div class="tip">Tip: wissel van week met ← → op je toetsenbord of swipe op je gsm. Toets T springt naar vandaag.</div>`;
+ return `<div class="menuhead">Weergave</div><button type="button" role="menuitemcheckbox" class="listoption" data-action="list" aria-checked="false"><span class="ico" aria-hidden="true">☰</span>Toon als lijst<span class="switchmark" aria-hidden="true"></span></button>${item('today','📅','Ga naar vandaag')}${PARENT?'':`<hr><div class="menuhead">Aanpassen</div>${item('colors','🎨','Kleuren aanpassen')}${item('reset','↺','Alle lessen weer volgen')}${WEB?'':item('download','⬇','Download met mijn keuzes')}`}<hr>${ON_PHONE?'':item('home','📱',WEB?'Zet op je gsm':'Zet op je beginscherm')}${item('print','🖨','Print / bewaar als PDF')}<div class="tip">${ON_PHONE?'Tip: swipe naar links of rechts om van week te wisselen.':'Tip: wissel van week met ← → op je toetsenbord. Toets T springt naar vandaag.'}</div>`;
 }
 
-function updateNow(){let now=new Date(),m=now.getHours()*60+now.getMinutes();document.querySelectorAll('.nowline').forEach(line=>{line.hidden=m<DAY_START||m>DAY_END;line.style.top=(m-DAY_START)*S+'px'})}
+// Rode lijn op het huidige tijdstip: in de weekweergave én in de lijst (gsm) van vandaag
+function updateNow(){
+ let now=new Date(),m=now.getHours()*60+now.getMinutes(),time=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
+ document.querySelectorAll('.nowline').forEach(line=>{line.hidden=m<DAY_START||m>DAY_END;line.style.top=(m-DAY_START)*S+'px';line.dataset.time=time});
+ document.querySelectorAll('.listnow').forEach(line=>line.remove());
+ document.querySelectorAll('.listitem.now').forEach(item=>item.classList.remove('now'));
+ document.querySelectorAll('.listday[data-today]').forEach(day=>{
+  let items=[...day.querySelectorAll('.listitem[data-start]')];
+  if(!items.length||m<DAY_START-90||m>=+items[items.length-1].dataset.end)return; // niet voor 07:00 of na de laatste les
+  let line=document.createElement('div'),current=items.find(item=>m>=+item.dataset.start&&m<+item.dataset.end);
+  line.className='listnow';line.dataset.time=time;
+  if(current){current.classList.add('now');line.style.top=(m-current.dataset.start)/(current.dataset.end-current.dataset.start)*100+'%';current.append(line)}
+  else{line.classList.add('between');items.find(item=>+item.dataset.start>m).before(line)}
+ });
+}
 function render(){
  let w=weeks[idx];
  $('weekname').value=String(idx);
@@ -474,7 +496,7 @@ if(!PARENT){
 
 if(WEB){importFromLink();addEventListener('hashchange',()=>{importFromLink();render()})}
 render();
-setInterval(updateNow,60000);
+setTimeout(()=>{updateNow();setInterval(updateNow,60000)},60000-Date.now()%60000); // precies op de minuut
 let resizeTimer;
 addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(fitScale())render()},150)});
 // Op gsm/tablet meteen naar de dag van vandaag scrollen (niet nodig op maandag)
