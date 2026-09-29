@@ -111,6 +111,8 @@ h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-
 .inforow a{color:var(--blue);font-weight:700}
 .dialogactions .secondary{margin-right:auto}
 .subj{padding:14px 0;border-top:1px solid var(--line)}
+.subj.single{padding-top:6px;border-top:0}
+.subj.single h3{display:none}
 .subj h3{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:17px}
 .subj h3 i{width:12px;height:12px;border-radius:50%;background:var(--accent)}
 .subj h3 small{color:var(--muted);font-size:12px;font-weight:600}
@@ -341,7 +343,7 @@ body.forceList .list{display:block}
 <p data-tymo-only>Dit wijzigt ook hetzelfde lesblok in alle volgende weken. Eerdere weken blijven zoals ze waren.</p>
 <div id="lessonTasks" class="tasks" data-tymo-only></div>
 <div class="dialogactions"><button type="button" class="secondary" id="lessonSubject">📚 Alles over dit vak</button><button class="primary">Klaar</button></div></form></dialog>
-<dialog id="subjectsDialog" class="editor wide"><form method="dialog"><div class="dialogtop"><h2>Vakken</h2><button aria-label="Sluiten">✕</button></div><div id="subjectList"></div><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
+<dialog id="subjectsDialog" class="editor wide"><form method="dialog"><div class="dialogtop"><h2 id="subjectsTitle">Vakken</h2><button aria-label="Sluiten">✕</button></div><div id="subjectList"></div><div class="dialogactions"><button type="button" class="secondary" id="allSubjects">📚 Alle vakken</button><button class="primary">Klaar</button></div></form></dialog>
 <dialog id="tasksDialog" class="editor wide" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Taken</h2><button aria-label="Sluiten">✕</button></div><p>Een taak hangt aan een les ("tegen die les"). Tik op een les om er een toe te voegen. Taken worden op dit toestel bewaard.</p><div id="taskList"></div><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
 <dialog id="friendsDialog" class="editor wide" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Samen vrij</h2><button aria-label="Sluiten">✕</button></div><p>Voeg het TimeEdit-rooster van een vriend toe. In je rooster zie je dan wanneer jullie allebei vrij zijn. De link blijft alleen op dit toestel.</p><div id="friendList"></div><div class="friendform"><input id="friendName" placeholder="Naam, bv. Jan" autocomplete="off"><input id="friendUrl" type="url" placeholder="TimeEdit-link van je vriend (eindigt op .ics)" autocomplete="off"><button type="button" class="primary" id="friendAdd">Toevoegen</button></div><p>Je vriend vindt de link in TimeEdit via <b>Abonneren</b>.</p><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
 <!--@web-->
@@ -781,17 +783,21 @@ function openLesson(id){
 
 // Vakkenpagina
 function daysUntil(date,now){let n=Math.round((startOfDay(date)-startOfDay(now))/864e5);return n===0?'vandaag':n===1?'morgen':`over ${n} dagen`}
+let subjectFocus=null; // één vak ("Alles over dit vak") of null voor alle vakken
 function renderSubjects(){
  let now=new Date(),w=weeks[idx],cell=(label,value)=>`<div><b>${label}</b>${value}</div>`;
- $('subjectList').innerHTML=Object.entries(subjects).map(([key,s])=>{
+ $('subjectsTitle').textContent=subjectFocus?subjects[subjectFocus].name+(subjects[subjectFocus].group?` · ${subjects[subjectFocus].group}`:''):'Vakken';
+ $('allSubjects').hidden=!subjectFocus;
+ $('subjectList').innerHTML=Object.entries(subjects).filter(([key])=>!subjectFocus||key===subjectFocus).map(([key,s])=>{
   let lessons=allLessons.filter(l=>l.e.key===key);if(!lessons.length)return '';
-  let followed=lessons.filter(l=>!isSkipped(lessonId(l.w,l.e))),next=followed.find(l=>l.end>now),upcoming=lessons.filter(l=>l.end>now),pool=upcoming.length?upcoming:lessons;
+  let followed=lessons.filter(l=>!isSkipped(lessonId(l.w,l.e))),upcoming=lessons.filter(l=>l.end>now),next=upcoming.find(l=>!isSkipped(lessonId(l.w,l.e)))||upcoming[0],pool=upcoming.length?upcoming:lessons;
   let teachers=[...new Set(pool.map(l=>l.e.teacher).filter(Boolean))],rooms=[...new Set(pool.map(l=>roomText(l.e)))];
-  let thisWeek=w.events.filter(e=>e.key===key&&!isSkipped(lessonId(w,e))),minutes=thisWeek.reduce((n,e)=>n+mins(e.end)-mins(e.start),0);
+  let weekLessons=w.events.filter(e=>e.key===key),thisWeek=weekLessons.filter(e=>!isSkipped(lessonId(w,e))),minutes=thisWeek.reduce((n,e)=>n+mins(e.end)-mins(e.start),0);
   let exam=followed.find(l=>l.e.exam&&l.end>now),openTasks=lessons.reduce((n,l)=>n+tasksFor(lessonId(l.w,l.e)).filter(t=>!t.done).length,0);
-  return `<section class="subj" id="subj-${key}" style="--accent:${colorFor(key)}"><h3><i></i>${s.name}${s.group?` <small>${s.group}</small>`:''}</h3><div class="subjgrid">`+
-   cell(next&&next.start<=now?'Nu bezig':'Volgende les',next?`${dayText(next.start,now)} ${next.e.start} · ${escapeHtml(roomText(next.e))}`:followed.length?'geen meer gepland':'je volgt dit vak niet')+
-   cell(`Week ${w.num}`,minutes?`${durationText(minutes*60000)} les (${thisWeek.length}×)`:'geen les')+
+  let nextSkipped=next&&isSkipped(lessonId(next.w,next.e));
+  return `<section class="subj${subjectFocus?' single':''}" id="subj-${key}" style="--accent:${colorFor(key)}"><h3><i></i>${s.name}${s.group?` <small>${s.group}</small>`:''}</h3><div class="subjgrid">`+
+   cell(next&&next.start<=now?'Nu bezig':'Volgende les',next?`${dayText(next.start,now)} ${next.e.start} · ${escapeHtml(roomText(next.e))}${nextSkipped?' · <i>je volgt deze les niet</i>':''}`:'geen meer gepland in dit rooster')+
+   cell(`Week ${w.num}`,minutes?`${durationText(minutes*60000)} les (${thisWeek.length}×)`:weekLessons.length?`${weekLessons.length}× les, maar je volgt ze niet`:'geen les')+
    (teachers.length?cell(teachers.length>1?'Docenten':'Docent',escapeHtml(teachers.join(', '))):'')+
    cell(rooms.length>1?'Lokalen':'Lokaal',rooms.map(escapeHtml).join('<br>'))+
    (exam?cell('Examen',`📝 ${dayText(exam.start,now)} ${exam.e.start} · ${daysUntil(exam.start,now)}`):'')+
@@ -799,7 +805,8 @@ function renderSubjects(){
    `</div>${PARENT?'':`<div class="subjlinks">${linkChip(key)}<button type="button" class="linkbtn" data-link-edit="${key}">${linkFor(key)?'Link wijzigen':'+ Link toevoegen (bv. Teams)'}</button></div>`}</section>`;
  }).join('');
 }
-function openSubjects(key){renderSubjects();$('subjectsDialog').showModal();if(key)requestAnimationFrame(()=>$('subj-'+key)?.scrollIntoView({block:'start'}))}
+function openSubjects(key){subjectFocus=subjects[key]?key:null;renderSubjects();$('subjectsDialog').showModal();$('subjectsDialog').scrollTop=0}
+$('allSubjects').onclick=()=>{subjectFocus=null;renderSubjects();$('subjectsDialog').scrollTop=0};
 function editLink(key){
  let url=prompt(`Link voor ${subjects[key].name}, bv. een Teams- of Blackboard-link. Laat leeg om te verwijderen.`,settings.links[key]||'');
  if(url===null)return;url=url.trim();
