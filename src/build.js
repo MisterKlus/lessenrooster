@@ -17,24 +17,26 @@ const dropBlock=(s,name)=>s.replace(new RegExp(`<!--@${name}-->[\\s\\S]*?<!--@/$
 const fileUrl=p=>'file:///'+p.replace(/\\/g,'/');
 function chromeRun(args){return execFileSync(chrome,['--headless=new','--disable-gpu','--hide-scrollbars',...args],{encoding:'utf8',maxBuffer:1e8})}
 
-// Iconen
-const iconSvg=fs.readFileSync(path.join(src,'icon.svg'),'utf8');
-const maskableSvg=replaceOnce(iconSvg,'<g id="art">','<g id="art" transform="translate(256 256) scale(.78) translate(-256 -256)">');
-fs.writeFileSync(out('icons','icon.svg'),iconSvg);
-function renderPng(svg,file){
+// Iconen uit src/icon-source.webp: op een witte achtergrond voor het beginscherm
+// (iPhone maakt transparante delen zwart), transparant voor het browsertabblad
+function renderPng(file,{scale=1,background='#fff'}={}){
  const tmp=path.join(src,'tmp-icon.html');
- fs.writeFileSync(tmp,`<!doctype html><style>html,body{margin:0;overflow:hidden}svg{display:block;width:100vw;height:100vh}</style>${svg}`);
- chromeRun(['--force-device-scale-factor=1','--window-size=512,512','--screenshot='+file,fileUrl(tmp)]);
+ fs.writeFileSync(tmp,`<!doctype html><style>html,body{margin:0;height:100%;overflow:hidden;background:${background}}body{display:grid;place-items:center}img{display:block;width:${scale*100}vmin;height:${scale*100}vmin}</style><img src="${fileUrl(path.join(src,'icon-source.webp'))}">`);
+ chromeRun(['--force-device-scale-factor=1','--window-size=512,512','--default-background-color=00000000','--screenshot='+file,fileUrl(tmp)]);
  fs.unlinkSync(tmp);
 }
 function resizePng(from,to,size){
  const ps=`Add-Type -AssemblyName System.Drawing;$s=[System.Drawing.Image]::FromFile('${from}');$b=New-Object System.Drawing.Bitmap ${size},${size};$g=[System.Drawing.Graphics]::FromImage($b);$g.InterpolationMode='HighQualityBicubic';$g.PixelOffsetMode='HighQuality';$g.DrawImage($s,0,0,${size},${size});$b.Save('${to}',[System.Drawing.Imaging.ImageFormat]::Png);$g.Dispose();$b.Dispose();$s.Dispose()`;
  execFileSync('powershell.exe',['-NoProfile','-Command',ps]);
 }
-renderPng(iconSvg,out('icons','icon-512.png'));
-renderPng(maskableSvg,out('icons','icon-maskable-512.png'));
+renderPng(out('icons','icon-512.png'));
+renderPng(out('icons','icon-maskable-512.png'),{scale:.8}); // Android knipt de randen af: iets kleiner
 resizePng(out('icons','icon-512.png'),out('icons','icon-192.png'),192);
 resizePng(out('icons','icon-512.png'),out('icons','apple-touch-icon.png'),180);
+const transparent=path.join(src,'tmp-transparent.png');
+renderPng(transparent,{background:'transparent'});
+resizePng(transparent,out('icons','favicon-48.png'),48);
+fs.unlinkSync(transparent);
 
 // Manifests (zonder start_url voor Tymo: zo blijft de link met je keuzes bewaard als je de app toevoegt)
 const icons=[{src:'icons/icon-192.png',sizes:'192x192',type:'image/png'},{src:'icons/icon-512.png',sizes:'512x512',type:'image/png'},{src:'icons/icon-maskable-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'}];
@@ -43,7 +45,7 @@ fs.writeFileSync(out('manifest.webmanifest'),JSON.stringify({name:'Mijn lessenro
 fs.writeFileSync(out('ouders.webmanifest'),JSON.stringify({name:'Lessenrooster van Tymo',short_name:'Rooster Tymo',description:'Lessenrooster van Tymo, PXL Graduaat Programmeren',start_url:'ouders.html',...manifestBase},null,1));
 
 // Service worker: eerst het netwerk (roosterwijzigingen komen meteen door), zonder internet de bewaarde versie
-const cached=['./','index.html','ouders.html','manifest.webmanifest','ouders.webmanifest','icons/icon.svg','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png','icons/apple-touch-icon.png'];
+const cached=['./','index.html','ouders.html','manifest.webmanifest','ouders.webmanifest','icons/favicon-48.png','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png','icons/apple-touch-icon.png'];
 fs.writeFileSync(out('sw.js'),`const CACHE='lessenrooster-${Date.now().toString(36)}';
 const FILES=${JSON.stringify(cached)};
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()))});
@@ -61,7 +63,7 @@ self.addEventListener('fetch',event=>{
 
 // Pagina's
 let base=fs.readFileSync(path.join(src,'rooster.src.html'),'utf8');
-const svgUri=encodeURIComponent(iconSvg.replace(/\s*\n\s*/g,'').replace(/"/g,"'"));
+const faviconBase64=fs.readFileSync(out('icons','favicon-48.png')).toString('base64');
 const pngBase64=fs.readFileSync(out('icons','apple-touch-icon.png')).toString('base64');
 
 function variant({web,parent}){
@@ -70,7 +72,7 @@ function variant({web,parent}){
  s=dropBlock(s,web?'file':'web').replace(/<!--@\/?(web|file)-->\n?/g,'');
  s=dropLines(s,parent?'data-tymo-only':'data-parent-only');
  if(web)s=replaceOnce(s,'const WEB=false;','const WEB=true;');
- else s=replaceOnce(replaceOnce(s,'__ICON_SVG__',svgUri),'__ICON_PNG__',pngBase64);
+ else s=replaceOnce(replaceOnce(s,'__FAVICON_PNG__',faviconBase64),'__ICON_PNG__',pngBase64);
  s=s.split('__MANIFEST__').join(parent?'ouders.webmanifest':'manifest.webmanifest');
  s=replaceOnce(s,'__APP_TITLE__',parent?'Rooster Tymo':'Lessenrooster');
  if(parent){
