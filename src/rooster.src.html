@@ -241,7 +241,7 @@ body.forceList .list{display:block}
 </head>
 <body>
 <main class="shell">
-<header class="top"><div><div class="eyebrow">PXL · Graduaat Programmeren</div><h1>Mijn lessenrooster</h1><p class="subtitle">21 september – 26 oktober 2026 · alleen jouw klasgroepen</p></div><div class="pill">Offline beschikbaar</div></header>
+<header class="top"><div><div class="eyebrow">PXL · Graduaat Programmeren</div><h1>Mijn lessenrooster</h1><p class="subtitle">__PERIOD__ · alleen jouw klasgroepen</p></div><div class="pill">Offline beschikbaar</div></header>
 <p class="note staticonly">Je ziet een vaste weergave van alle weken. Grijs en doorgestreept = een les die je niet volgt. Om van week te wisselen of lessen aan te passen, open je het bestand in een browser.</p>
 <nav class="toolbar" aria-label="Roosternavigatie">
 <div class="nav"><button class="iconbtn" id="prev" aria-label="Vorige week" title="Vorige week (←)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><select class="weekname" id="weekname" aria-label="Kies week"></select><button class="iconbtn" id="next" aria-label="Volgende week" title="Volgende week (→)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button></div>
@@ -257,7 +257,7 @@ body.forceList .list{display:block}
 <div class="allweeks" id="allweeks" hidden></div>
 <p class="note" id="saveHint" data-tymo-only data-file-only>Je keuzes worden op dit apparaat bewaard. Gebruik ⚙ → “Download met mijn keuzes” om je huidige kleuren en leskeuzes mee te sturen naar je gsm, en ⚙ → “Zet op je beginscherm” om het rooster met een eigen icoontje op je gsm te zetten. Raadpleeg TimeEdit voor wijzigingen.</p>
 <p class="note" id="saveHint" data-tymo-only data-web-only>Je keuzes worden op dit toestel bewaard. Via ⚙ → “Zet op je gsm” scan je een QR-code, dan gaan je vinkjes en kleuren mee naar je gsm. Raadpleeg TimeEdit voor wijzigingen.</p>
-<p class="note" data-tymo-only><strong>Let op:</strong> Dit overzicht komt uit je TimeEdit-roosters van 21 en 28 september 2026. Lessen kunnen later wijzigen. C# Essentials monitoraat is weggelaten. C# Advanced 2PROA komt in deze periode niet voor. De laatste week bevat in de aangeleverde bron alleen maandag 26 oktober.</p>
+<p class="note" data-tymo-only><strong>Automatisch bijgewerkt:</strong> dit rooster wordt elke nacht opgehaald uit TimeEdit (laatste wijziging: __UPDATED__). Weggelaten: het C#-monitoraat en Project management van andere klasgroepen dan 2PROB. Kijk bij twijfel altijd in TimeEdit.</p>
 <dialog id="colorsDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Kleuren van vakken</h2><button aria-label="Sluiten">✕</button></div><p>Kies een kleur per vak. Alle lessen van dat vak veranderen mee.</p><div id="colorRows"></div><div class="dialogactions"><button type="button" id="resetColors">Standaardkleuren</button><button class="primary">Klaar</button></div></form></dialog>
 <dialog id="lessonDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2 id="lessonTitle"></h2><button aria-label="Sluiten">✕</button></div><p id="lessonMeta"></p><label class="largeAttend"><input type="checkbox" id="lessonAttend"> Ik volg deze les</label><p>Dit wijzigt ook hetzelfde lesblok in alle volgende weken. Eerdere weken blijven zoals ze waren.</p><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
 <!--@web-->
@@ -314,10 +314,9 @@ function fitScale(){
 }
 fitScale();
 
-const subjects={web:{name:'Web Essentials',group:'1PROA',color:'#4377df'},cs:{name:'C# Essentials',group:'1PROA',color:'#8859c9'},it:{name:'IT Organisation',group:'1PROA',color:'#d68a27'},data:{name:'Data Expert',group:'2PROA',color:'#24977b'},pm:{name:'Project Management',group:'2PROB',color:'#d35f78'}};
-const E=(day,start,end,key,room,old)=>({day,start,end,key,room,old});
-const base=[E(0,'08:30','10:30','pm','DH.z1v01.04','DB107'),E(0,'10:45','12:45','web','DH.z1v02.11','DB211'),E(0,'13:45','15:45','data','DH.z1v01.07','DB102'),E(2,'08:30','10:30','cs','DH.z1v01.04','DB107'),E(2,'10:45','11:45','cs','DH.z1v01.04','DB107'),E(3,'14:45','15:45','it','DH.z2v02.20','DD204'),E(3,'16:00','18:00','it','DH.z2v01.41','DE102'),E(4,'08:30','10:30','web','DH.z1v01.21','DA104'),E(4,'10:45','12:45','cs','DH.z1v01.21','DA104'),E(4,'16:00','18:00','pm','Online','Online DIG')];
-const weeks=[{num:39,start:'2026-09-21',end:'2026-09-25',events:[...base.filter(e=>!(e.day===0&&e.key==='pm')&&!(e.day===0&&e.key==='data')),E(0,'13:45','15:45','data','DH.z1v01.07','DB102')]},{num:40,start:'2026-09-28',end:'2026-10-02',events:base},{num:41,start:'2026-10-05',end:'2026-10-09',events:base},{num:42,start:'2026-10-12',end:'2026-10-16',events:base},{num:43,start:'2026-10-19',end:'2026-10-23',events:base},{num:44,start:'2026-10-26',end:'2026-10-26',events:base.filter(e=>e.day===0)}];
+// Lessen en vakken: ingevuld door src/build.js uit src/rooster-data.json (bijgewerkt vanuit TimeEdit)
+const subjects=__SUBJECTS__;
+const weeks=__WEEKS__;
 const days=['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag'];
 const pad=n=>String(n).padStart(2,'0');
 function localDate(iso,delta=0){let [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d+delta)}
@@ -360,12 +359,12 @@ const todayIdx=(()=>{let now=new Date(),i=weeks.findIndex(w=>now<localDate(w.sta
 let idx=todayIdx,mode='one';
 
 function legendHtml(){return Object.entries(subjects).map(([key,s])=>`<span class="chip" style="--accent:${colorFor(key)}"><i></i>${s.name} <small>${s.group}</small></span>`).join('')}
-function listItemHtml(w,e){let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id);return `<div class="listitem${skipped?' skipped':''}" style="${styleFor(e,id)}" data-start="${mins(e.start)}" data-end="${mins(e.end)}"><div class="when">${e.start}<br>– ${e.end}</div><div><div class="title">${s.name}</div><div class="detail">${s.group} · ${roomHtml(e)}</div>${PARENT?'':`<label class="attend"><input type="checkbox" data-lesson="${id}" ${skipped?'':'checked'}> Ik volg deze les</label>`}</div></div>`}
+function listItemHtml(w,e){let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id);return `<div class="listitem${skipped?' skipped':''}" style="${styleFor(e,id)}" data-start="${mins(e.start)}" data-end="${mins(e.end)}"><div class="when">${e.start}<br>– ${e.end}</div><div><div class="title">${s.name}</div><div class="detail">${s.group?s.group+" · ":""}${roomHtml(e)}${e.teacher?" · "+e.teacher:""}</div>${PARENT?'':`<label class="attend"><input type="checkbox" data-lesson="${id}" ${skipped?'':'checked'}> Ik volg deze les</label>`}</div></div>`}
 function listHtml(w){return days.map((d,i)=>{let date=localDate(w.start,i);if(date>localDate(w.end))return '';let events=w.events.filter(e=>e.day===i),today=isToday(date);return `<section class="listday${today?' today':''}" data-day="${i}"${today?' data-today':''}><div class="listhead"><span>${d}${today?'<em class="badge">Vandaag</em>':''}</span><small>${shortDate(date)}</small></div>${events.length?events.map(e=>listItemHtml(w,e)).join(''):'<div class="listempty">Geen les van jouw vakken</div>'}</section>`}).join('')}
 function eventHtml(w,e,i,date){
  let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id),top=(mins(e.start)-DAY_START)*S+2,height=(mins(e.end)-mins(e.start))*S-4;
  let inner=`<span class="time">${e.start}–${e.end}</span><span class="name">${s.name}</span><span class="room">${e.room==='Online'?'Online':`${e.room} <span class="old">(${e.old})</span>`}</span><span class="group">${s.group}</span>${PARENT?'':`<span class="state">${skipped?'Volg ik niet':'Volg ik'} · bewerk</span>`}`;
- let attrs=`class="event${height<120?' short':''}${height<80?' tiny':''}${skipped?' skipped':''}" style="top:${top}px;height:${height}px;${styleFor(e,id)}" title="${s.name} · ${e.start}–${e.end} · ${e.room}${e.room==='Online'?'':` (${e.old})`}"`;
+ let attrs=`class="event${height<120?' short':''}${height<80?' tiny':''}${skipped?' skipped':''}" style="top:${top}px;height:${height}px;${styleFor(e,id)}" title="${s.name} · ${e.start}–${e.end} · ${e.room}${e.room==='Online'?'':` (${e.old})`}${e.teacher?" · "+e.teacher:""}"`;
  return PARENT?`<div ${attrs}>${inner}</div>`:`<button type="button" ${attrs} data-edit="${id}" aria-label="Bewerk ${s.name} op ${days[i]} ${shortDate(date)} om ${e.start}">${inner}</button>`;
 }
 function boardHtml(w){
@@ -522,7 +521,7 @@ $('single').addEventListener('touchend',event=>{if(touchX===null)return;let dx=e
 if(!PARENT){
  function findLesson(id){for(let w of weeks)for(let e of w.events)if(lessonId(w,e)===id)return {w,e};return null}
  function setAttendanceFromHere(id,attending){let found=findLesson(id);if(!found)return;let {w:startWeek,e:source}=found;for(let w of weeks){if(w.start<startWeek.start)continue;for(let e of w.events){if(e.key===source.key&&e.day===source.day&&e.start===source.start&&e.end===source.end)settings.skipped[lessonId(w,e)]=!attending}}save();render()}
- function openLesson(id){let found=findLesson(id);if(!found)return;let {w,e}=found,s=subjects[e.key],date=localDate(w.start,e.day);$('lessonTitle').textContent=s.name;$('lessonMeta').textContent=`${days[e.day]} ${shortDate(date)} · ${e.start}–${e.end} · ${s.group} · ${e.room}${e.room==='Online'?'':` (${e.old})`}`;let input=$('lessonAttend');input.dataset.lesson=id;input.checked=!settings.skipped[id];$('lessonDialog').showModal()}
+ function openLesson(id){let found=findLesson(id);if(!found)return;let {w,e}=found,s=subjects[e.key],date=localDate(w.start,e.day);$('lessonTitle').textContent=s.name;$('lessonMeta').textContent=`${days[e.day]} ${shortDate(date)} · ${e.start}–${e.end} · ${s.group} · ${e.room}${e.room==='Online'?'':` (${e.old})`}${e.teacher?" · "+e.teacher:""}`;let input=$('lessonAttend');input.dataset.lesson=id;input.checked=!settings.skipped[id];$('lessonDialog').showModal()}
  window.renderColors=function(){$('colorRows').innerHTML=Object.entries(subjects).map(([key,s])=>`<label class="colorRow"><span>${s.name}<small>${s.group}</small></span><input type="color" data-color="${key}" value="${colorFor(key)}" aria-label="Kleur voor ${s.name}"></label>`).join('')};
  $('resetColors').onclick=()=>{settings.colors={};save();renderColors();render()};
  document.addEventListener('change',event=>{let t=event.target;if(t.dataset.lesson)setAttendanceFromHere(t.dataset.lesson,t.checked);if(t.dataset.color){settings.colors[t.dataset.color]=t.value;save();render()}});

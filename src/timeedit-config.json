@@ -1,0 +1,15 @@
+{
+ "timezone": "Europe/Brussels",
+ "subjects": [
+  {"key": "web", "codes": ["41PRO1010"], "title": "Web Essentials", "name": "Web Essentials", "group": "1PROA", "color": "#4377df"},
+  {"key": "cs", "codes": ["41PRO1020"], "title": "C# Essentials", "name": "C# Essentials", "group": "1PROA", "color": "#8859c9"},
+  {"key": "it", "codes": ["41PRO1120"], "title": "IT-organisation", "name": "IT Organisation", "group": "1PROA", "color": "#d68a27"},
+  {"key": "data", "codes": [], "title": "Data Expert", "name": "Data Expert", "group": "2PROA", "color": "#24977b", "keepIfMissing": true},
+  {"key": "pm", "codes": ["42PRO1040"], "title": "Project management", "name": "Project Management", "group": "2PROB", "color": "#d35f78"}
+ ],
+ "exclude": [
+  {"reason": "C#-monitoraat", "descriptionContains": "monitoraat"},
+  {"reason": "Project management van een andere klasgroep (niet 2PROB)", "code": "42PRO1040", "teacher": "Das Ann"}
+ ],
+ "extraColors": ["#0e9aa7", "#b5651d", "#6a5acd", "#2e8b57", "#c2185b", "#5d7a1f"]
+}
