@@ -206,6 +206,7 @@ body.dayMode .dayview{display:block}
 .travelmodes{display:flex;gap:6px}
 .travelmodes button{flex:1;padding:8px 0;border:1px solid var(--line);border-radius:10px;background:var(--chip);font-size:20px}
 .travelmodes button[aria-pressed=true]{border-color:var(--blue);background:var(--blue-soft)}
+.editor .travelpreview{margin:0;color:var(--ink);font-weight:700}
 
 /* Legende + uitleg */
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
@@ -390,7 +391,7 @@ body.forceList .list{display:block}
 <p class="weekstats" id="weekStats"></p>
 <div class="allweeks" id="allweeks" hidden></div>
 <dialog id="monthDialog" class="editor wide"><form method="dialog"><div class="dialogtop"><h2>Maand</h2><button aria-label="Sluiten">✕</button></div><div id="monthView"></div><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
-<dialog id="travelDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Reistijd</h2><button aria-label="Sluiten">✕</button></div><p>Hoe lang doe je erover naar de campus? Bovenaan zie je dan wanneer je uiterlijk moet vertrekken voor je eerste les.</p><div class="travelform"><label><input type="number" id="travelMinutes" inputmode="numeric" min="0" max="240" step="5" placeholder="25"> minuten</label><div class="travelmodes" id="travelModes"></div></div><div class="dialogactions"><button type="button" class="secondary" id="travelOff">Uitzetten</button><button class="primary" id="travelSave">Bewaren</button></div></form></dialog>
+<dialog id="travelDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Reistijd</h2><button aria-label="Sluiten">✕</button></div><p>Bovenaan zie je wanneer je ten laatste moet vertrekken voor je eerste les op de campus: je reistijd plus wat extra marge, bv. om een plek op de parking te vinden.</p><div class="travelform"><label><input type="number" id="travelMinutes" inputmode="numeric" min="0" max="240" step="5" placeholder="25"> minuten reistijd</label><label><input type="number" id="travelMargin" inputmode="numeric" min="0" max="180" step="5" placeholder="50"> minuten extra marge (parking)</label><div class="travelmodes" id="travelModes"></div><p class="travelpreview" id="travelPreview"></p></div><div class="dialogactions"><button type="button" class="secondary" id="travelOff">Uitzetten</button><button class="primary" id="travelSave">Bewaren</button></div></form></dialog>
 <dialog id="infoDialog" class="editor"><form method="dialog"><div class="dialogtop"><h2>Over dit rooster</h2><button aria-label="Sluiten">✕</button></div>
 <p class="note" id="saveHint" data-tymo-only data-file-only>Je keuzes worden op dit apparaat bewaard. Gebruik ⚙ → “Download met mijn keuzes” om je huidige kleuren en leskeuzes mee te sturen naar je gsm, en ⚙ → “Zet op je beginscherm” om het rooster met een eigen icoontje op je gsm te zetten. Raadpleeg TimeEdit voor wijzigingen.</p>
 <p class="note" id="saveHint" data-tymo-only data-web-only>Je keuzes worden op dit toestel bewaard. Via ⚙ → “Zet op je gsm” scan je een QR-code, dan gaan je vinkjes en kleuren mee naar je gsm. Raadpleeg TimeEdit voor wijzigingen.</p>
@@ -819,22 +820,26 @@ function jumpToDate(iso){
 
 // Wanneer vertrekken (alleen Tymo): reistijd één keer instellen, vertrektijd voor je eerste les op de campus
 const travelModes=[['🚲','fiets'],['🚌','bus'],['🚆','trein'],['🚗','auto'],['🚶','te voet']];
+// Standaard 25 min reistijd + 50 min marge voor de parking: les om 08:30 = vertrek ten laatste om 07:15
+function travelSettings(){let t=settings.travel;return PARENT||t?.off?null:{minutes:25,margin:50,mode:'🚗',...(t||{})}}
+function updateTravelPreview(){let total=(parseInt($('travelMinutes').value,10)||0)+(parseInt($('travelMargin').value,10)||0);$('travelPreview').textContent=total?`Les om 08:30 → vertrek ten laatste om ${hm(510-total)}`:''}
 function openTravel(){
- let t=settings.travel||{};
- $('travelMinutes').value=t.minutes||'';
- $('travelModes').innerHTML=travelModes.map(([ico,name])=>`<button type="button" data-travel-mode="${ico}" aria-pressed="${(t.mode||'🚲')===ico}" title="${name}" aria-label="${name}">${ico}</button>`).join('');
+ let t=travelSettings()||{minutes:25,margin:50,mode:'🚗'};
+ $('travelMinutes').value=t.minutes;$('travelMargin').value=t.margin;
+ $('travelModes').innerHTML=travelModes.map(([ico,name])=>`<button type="button" data-travel-mode="${ico}" aria-pressed="${t.mode===ico}" title="${name}" aria-label="${name}">${ico}</button>`).join('');
+ updateTravelPreview();
  $('travelDialog').showModal();
 }
 function travelLine(now){ // vandaag, of morgen vanaf 17:00
- let t=PARENT?null:settings.travel;if(!t||!t.minutes)return '';
+ let t=travelSettings();if(!t||!(t.minutes+t.margin))return '';
  for(let offset of [0,1]){
   if(offset===1&&now.getHours()<17)break;
   let date=startOfDay(now);date.setDate(date.getDate()+offset);
   let first=(lessonsByDate[isoDate(date)]||[]).filter(l=>!isSkipped(lessonId(l.w,l.e))&&l.e.room!=='Online').sort((a,b)=>a.start-b.start)[0];
   if(!first||first.start<=now)continue;
-  let leave=new Date(first.start-t.minutes*60000),left=leave-now,at=hm(leave.getHours()*60+leave.getMinutes());
-  if(offset)return `${t.mode} Morgen vertrek je uiterlijk om ${at}`;
-  return left<=0?`${t.mode} Tijd om te vertrekken!`:`${t.mode} Vertrek uiterlijk om ${at}${left<3*36e5?` · over ${durationText(left)}`:''}`;
+  let leave=new Date(first.start-(t.minutes+t.margin)*60000),left=leave-now,at=hm(leave.getHours()*60+leave.getMinutes());
+  if(offset)return `${t.mode} Morgen vertrek je ten laatste om ${at}`;
+  return left<=0?`${t.mode} Tijd om te vertrekken!`:`${t.mode} Vertrek ten laatste om ${at}${left<3*36e5?` · over ${durationText(left)}`:''}`;
  }
  return '';
 }
@@ -1139,8 +1144,9 @@ if(!PARENT){
 if(WEB){importFromLink();addEventListener('hashchange',()=>{importFromLink();render()})}
 render();
 if(!PARENT){
- $('travelSave').onclick=()=>{let minutes=parseInt($('travelMinutes').value,10),travelMode=document.querySelector('[data-travel-mode][aria-pressed=true]')?.dataset.travelMode||'🚲';settings.travel=minutes>0?{minutes:Math.min(minutes,240),mode:travelMode}:null;save();render()};
- $('travelOff').onclick=()=>{settings.travel=null;save();$('travelDialog').close();render()};
+ $('travelSave').onclick=()=>{let minutes=parseInt($('travelMinutes').value,10),travelMode=document.querySelector('[data-travel-mode][aria-pressed=true]')?.dataset.travelMode||'🚲';let margin=parseInt($('travelMargin').value,10)||0;settings.travel={minutes:Math.max(0,Math.min(minutes||0,240)),margin:Math.max(0,Math.min(margin,180)),mode:travelMode};save();render()};
+ $('travelMinutes').oninput=updateTravelPreview;$('travelMargin').oninput=updateTravelPreview;
+ $('travelOff').onclick=()=>{settings.travel={off:true};save();$('travelDialog').close();render()};
 }
 if(!PARENT&&settings.friends.length)refreshFriends();
 loadWeather();addEventListener('focus',loadWeather); // weer hoogstens één keer per uur opnieuw ophalen // roosters van vrienden hoogstens om de 6 uur opnieuw ophalen
