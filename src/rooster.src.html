@@ -65,6 +65,19 @@ h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-
 .menu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
 .menu .tip{padding:6px 12px 8px;font-size:12px;color:var(--muted)}
 
+/* Kaartje "Nu en straks" */
+.nextcard{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin:0 0 14px}
+.nextrow{position:relative;display:grid;gap:2px;overflow:hidden;padding:12px 14px 13px 16px;background:#fff;border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:14px;box-shadow:var(--shadow);color:var(--ink);text-align:left}
+.nextrow:hover{background:#fafbff}
+.nextlabel{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+.nextrow.now .nextlabel::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:#e5484d;vertical-align:1px}
+.nextmain{font-size:16px;line-height:1.3}
+.nextmain b{font-weight:800}
+.nextsub{font-size:13px;color:var(--muted)}
+.progress{position:absolute;left:0;right:0;bottom:0;height:4px;background:#eef1f7}
+.progress i{display:block;height:100%;background:var(--accent)}
+.nextnone{margin:0;padding:12px 16px;background:#fff;border:1px solid var(--line);border-radius:14px;color:var(--muted)}
+
 /* Legende + uitleg */
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
 .chip{display:inline-flex;align-items:center;gap:7px;padding:5px 11px 5px 9px;background:#fff;border:1px solid var(--line);border-radius:100px;font-size:13px;font-weight:700}
@@ -174,7 +187,7 @@ button.event:hover{transform:translateY(-1px);box-shadow:0 8px 20px #14213d22}
 .static .staticonly{display:block}
 .static .listday.today{border-color:var(--line);box-shadow:none}
 .static .listday.today .listhead{background:#f9faff}
-.static .nowline,.static .listnow,.static .listitem.now .title::after{display:none!important}
+.static .nowline,.static .listnow,.static .listitem.now .title::after,.static .nextcard{display:none!important}
 .note.staticonly{margin:0 0 14px}
 
 /* Lijstweergave: altijd op smallere schermen, of gekozen via het tandwiel */
@@ -217,7 +230,7 @@ body.forceList .list{display:block}
  body{background:#fff}
  .shell{padding:0;max-width:none}
  .top{margin-bottom:15px}
- .toolbar,.legend,.hint,.note,.pill,.attend,.state,dialog,#single,.nowline,.listnow{display:none!important}
+ .toolbar,.legend,.hint,.note,.pill,.attend,.state,dialog,#single,.nowline,.listnow,.nextcard{display:none!important}
  .listitem.now .title::after{display:none}
  #allweeks{display:block!important}
  .allweeks .weeksection{break-inside:avoid;page-break-inside:avoid}
@@ -236,6 +249,7 @@ body.forceList .list{display:block}
 <div class="switch" role="group" aria-label="Weergave"><button id="one" type="button" aria-pressed="true">Week</button><button id="all" type="button" aria-pressed="false">Alle weken</button></div>
 <div class="gearWrap"><button class="iconbtn gear" id="gearBtn" type="button" aria-label="Instellingen" title="Instellingen" aria-haspopup="true" aria-expanded="false" aria-controls="gearMenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><div class="menu" id="gearMenu" role="menu" hidden></div></div>
 </nav>
+<section class="nextcard" id="nextCard" aria-label="Nu en straks" aria-live="polite" hidden></section>
 <div class="legend" id="legend" aria-label="Vakken"></div>
 <p class="hint">De nieuwe lokaalnaam staat vet, de code tussen haakjes is de oude lokaalnaam. Wissel van week met de pijlen, de pijltjestoetsen of door te swipen op je gsm.</p>
 <p class="hint" data-tymo-only>Klik op een les om ze aan of uit te zetten. Een vinkje wijzigen geldt ook voor hetzelfde lesblok in de volgende weken.</p>
@@ -347,7 +361,7 @@ let idx=todayIdx,mode='one';
 
 function legendHtml(){return Object.entries(subjects).map(([key,s])=>`<span class="chip" style="--accent:${colorFor(key)}"><i></i>${s.name} <small>${s.group}</small></span>`).join('')}
 function listItemHtml(w,e){let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id);return `<div class="listitem${skipped?' skipped':''}" style="${styleFor(e,id)}" data-start="${mins(e.start)}" data-end="${mins(e.end)}"><div class="when">${e.start}<br>– ${e.end}</div><div><div class="title">${s.name}</div><div class="detail">${s.group} · ${roomHtml(e)}</div>${PARENT?'':`<label class="attend"><input type="checkbox" data-lesson="${id}" ${skipped?'':'checked'}> Ik volg deze les</label>`}</div></div>`}
-function listHtml(w){return days.map((d,i)=>{let date=localDate(w.start,i);if(date>localDate(w.end))return '';let events=w.events.filter(e=>e.day===i),today=isToday(date);return `<section class="listday${today?' today':''}"${today?' data-today':''}><div class="listhead"><span>${d}${today?'<em class="badge">Vandaag</em>':''}</span><small>${shortDate(date)}</small></div>${events.length?events.map(e=>listItemHtml(w,e)).join(''):'<div class="listempty">Geen les van jouw vakken</div>'}</section>`}).join('')}
+function listHtml(w){return days.map((d,i)=>{let date=localDate(w.start,i);if(date>localDate(w.end))return '';let events=w.events.filter(e=>e.day===i),today=isToday(date);return `<section class="listday${today?' today':''}" data-day="${i}"${today?' data-today':''}><div class="listhead"><span>${d}${today?'<em class="badge">Vandaag</em>':''}</span><small>${shortDate(date)}</small></div>${events.length?events.map(e=>listItemHtml(w,e)).join(''):'<div class="listempty">Geen les van jouw vakken</div>'}</section>`}).join('')}
 function eventHtml(w,e,i,date){
  let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id),top=(mins(e.start)-DAY_START)*S+2,height=(mins(e.end)-mins(e.start))*S-4;
  let inner=`<span class="time">${e.start}–${e.end}</span><span class="name">${s.name}</span><span class="room">${e.room==='Online'?'Online':`${e.room} <span class="old">(${e.old})</span>`}</span><span class="group">${s.group}</span>${PARENT?'':`<span class="state">${skipped?'Volg ik niet':'Volg ik'} · bewerk</span>`}`;
@@ -370,9 +384,24 @@ function menuHtml(){
  return `<div class="menuhead">Weergave</div><button type="button" role="menuitemcheckbox" class="listoption" data-action="list" aria-checked="false"><span class="ico" aria-hidden="true">☰</span>Toon als lijst<span class="switchmark" aria-hidden="true"></span></button>${item('today','📅','Ga naar vandaag')}${PARENT?'':`<hr><div class="menuhead">Aanpassen</div>${item('colors','🎨','Kleuren aanpassen')}${item('reset','↺','Alle lessen weer volgen')}${WEB?'':item('download','⬇','Download met mijn keuzes')}`}<hr>${ON_PHONE?'':item('home','📱',WEB?'Zet op je gsm':'Zet op je beginscherm')}${item('print','🖨','Print / bewaar als PDF')}<div class="tip">${ON_PHONE?'Tip: swipe naar links of rechts om van week te wisselen.':'Tip: wissel van week met ← → op je toetsenbord. Toets T springt naar vandaag.'}</div>`;
 }
 
+// Kaartje bovenaan: de les van nu en de volgende les (lessen die je niet volgt tellen niet mee)
+const allLessons=weeks.flatMap((w,wi)=>w.events.map(e=>{let d=localDate(w.start,e.day),at=t=>new Date(d.getFullYear(),d.getMonth(),d.getDate(),0,mins(t));return {w,wi,e,start:at(e.start),end:at(e.end)}})).sort((a,b)=>a.start-b.start);
+function durationText(ms){let m=Math.max(1,Math.round(ms/60000));return m<60?`${m} min`:`${Math.floor(m/60)} u${m%60?` ${m%60} min`:''}`}
+function dayText(date,now){let diff=Math.round((new Date(date.getFullYear(),date.getMonth(),date.getDate())-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);return diff===0?'vandaag':diff===1?'morgen':`${days[(date.getDay()+6)%7].toLowerCase()} ${shortDate(date)}`}
+function roomText(e){return e.room==='Online'?'Online':`${e.room} (${e.old})`}
+function nextRow(label,lesson,main,sub,extra='',cls=''){return `<button type="button" class="nextrow${cls}" data-week="${lesson.wi}" data-day="${lesson.e.day}" style="--accent:${colorFor(lesson.e.key)}"><span class="nextlabel">${label}</span><span class="nextmain"><b>${subjects[lesson.e.key].name}</b> ${main}</span><span class="nextsub">${sub}</span>${extra}</button>`}
+function renderNext(now){
+ let lessons=allLessons.filter(l=>!isSkipped(lessonId(l.w,l.e))),current=lessons.find(l=>l.start<=now&&now<l.end),next=lessons.find(l=>l.start>now),html='';
+ if(current)html+=nextRow('Nu',current,`tot ${current.e.end}`,`${roomText(current.e)} · nog ${durationText(current.end-now)}`,`<span class="progress"><i style="width:${((now-current.start)/(current.end-current.start)*100).toFixed(1)}%"></i></span>`,' now');
+ if(next){let day=dayText(next.start,now);html+=nextRow(day==='vandaag'?'Straks':'Volgende les',next,`${day} ${next.e.start}`,`${roomText(next.e)}${day==='vandaag'?` · over ${durationText(next.start-now)}`:''}`)}
+ $('nextCard').innerHTML=html||'<p class="nextnone">Geen lessen meer gepland in dit rooster.</p>';
+ $('nextCard').hidden=false;
+}
+
 // Rode lijn op het huidige tijdstip: in de weekweergave én in de lijst (gsm) van vandaag
 function updateNow(){
  let now=new Date(),m=now.getHours()*60+now.getMinutes(),time=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
+ renderNext(now);
  document.querySelectorAll('.nowline').forEach(line=>{line.hidden=m<DAY_START||m>DAY_END;line.style.top=(m-DAY_START)*S+'px';line.dataset.time=time});
  document.querySelectorAll('.listnow').forEach(line=>line.remove());
  document.querySelectorAll('.listitem.now').forEach(item=>item.classList.remove('now'));
@@ -414,6 +443,12 @@ $('weekname').onchange=e=>goTo(Number(e.target.value));
 $('prev').onclick=()=>goTo(idx-1);
 $('next').onclick=()=>goTo(idx+1);
 $('todayBtn').onclick=goToday;
+$('nextCard').addEventListener('click',event=>{
+ let row=event.target.closest('.nextrow');if(!row)return;
+ mode='one';idx=+row.dataset.week;render();
+ let day=[...document.querySelectorAll(`#list .listday[data-day="${row.dataset.day}"]`)].find(visible);
+ (day||$('single')).scrollIntoView({block:'start'});
+});
 $('one').onclick=()=>{mode='one';render()};
 $('all').onclick=()=>{mode='all';render();$('week-'+idx).scrollIntoView({block:'start'})};
 $('gearMenu').innerHTML=menuHtml();
