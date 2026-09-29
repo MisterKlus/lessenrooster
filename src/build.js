@@ -87,6 +87,8 @@ function variant(base,schedule,{web,parent}){
  s=replaceOnce(s,'__APP_TITLE__',parent?'Rooster Tymo':'Lessenrooster');
  s=replaceOnce(s,'__SUBJECTS__',JSON.stringify(schedule.subjects));
  s=replaceOnce(s,'__WEEKS__',JSON.stringify(schedule.weeks));
+ s=replaceOnce(s,'__CHANGES__',JSON.stringify(schedule.changes));
+ s=replaceOnce(s,'__HOLIDAYS__',JSON.stringify(schedule.holidays));
  s=replaceOnce(s,'__PERIOD__',`${longDate(schedule.firstDate,schedule.firstDate.slice(0,4)!==schedule.lastDate.slice(0,4))} – ${longDate(schedule.lastDate,true)}`);
  s=fill(s,'__UPDATED__',updatedText(schedule.updated));
  if(parent){

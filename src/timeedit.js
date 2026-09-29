@@ -4,7 +4,8 @@
 // - Regels om lessen weg te laten en de vakken/kleuren staan in src/timeedit-config.json.
 const fs=require('fs'),path=require('path');
 const config=JSON.parse(fs.readFileSync(path.join(__dirname,'timeedit-config.json'),'utf8'));
-const dataFile=path.join(__dirname,'rooster-data.json');
+const dataFile=process.env.ROOSTER_DATA||path.join(__dirname,'rooster-data.json');
+const CHANGE_DAYS=7; // zo lang blijft het label "Gewijzigd" zichtbaar
 
 function unescapeText(s){return s.replace(/\\n/gi,'\n').replace(/\\([,;\\])/g,'$1')}
 function parseIcs(text){
@@ -62,11 +63,43 @@ async function syncFromTimeEdit(url){
  const missing=config.subjects.filter(s=>s.keepIfMissing&&!inFeed.has(s.key)).map(s=>s.name);
  const lessons=[...kept,...feed].sort((a,b)=>(a.date+a.start+a.key).localeCompare(b.date+b.start+b.key));
  const changed=JSON.stringify(lessons)!==JSON.stringify(stored.lessons);
- const result={updated:changed?new Date().toISOString():stored.updated,extraSubjects:Object.values(extra),lessons};
- if(changed||JSON.stringify(stored.extraSubjects||[])!==JSON.stringify(result.extraSubjects))fs.writeFileSync(dataFile,JSON.stringify(result,null,1));
+ const found=changed?detectChanges(stored.lessons,feed,windowStart):[];
+ const changes=[...(stored.changes||[]).filter(isStillRelevant),...found];
+ const result={updated:changed?new Date().toISOString():stored.updated,extraSubjects:Object.values(extra),changes,lessons};
+ if(changed||JSON.stringify(stored.extraSubjects||[])!==JSON.stringify(result.extraSubjects)||JSON.stringify(stored.changes||[])!==JSON.stringify(changes))fs.writeFileSync(dataFile,JSON.stringify(result,null,1));
  console.log(`TimeEdit: ${feed.length} lessen vanaf ${windowStart}, ${skipped.length} weggelaten, ${changed?'rooster gewijzigd':'geen wijzigingen'}`);
+ found.forEach(c=>console.log(`  ${c.kind}: ${c.date} ${c.start} ${c.key}${c.was?` (was ${c.was.start} ${c.was.room})`:''}`));
  skipped.forEach(s=>console.log('  weggelaten:',s));
  if(missing.length)console.log('  let op, ontbreekt in TimeEdit (bekende lessen behouden):',missing.join(', '));
+}
+
+// Wijzigingen tussen de vorige en de nieuwe versie: ander lokaal/uur, nieuwe les of les die vervalt.
+// Alleen vanaf vandaag en binnen de periode die beide versies kennen (zodat een langer TimeEdit-venster
+// geen stapel "nieuwe lessen" oplevert).
+function todayLocal(){return toLocal(new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z')).date}
+function isStillRelevant(change){return change.date>=todayLocal()&&Date.now()-new Date(change.detected)<CHANGE_DAYS*864e5}
+function detectChanges(before,after,windowStart){
+ const maxDate=list=>list.reduce((max,l)=>l.date>max?l.date:max,'');
+ const from=[windowStart,todayLocal()].sort()[1],to=[maxDate(before),maxDate(after)].sort()[0];
+ const afterKeys=new Set(after.map(l=>l.key));
+ const inRange=l=>l.date>=from&&l.date<=to&&afterKeys.has(l.key);
+ const groups={};
+ for(const l of before.filter(inRange))(groups[l.date+'|'+l.key]??={before:[],after:[]}).before.push(l);
+ for(const l of after.filter(inRange))(groups[l.date+'|'+l.key]??={before:[],after:[]}).after.push(l);
+ const detected=new Date().toISOString(),out=[];
+ const record=(kind,l,was)=>out.push({kind,date:l.date,key:l.key,start:l.start,end:l.end,room:l.room,old:l.old,was:was?{start:was.start,end:was.end,room:was.room,old:was.old}:null,detected});
+ for(const {before:olds,after:news} of Object.values(groups)){
+  const restOld=[...olds],restNew=[];
+  for(const n of news){ // zelfde uur: hoogstens een ander lokaal
+   const i=restOld.findIndex(o=>o.start===n.start&&o.end===n.end);
+   if(i<0){restNew.push(n);continue}
+   const o=restOld.splice(i,1)[0];
+   if(o.room!==n.room)record('changed',n,o);
+  }
+  restNew.forEach((n,i)=>{if(restOld[i])record('changed',n,restOld[i]);else record('new',n)}); // ander uur
+  restOld.slice(restNew.length).forEach(o=>record('cancelled',o));
+ }
+ return out;
 }
 
 // Vakken en weken voor de pagina's
@@ -82,7 +115,7 @@ function loadSchedule(){
  for(let t=first;t<=last;t+=7*dayMs){
   weeks.push({num:isoWeek(t),start:isoOf(t),end:isoOf(t+4*dayMs),events:lessons.filter(l=>mondayOf(l.date)===t).map(l=>({day:Math.round((toUtc(l.date)-t)/dayMs),start:l.start,end:l.end,key:l.key,room:l.room,old:l.old,teacher:l.teacher||''}))});
  }
- return {subjects,weeks,updated:data.updated,firstDate:lessons[0].date,lastDate:lessons.at(-1).date};
+ return {subjects,weeks,updated:data.updated,firstDate:lessons[0].date,lastDate:lessons.at(-1).date,changes:(data.changes||[]).filter(isStillRelevant),holidays:config.holidays||[]};
 }
 
 module.exports={syncFromTimeEdit,loadSchedule};

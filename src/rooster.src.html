@@ -16,10 +16,10 @@
 <script>document.documentElement.classList.remove('static');try{var thema=localStorage.getItem('lessenrooster-thema');if(thema==='light'||thema==='dark')document.documentElement.dataset.theme=thema}catch(e){}</script>
 <title>Mijn lessenrooster · PXL</title>
 <style>
-:root{color-scheme:light;--ink:#17223b;--muted:#65718a;--line:#e4e9f1;--bg:#f5f7fc;--card:#fff;--blue:#4169e1;--blue-ink:#3150ae;--blue-soft:#e8edff;--chip:#f2f5fb;--head:#f9faff;--grid:#e9edf4;--hover:#e7edfa;--today-bg:#edf1ff;--today-line:#9fb3ff;--today-ring:#e3e9ff;--skip-bg:#edf0f3;--skip-ink:#6e7888;--bar:rgba(255,255,255,.95);--shadow:0 14px 40px rgba(26,44,83,.08);--soft-mix:13%;--now-pill-bg:#fde8e8;--now-pill-ink:#c9303a;--menu-shadow:0 15px 40px #17223b2b;--faint:#8b96a9;--switch-off:#d5dbe6;--pill-line:#ced8ff;--hour:90px;--track:855px}
+:root{color-scheme:light;--ink:#17223b;--muted:#65718a;--line:#e4e9f1;--bg:#f5f7fc;--card:#fff;--blue:#4169e1;--blue-ink:#3150ae;--blue-soft:#e8edff;--chip:#f2f5fb;--head:#f9faff;--grid:#e9edf4;--hover:#e7edfa;--today-bg:#edf1ff;--today-line:#9fb3ff;--today-ring:#e3e9ff;--skip-bg:#edf0f3;--skip-ink:#6e7888;--bar:rgba(255,255,255,.95);--shadow:0 14px 40px rgba(26,44,83,.08);--soft-mix:13%;--now-pill-bg:#fde8e8;--now-pill-ink:#c9303a;--menu-shadow:0 15px 40px #17223b2b;--faint:#8b96a9;--switch-off:#d5dbe6;--pill-line:#ced8ff;--chg-bg:#fff1cc;--chg-ink:#7a4f00;--chg-line:#f0b84a;--hour:90px;--track:855px}
 /* Donkere modus: volgt je toestel, of gekozen via het tandwiel (data-theme) */
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--ink:#e6eaf4;--muted:#9aa6bf;--line:#2a344d;--bg:#0e1422;--card:#172033;--chip:#1f2940;--head:#1b2438;--grid:#232d44;--hover:#27324c;--blue:#6d8ff5;--blue-ink:#a9bcff;--blue-soft:#22315e;--today-bg:#1d2a4f;--today-line:#4d68c9;--today-ring:#1f2c55;--skip-bg:#1c2233;--skip-ink:#7c869b;--bar:rgba(23,32,51,.94);--shadow:0 14px 40px rgba(0,0,0,.35);--soft-mix:22%;--now-pill-bg:#4a1f25;--now-pill-ink:#ff9aa1;--menu-shadow:0 15px 40px #0008;--faint:#7c879c;--switch-off:#3a4560;--pill-line:#34457e}}
-:root[data-theme=dark]{color-scheme:dark;--ink:#e6eaf4;--muted:#9aa6bf;--line:#2a344d;--bg:#0e1422;--card:#172033;--chip:#1f2940;--head:#1b2438;--grid:#232d44;--hover:#27324c;--blue:#6d8ff5;--blue-ink:#a9bcff;--blue-soft:#22315e;--today-bg:#1d2a4f;--today-line:#4d68c9;--today-ring:#1f2c55;--skip-bg:#1c2233;--skip-ink:#7c869b;--bar:rgba(23,32,51,.94);--shadow:0 14px 40px rgba(0,0,0,.35);--soft-mix:22%;--now-pill-bg:#4a1f25;--now-pill-ink:#ff9aa1;--menu-shadow:0 15px 40px #0008;--faint:#7c879c;--switch-off:#3a4560;--pill-line:#34457e}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--ink:#e6eaf4;--muted:#9aa6bf;--line:#2a344d;--bg:#0e1422;--card:#172033;--chip:#1f2940;--head:#1b2438;--grid:#232d44;--hover:#27324c;--blue:#6d8ff5;--blue-ink:#a9bcff;--blue-soft:#22315e;--today-bg:#1d2a4f;--today-line:#4d68c9;--today-ring:#1f2c55;--skip-bg:#1c2233;--skip-ink:#7c869b;--bar:rgba(23,32,51,.94);--shadow:0 14px 40px rgba(0,0,0,.35);--soft-mix:22%;--now-pill-bg:#4a1f25;--now-pill-ink:#ff9aa1;--menu-shadow:0 15px 40px #0008;--faint:#7c879c;--switch-off:#3a4560;--pill-line:#34457e;--chg-bg:#3d2f10;--chg-ink:#ffcf70;--chg-line:#9a7324}}
+:root[data-theme=dark]{color-scheme:dark;--ink:#e6eaf4;--muted:#9aa6bf;--line:#2a344d;--bg:#0e1422;--card:#172033;--chip:#1f2940;--head:#1b2438;--grid:#232d44;--hover:#27324c;--blue:#6d8ff5;--blue-ink:#a9bcff;--blue-soft:#22315e;--today-bg:#1d2a4f;--today-line:#4d68c9;--today-ring:#1f2c55;--skip-bg:#1c2233;--skip-ink:#7c869b;--bar:rgba(23,32,51,.94);--shadow:0 14px 40px rgba(0,0,0,.35);--soft-mix:22%;--now-pill-bg:#4a1f25;--now-pill-ink:#ff9aa1;--menu-shadow:0 15px 40px #0008;--faint:#7c879c;--switch-off:#3a4560;--pill-line:#34457e;--chg-bg:#3d2f10;--chg-ink:#ffcf70;--chg-line:#9a7324}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -84,6 +84,21 @@ h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-
 .progress{position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--chip)}
 .progress i{display:block;height:100%;background:var(--accent)}
 .nextnone{margin:0;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--muted)}
+
+/* Roosterwijzigingen, pauzes, aftellen, weekendfeestje */
+.chg{display:inline-block;margin:3px 0 1px;padding:1px 7px;border-radius:6px;background:var(--chg-bg);color:var(--chg-ink);font-size:11px;font-weight:800;line-height:1.5;text-decoration:none}
+.listitem.changed{box-shadow:inset 0 0 0 2px var(--chg-line)}
+.event.changed{box-shadow:inset 0 0 0 2px var(--chg-line),0 3px 10px #14213d12}
+.event .chg{align-self:flex-start;margin:2px 0;padding:0 5px;font-size:10px}
+.listitem.cancelled,.event.cancelled{opacity:.6}
+.listitem.cancelled .title,.event.cancelled .name{text-decoration:line-through}
+.event.cancelled{background:transparent;border:1px dashed var(--line);border-left:4px dashed var(--accent);box-shadow:none}
+.pause{padding:6px 16px;border-top:1px solid var(--line);background:var(--head);color:var(--muted);font-size:12px;font-weight:700}
+.dayinfo{color:var(--muted);font-weight:600}
+.countdown{grid-column:1/-1;margin:0;padding:0 4px;color:var(--muted);font-size:13px;font-weight:600}
+.confetti{position:fixed;inset:0;z-index:70;overflow:hidden;pointer-events:none}
+.confetti i{position:absolute;top:-14px;width:7px;height:11px;border-radius:2px;opacity:.85;animation:confetti-fall var(--dur) cubic-bezier(.25,.6,.45,1) var(--delay) forwards}
+@keyframes confetti-fall{to{transform:translate(var(--dx),105vh) rotate(var(--rot));opacity:0}}
 
 /* Legende + uitleg */
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
@@ -194,7 +209,7 @@ button.event:hover{transform:translateY(-1px);box-shadow:0 8px 20px #14213d22}
 .static .staticonly{display:block}
 .static .listday.today{border-color:var(--line);box-shadow:none}
 .static .listday.today .listhead{background:var(--head)}
-.static .nowline,.static .listnow,.static .listitem.now .title::after,.static .nextcard{display:none!important}
+.static .nowline,.static .listnow,.static .listitem.now .title::after,.static .nextcard,.static .confetti,.static .toast{display:none!important}
 .note.staticonly{margin:0 0 14px}
 
 /* Lijstweergave: altijd op smallere schermen, of gekozen via het tandwiel */
@@ -325,6 +340,8 @@ fitScale();
 // Lessen en vakken: ingevuld door src/build.js uit src/rooster-data.json (bijgewerkt vanuit TimeEdit)
 const subjects=__SUBJECTS__;
 const weeks=__WEEKS__;
+const changes=__CHANGES__; // recente roosterwijzigingen uit TimeEdit (label "Gewijzigd")
+const holidays=__HOLIDAYS__; // vakanties uit de academische kalender
 const days=['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag'];
 const pad=n=>String(n).padStart(2,'0');
 function localDate(iso,delta=0){let [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d+delta)}
@@ -368,20 +385,52 @@ const todayIdx=(()=>{let now=new Date(),i=weeks.findIndex(w=>now<localDate(w.sta
 let idx=todayIdx,mode='one';
 
 function legendHtml(){return Object.entries(subjects).map(([key,s])=>`<span class="chip" style="--accent:${colorFor(key)}"><i></i>${s.name} <small>${s.group}</small></span>`).join('')}
-function listItemHtml(w,e){let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id);return `<div class="listitem${skipped?' skipped':''}" style="${styleFor(e,id)}" data-start="${mins(e.start)}" data-end="${mins(e.end)}"><div class="when">${e.start}<br>– ${e.end}</div><div><div class="title">${s.name}</div><div class="detail">${s.group?s.group+" · ":""}${roomHtml(e)}${e.teacher?" · "+e.teacher:""}</div>${PARENT?'':`<label class="attend"><input type="checkbox" data-lesson="${id}" ${skipped?'':'checked'}> Ik volg deze les</label>`}</div></div>`}
-function listHtml(w){return days.map((d,i)=>{let date=localDate(w.start,i);if(date>localDate(w.end))return '';let events=w.events.filter(e=>e.day===i),today=isToday(date);return `<section class="listday${today?' today':''}" data-day="${i}"${today?' data-today':''}><div class="listhead"><span>${d}${today?'<em class="badge">Vandaag</em>':''}</span><small>${shortDate(date)}</small></div>${events.length?events.map(e=>listItemHtml(w,e)).join(''):'<div class="listempty">Geen les van jouw vakken</div>'}</section>`}).join('')}
+// Roosterwijzigingen ("Gewijzigd", "Nieuwe les", "Vervalt"), vrije dagen en vakanties
+const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function changeFor(w,e){let date=isoDate(localDate(w.start,e.day));return changes.find(c=>c.kind!=='cancelled'&&c.date===date&&c.start===e.start&&c.key===e.key)}
+function cancelledOn(date){let iso=isoDate(date);return changes.filter(c=>c.kind==='cancelled'&&c.date===iso&&subjects[c.key])}
+function changeText(c,short){
+ if(c.kind==='new')return short?'Nieuw':'Nieuwe les';
+ if(c.kind==='cancelled')return 'Vervalt';
+ let parts=[];
+ if(c.was.start!==c.start||c.was.end!==c.end)parts.push(short?'nieuw uur':`was ${c.was.start}–${c.was.end}`);
+ if(c.was.room!==c.room)parts.push(short?'nieuw lokaal':`was ${c.was.room==='Online'?'online':c.was.room}`);
+ return short?parts.join(' + ').replace(/^./,x=>x.toUpperCase()):`Gewijzigd · ${parts.join(', ')}`;
+}
+function changeBadge(c,short){return c?`<span class="chg">${changeText(c,short)}</span>`:''}
+function holidayOn(date){let iso=isoDate(date);return holidays.find(h=>h.start<=iso&&iso<=h.end)}
+function dayEnd(w,i){return w.events.filter(e=>e.day===i&&!isSkipped(lessonId(w,e))).reduce((max,e)=>e.end>max?e.end:max,'')}
+function cancelledHtml(c){return `<div class="listitem cancelled" style="--accent:${colorFor(c.key)}"><div class="when">${c.start}<br>– ${c.end}</div><div><div class="title">${subjects[c.key].name}</div><span class="chg">Vervalt</span><div class="detail">${c.room==='Online'?'Online':c.room}</div></div></div>`}
+
+function listItemHtml(w,e){let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id),change=changeFor(w,e);return `<div class="listitem${skipped?' skipped':''}${change?' changed':''}" style="${styleFor(e,id)}" data-start="${mins(e.start)}" data-end="${mins(e.end)}"><div class="when">${e.start}<br>– ${e.end}</div><div><div class="title">${s.name}</div>${changeBadge(change)}<div class="detail">${s.group?s.group+" · ":""}${roomHtml(e)}${e.teacher?" · "+e.teacher:""}</div>${PARENT?'':`<label class="attend"><input type="checkbox" data-lesson="${id}" ${skipped?'':'checked'}> Ik volg deze les</label>`}</div></div>`}
+function listHtml(w){return days.map((d,i)=>{
+ let date=localDate(w.start,i);if(date>localDate(w.end))return '';
+ let events=w.events.filter(e=>e.day===i),today=isToday(date),end=dayEnd(w,i),holiday=holidayOn(date),rows=[],lastEnd=null;
+ let items=[...events.map(e=>({t:e.start,e})),...cancelledOn(date).map(c=>({t:c.start,c}))].sort((a,b)=>a.t.localeCompare(b.t));
+ for(let item of items){
+  if(item.c){rows.push(cancelledHtml(item.c));continue}
+  let e=item.e,active=!isSkipped(lessonId(w,e));
+  if(active&&lastEnd!==null&&mins(e.start)-lastEnd>=30)rows.push(`<div class="pause">☕ Pauze ${durationText((mins(e.start)-lastEnd)*60000)}</div>`);
+  rows.push(listItemHtml(w,e));
+  if(active)lastEnd=Math.max(lastEnd??0,mins(e.end));
+ }
+ let info=end?`klaar om ${end}`:events.length?'vrije dag':'';
+ return `<section class="listday${today?' today':''}" data-day="${i}"${today?' data-today':''}><div class="listhead"><span>${d}${today?'<em class="badge">Vandaag</em>':''}</span><small>${info?`<span class="dayinfo">${info}</span> · `:''}${shortDate(date)}</small></div>${rows.length?rows.join(''):`<div class="listempty">${holiday?`${holiday.emoji} ${holiday.name}`:'Vrije dag 🎉'}</div>`}</section>`;
+}).join('')}
 function eventHtml(w,e,i,date){
- let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id),top=(mins(e.start)-DAY_START)*S+2,height=(mins(e.end)-mins(e.start))*S-4;
- let inner=`<span class="time">${e.start}–${e.end}</span><span class="name">${s.name}</span><span class="room">${e.room==='Online'?'Online':`${e.room} <span class="old">(${e.old})</span>`}</span><span class="group">${s.group}</span>${PARENT?'':`<span class="state">${skipped?'Volg ik niet':'Volg ik'} · bewerk</span>`}`;
- let attrs=`class="event${height<120?' short':''}${height<80?' tiny':''}${skipped?' skipped':''}" style="top:${top}px;height:${height}px;${styleFor(e,id)}" title="${s.name} · ${e.start}–${e.end} · ${e.room}${e.room==='Online'?'':` (${e.old})`}${e.teacher?" · "+e.teacher:""}"`;
+ let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id),change=changeFor(w,e),top=(mins(e.start)-DAY_START)*S+2,height=(mins(e.end)-mins(e.start))*S-4;
+ let inner=`<span class="time">${e.start}–${e.end}</span>${change?`<span class="chg">${changeText(change,true)}</span>`:''}<span class="name">${s.name}</span><span class="room">${e.room==='Online'?'Online':`${e.room} <span class="old">(${e.old})</span>`}</span><span class="group">${s.group}</span>${PARENT?'':`<span class="state">${skipped?'Volg ik niet':'Volg ik'} · bewerk</span>`}`;
+ let attrs=`class="event${height<120?' short':''}${height<80?' tiny':''}${skipped?' skipped':''}${change?' changed':''}" style="top:${top}px;height:${height}px;${styleFor(e,id)}" title="${s.name} · ${e.start}–${e.end} · ${e.room}${e.room==='Online'?'':` (${e.old})`}${e.teacher?" · "+e.teacher:""}${change?" · "+changeText(change):""}"`;
  return PARENT?`<div ${attrs}>${inner}</div>`:`<button type="button" ${attrs} data-edit="${id}" aria-label="Bewerk ${s.name} op ${days[i]} ${shortDate(date)} om ${e.start}">${inner}</button>`;
 }
 function boardHtml(w){
  let marks=['08:30','09:30','10:30','11:30','12:30','13:30','14:30','15:30','16:30','17:30','18:00'];
  let html=`<div class="hours" aria-hidden="true">${marks.map(t=>`<span style="top:${(mins(t)-DAY_START)*S}px">${t}</span>`).join('')}</div>`;
  for(let i=0;i<5;i++){
-  let date=localDate(w.start,i),inRange=date<=localDate(w.end),today=isToday(date),events=inRange?w.events.filter(e=>e.day===i):[];
-  html+=`<section class="day${today?' today':''}"><div class="dayhead"><strong>${days[i]}</strong><small>${inRange?shortDate(date):'—'}${today?' · vandaag':''}</small></div><div class="track">${events.map(e=>eventHtml(w,e,i,date)).join('')}${events.length?'':'<div class="empty">Geen les</div>'}${today?'<div class="nowline" hidden></div>':''}</div></section>`;
+  let date=localDate(w.start,i),inRange=date<=localDate(w.end),today=isToday(date),events=inRange?w.events.filter(e=>e.day===i):[],end=inRange?dayEnd(w,i):'',holiday=holidayOn(date);
+  let info=inRange?`${today?'vandaag':shortDate(date)}${end?` · tot ${end}`:events.length?' · vrij':''}`:'—';
+  let ghosts=inRange?cancelledOn(date).map(c=>{let top=(mins(c.start)-DAY_START)*S+2,height=(mins(c.end)-mins(c.start))*S-4;return `<div class="event cancelled${height<80?' tiny':''}" style="top:${top}px;height:${height}px;--accent:${colorFor(c.key)}" title="${subjects[c.key].name} · ${c.start}–${c.end} · vervalt"><span class="time">${c.start}–${c.end}</span><span class="chg">Vervalt</span><span class="name">${subjects[c.key].name}</span></div>`}).join(''):'';
+  html+=`<section class="day${today?' today':''}"><div class="dayhead"><strong>${days[i]}</strong><small>${info}</small></div><div class="track">${events.map(e=>eventHtml(w,e,i,date)).join('')}${ghosts}${events.length?'':`<div class="empty">${holiday?`${holiday.emoji} ${holiday.name}`:'Vrije dag'}</div>`}${today?'<div class="nowline" hidden></div>':''}</div></section>`;
  }
  return html;
 }
@@ -400,16 +449,54 @@ function roomText(e){return e.room==='Online'?'Online':`${e.room} (${e.old})`}
 function nextRow(label,lesson,main,sub,extra='',cls=''){return `<button type="button" class="nextrow${cls}" data-week="${lesson.wi}" data-day="${lesson.e.day}" style="--accent:${colorFor(lesson.e.key)}"><span class="nextlabel">${label}</span><span class="nextmain"><b>${subjects[lesson.e.key].name}</b> ${main}</span><span class="nextsub">${sub}</span>${extra}</button>`}
 function renderNext(now){
  let lessons=allLessons.filter(l=>!isSkipped(lessonId(l.w,l.e))),current=lessons.find(l=>l.start<=now&&now<l.end),next=lessons.find(l=>l.start>now),html='';
- if(current)html+=nextRow('Nu',current,`tot ${current.e.end}`,`${roomText(current.e)} · nog ${durationText(current.end-now)}`,`<span class="progress"><i style="width:${((now-current.start)/(current.end-current.start)*100).toFixed(1)}%"></i></span>`,' now');
- if(next){let day=dayText(next.start,now);html+=nextRow(day==='vandaag'?'Straks':'Volgende les',next,`${day} ${next.e.start}`,`${roomText(next.e)}${day==='vandaag'?` · over ${durationText(next.start-now)}`:''}`)}
- $('nextCard').innerHTML=html||'<p class="nextnone">Geen lessen meer gepland in dit rooster.</p>';
+ let badge=l=>{let c=changeFor(l.w,l.e);return c?' '+changeBadge(c,true):''};
+ if(current)html+=nextRow('Nu',current,`tot ${current.e.end}`,`${roomText(current.e)} · nog ${durationText(current.end-now)}${badge(current)}`,`<span class="progress"><i style="width:${((now-current.start)/(current.end-current.start)*100).toFixed(1)}%"></i></span>`,' now');
+ if(next){let day=dayText(next.start,now);html+=nextRow(day==='vandaag'?'Straks':'Volgende les',next,`${day} ${next.e.start}`,`${roomText(next.e)}${day==='vandaag'?` · over ${durationText(next.start-now)}`:''}${badge(next)}`)}
+ $('nextCard').innerHTML=(html||'<p class="nextnone">Geen lessen meer gepland in dit rooster.</p>')+countdownHtml(now);
  $('nextCard').hidden=false;
+}
+
+// Aftellen naar het weekend en de volgende vakantie
+function startOfDay(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function weekStatus(now){
+ let monday=startOfDay(now);monday.setDate(monday.getDate()-(now.getDay()+6)%7);
+ let nextMonday=new Date(monday);nextMonday.setDate(nextMonday.getDate()+7);
+ let week=allLessons.filter(l=>!isSkipped(lessonId(l.w,l.e))&&l.start>=monday&&l.start<nextMonday);
+ return {monday,count:week.length,left:new Set(week.filter(l=>l.end>now).map(l=>l.start.toDateString()))};
+}
+function countdownHtml(now){
+ let parts=[],{count,left}=weekStatus(now),today=isoDate(now),holiday=holidays.find(h=>h.start<=today&&today<=h.end);
+ if(holiday)parts.push(`${holiday.emoji} ${holiday.name}`);
+ else if(count){
+  if(!left.size)parts.push('🎉 Weekend! Deze week zit erop');
+  else if(left.size===1&&left.has(now.toDateString()))parts.push('💪 Laatste lesdag van de week');
+  else parts.push(`Nog ${left.size} lesdagen tot het weekend`);
+ }
+ let next=holidays.find(h=>h.start>today);
+ if(next){let n=Math.round((localDate(next.start)-startOfDay(now))/864e5);if(n<=60)parts.push(`${next.emoji} ${next.name} over ${n} ${n===1?'dag':'dagen'}`)}
+ return parts.length?`<p class="countdown">${parts.join('<span aria-hidden="true"> · </span>')}</p>`:'';
+}
+// Klein feestje na je laatste les van de week (één keer per week, per toestel)
+function maybeCelebrate(now){
+ if(PARENT)return;
+ let {monday,count,left}=weekStatus(now);
+ if(!count||left.size)return;
+ try{let key='lessenrooster-feest-'+isoDate(monday);if(localStorage.getItem(key))return;localStorage.setItem(key,'1')}catch(err){return}
+ setTimeout(()=>{
+  toast('Weekend! 🎉 Deze week zit erop');
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  let box=document.createElement('div'),colors=Object.keys(subjects).map(colorFor);
+  box.className='confetti';box.setAttribute('aria-hidden','true');
+  for(let i=0;i<36;i++){let piece=document.createElement('i');piece.style.cssText=`left:${(Math.random()*100).toFixed(1)}%;background:${colors[i%colors.length]};--dx:${Math.round(Math.random()*80-40)}px;--rot:${Math.round(Math.random()*720-360)}deg;--dur:${(2.2+Math.random()*1.2).toFixed(2)}s;--delay:${(Math.random()*.6).toFixed(2)}s`;box.append(piece)}
+  document.body.append(box);setTimeout(()=>box.remove(),4500);
+ },800);
 }
 
 // Rode lijn op het huidige tijdstip: in de weekweergave én in de lijst (gsm) van vandaag
 function updateNow(){
  let now=new Date(),m=now.getHours()*60+now.getMinutes(),time=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
  renderNext(now);
+ maybeCelebrate(now);
  document.querySelectorAll('.nowline').forEach(line=>{line.hidden=m<DAY_START||m>DAY_END;line.style.top=(m-DAY_START)*S+'px';line.dataset.time=time});
  document.querySelectorAll('.listnow').forEach(line=>line.remove());
  document.querySelectorAll('.listitem.now').forEach(item=>item.classList.remove('now'));
@@ -546,7 +633,7 @@ $('single').addEventListener('touchend',event=>{if(touchX===null)return;let dx=e
 if(!PARENT){
  function findLesson(id){for(let w of weeks)for(let e of w.events)if(lessonId(w,e)===id)return {w,e};return null}
  function setAttendanceFromHere(id,attending){let found=findLesson(id);if(!found)return;let {w:startWeek,e:source}=found;for(let w of weeks){if(w.start<startWeek.start)continue;for(let e of w.events){if(e.key===source.key&&e.day===source.day&&e.start===source.start&&e.end===source.end)settings.skipped[lessonId(w,e)]=!attending}}save();render()}
- function openLesson(id){let found=findLesson(id);if(!found)return;let {w,e}=found,s=subjects[e.key],date=localDate(w.start,e.day);$('lessonTitle').textContent=s.name;$('lessonMeta').textContent=`${days[e.day]} ${shortDate(date)} · ${e.start}–${e.end} · ${s.group} · ${e.room}${e.room==='Online'?'':` (${e.old})`}${e.teacher?" · "+e.teacher:""}`;let input=$('lessonAttend');input.dataset.lesson=id;input.checked=!settings.skipped[id];$('lessonDialog').showModal()}
+ function openLesson(id){let found=findLesson(id);if(!found)return;let {w,e}=found,s=subjects[e.key],date=localDate(w.start,e.day);$('lessonTitle').textContent=s.name;$('lessonMeta').textContent=`${days[e.day]} ${shortDate(date)} · ${e.start}–${e.end} · ${s.group} · ${e.room}${e.room==='Online'?'':` (${e.old})`}${e.teacher?" · "+e.teacher:""}${changeFor(w,e)?" · "+changeText(changeFor(w,e)):""}`;let input=$('lessonAttend');input.dataset.lesson=id;input.checked=!settings.skipped[id];$('lessonDialog').showModal()}
  window.renderColors=function(){$('colorRows').innerHTML=Object.entries(subjects).map(([key,s])=>`<label class="colorRow"><span>${s.name}<small>${s.group}</small></span><input type="color" data-color="${key}" value="${colorFor(key)}" aria-label="Kleur voor ${s.name}"></label>`).join('')};
  $('resetColors').onclick=()=>{settings.colors={};save();renderColors();render()};
  document.addEventListener('change',event=>{let t=event.target;if(t.dataset.lesson)setAttendanceFromHere(t.dataset.lesson,t.checked);if(t.dataset.color){settings.colors[t.dataset.color]=t.value;save();render()}});

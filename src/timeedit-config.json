@@ -11,5 +11,14 @@
   {"reason": "C#-monitoraat", "descriptionContains": "monitoraat"},
   {"reason": "Project management van een andere klasgroep (niet 2PROB)", "code": "42PRO1040", "teacher": "Das Ann"}
  ],
+ "holidays": [
+  {"name": "Herfstvakantie", "emoji": "🍂", "start": "2026-11-02", "end": "2026-11-08"},
+  {"name": "Wapenstilstand", "emoji": "🕊️", "start": "2026-11-11", "end": "2026-11-11"},
+  {"name": "Kerstvakantie", "emoji": "🎄", "start": "2026-12-18", "end": "2027-01-03"},
+  {"name": "Examenperiode", "emoji": "📝", "start": "2027-01-18", "end": "2027-01-30", "exams": true},
+  {"name": "Lesvrije week", "emoji": "☀️", "start": "2027-02-08", "end": "2027-02-14"},
+  {"name": "Paasvakantie", "emoji": "🐣", "start": "2027-03-29", "end": "2027-04-11"},
+  {"name": "Examenperiode", "emoji": "📝", "start": "2027-06-07", "end": "2027-06-26", "exams": true}
+ ],
  "extraColors": ["#0e9aa7", "#b5651d", "#6a5acd", "#2e8b57", "#c2185b", "#5d7a1f"]
 }
