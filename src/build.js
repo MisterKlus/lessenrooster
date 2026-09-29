@@ -116,7 +116,8 @@ async function main(){
  // 1. Rooster bijwerken vanuit TimeEdit (bij een fout: verder met de bewaarde lessen)
  const urlFile=path.join(src,'timeedit-url.txt');
  const url=process.env.TIMEEDIT_URL||(fs.existsSync(urlFile)?fs.readFileSync(urlFile,'utf8').trim():'');
- if(url){try{await syncFromTimeEdit(url)}catch(err){console.warn('TimeEdit niet bijgewerkt:',err.message)}}
+ if(process.env.SKIP_TIMEEDIT)console.log('TimeEdit overgeslagen (SKIP_TIMEEDIT)');
+ else if(url){try{await syncFromTimeEdit(url)}catch(err){console.warn('TimeEdit niet bijgewerkt:',err.message)}}
  else console.log('Geen TimeEdit-link ingesteld: bewaarde lessen gebruikt');
  // 2. Iconen, manifests, service worker
  if(process.argv.includes('--icons')||!fs.existsSync(out('icons','apple-touch-icon.png')))buildIcons();
