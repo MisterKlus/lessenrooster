@@ -116,7 +116,7 @@ function loadSchedule(){
  for(let t=first;t<=last;t+=7*dayMs){
   weeks.push({num:isoWeek(t),start:isoOf(t),end:isoOf(t+4*dayMs),events:lessons.filter(l=>mondayOf(l.date)===t).map(l=>({day:Math.round((toUtc(l.date)-t)/dayMs),start:l.start,end:l.end,key:l.key,room:l.room,old:l.old,teacher:l.teacher||'',...(l.exam?{exam:true}:{})}))});
  }
- return {subjects,weeks,updated:data.updated,firstDate:lessons[0].date,lastDate:lessons.at(-1).date,changes:(data.changes||[]).filter(isStillRelevant),holidays:config.holidays||[]};
+ return {subjects,weeks,updated:data.updated,firstDate:lessons[0].date,lastDate:lessons.at(-1).date,changes:(data.changes||[]).filter(isStillRelevant),holidays:config.holidays||[],semesters:config.semesters||[],weather:config.weather||null};
 }
 
 module.exports={syncFromTimeEdit,loadSchedule};

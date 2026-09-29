@@ -11,6 +11,11 @@
   {"reason": "C#-monitoraat", "descriptionContains": "monitoraat"},
   {"reason": "Project management van een andere klasgroep (niet 2PROB)", "code": "42PRO1040", "teacher": "Das Ann"}
  ],
+ "semesters": [
+  {"name": "Semester 1", "start": "2026-09-21", "exams": "2027-01-18", "end": "2027-01-30"},
+  {"name": "Semester 2", "start": "2027-02-15", "exams": "2027-06-07", "end": "2027-06-26"}
+ ],
+ "weather": {"place": "Diepenbeek", "latitude": 50.928, "longitude": 5.393},
  "examPattern": "examen|\\bexam\\b|evaluatie|toets",
  "holidays": [
   {"name": "Herfstvakantie", "emoji": "🍂", "start": "2026-11-02", "end": "2026-11-08"},
