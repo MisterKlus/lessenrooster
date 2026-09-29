@@ -101,7 +101,7 @@ h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-
 @keyframes confetti-fall{to{transform:translate(var(--dx),105vh) rotate(var(--rot));opacity:0}}
 
 /* Weekstatistiek, vakken, lesinfo, taken, samen vrij, examens */
-.weekstats{margin:0 0 12px;color:var(--muted);font-size:13px;font-weight:600}
+.weekstats{margin:12px 4px 0;color:var(--muted);font-size:12px;font-weight:600}
 .editor.wide{width:min(560px,calc(100vw - 24px))}
 .editor.wide,.lessoninfo{max-height:calc(100vh - 40px);overflow:auto}
 .infolist{display:grid;gap:8px;margin:0 0 14px}
@@ -167,9 +167,9 @@ body.dayMode .dayview{display:block}
 .daynav button{padding:6px 4px;border:0;background:none;color:var(--muted);font-size:13px;font-weight:700}
 .wx{margin-left:6px;color:var(--muted);font-size:12px;font-weight:600;white-space:nowrap}
 .listhead{flex-wrap:wrap;gap:2px 10px}
-.countdown.rain{color:var(--blue-ink)}
+.countdown.top{color:var(--blue-ink)}
 .semester{display:flex;align-items:center;gap:10px;margin-top:8px;color:var(--muted);font-size:12px;font-weight:600}
-.semester .bar{flex:none;width:80px;height:4px;overflow:hidden;border-radius:4px;background:var(--line)}
+.semester .bar{flex:none;width:56px;height:4px;overflow:hidden;border-radius:4px;background:var(--line)}
 .semester .bar i{display:block;height:100%;border-radius:4px;background:var(--blue)}
 .grade{display:grid;grid-template-columns:minmax(0,1fr) auto auto 22px;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
 .grade b{display:block;font-size:14px}
@@ -180,6 +180,32 @@ body.dayMode .dayview{display:block}
 .grade .status{text-align:center}
 .editor .gradesummary{margin:14px 0 0;color:var(--ink);font-size:14px;font-weight:700}
 .static .semester,.static .wx,.static .dayview{display:none!important}
+.menu{max-height:calc(100vh - 180px);overflow-y:auto;overscroll-behavior:contain}
+.editor .note{margin:0 0 10px;padding:12px 14px;border:0;background:var(--chip);color:var(--ink);font-size:13px}
+.monthnav{display:flex;align-items:center;justify-content:space-between;margin:12px 0 8px}
+.monthnav b{font-size:16px}
+.monthnav b::first-letter{text-transform:uppercase}
+.monthnav button{width:38px;height:34px;border:1px solid var(--line);border-radius:9px;background:var(--chip);font-size:18px}
+.monthnav button:disabled{opacity:.35;cursor:default}
+.monthgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.monthgrid>span{padding:2px 0;color:var(--muted);font-size:11px;font-weight:700;text-align:center;text-transform:uppercase}
+.mday{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:46px;padding:6px 2px;border:1px solid transparent;border-radius:10px;background:var(--chip);font-size:13px}
+.mday b{font-weight:700;line-height:1}
+.mday .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;font-size:10px;line-height:1}
+.mday .dots i{width:6px;height:6px;border-radius:50%}
+.mday.weekend{background:transparent;color:var(--faint)}
+.mday.holiday{background:var(--free-bg)}
+.mday.examperiod{background:var(--chg-bg)}
+.mday.today{border-color:var(--blue)}
+.mday:disabled{cursor:default}
+.mday:not(:disabled):hover{border-color:var(--line)}
+.monthnote{margin:12px 0 0;font-size:12px}
+.travelform{display:grid;gap:12px;margin-bottom:6px}
+.travelform label{display:flex;align-items:center;gap:8px;font-weight:700}
+.travelform input{width:90px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;text-align:center}
+.travelmodes{display:flex;gap:6px}
+.travelmodes button{flex:1;padding:8px 0;border:1px solid var(--line);border-radius:10px;background:var(--chip);font-size:20px}
+.travelmodes button[aria-pressed=true]{border-color:var(--blue);background:var(--blue-soft)}
 
 /* Legende + uitleg */
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
@@ -360,12 +386,18 @@ body.forceList .list{display:block}
 <div class="legend" id="legend" aria-label="Vakken"></div>
 <p class="hint">De nieuwe lokaalnaam staat vet, de code tussen haakjes is de oude lokaalnaam. Wissel van week met de pijlen, de pijltjestoetsen of door te swipen op je gsm.</p>
 <p class="hint" data-tymo-only>Klik op een les om ze aan of uit te zetten. Een vinkje wijzigen geldt ook voor hetzelfde lesblok in de volgende weken.</p>
-<p class="weekstats" id="weekStats"></p>
 <div id="single"><div class="board" id="board"></div><div class="list" id="list"></div><div class="dayview" id="dayview"></div></div>
+<p class="weekstats" id="weekStats"></p>
 <div class="allweeks" id="allweeks" hidden></div>
+<dialog id="monthDialog" class="editor wide"><form method="dialog"><div class="dialogtop"><h2>Maand</h2><button aria-label="Sluiten">✕</button></div><div id="monthView"></div><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
+<dialog id="travelDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Reistijd</h2><button aria-label="Sluiten">✕</button></div><p>Hoe lang doe je erover naar de campus? Bovenaan zie je dan wanneer je uiterlijk moet vertrekken voor je eerste les.</p><div class="travelform"><label><input type="number" id="travelMinutes" inputmode="numeric" min="0" max="240" step="5" placeholder="25"> minuten</label><div class="travelmodes" id="travelModes"></div></div><div class="dialogactions"><button type="button" class="secondary" id="travelOff">Uitzetten</button><button class="primary" id="travelSave">Bewaren</button></div></form></dialog>
+<dialog id="infoDialog" class="editor"><form method="dialog"><div class="dialogtop"><h2>Over dit rooster</h2><button aria-label="Sluiten">✕</button></div>
 <p class="note" id="saveHint" data-tymo-only data-file-only>Je keuzes worden op dit apparaat bewaard. Gebruik ⚙ → “Download met mijn keuzes” om je huidige kleuren en leskeuzes mee te sturen naar je gsm, en ⚙ → “Zet op je beginscherm” om het rooster met een eigen icoontje op je gsm te zetten. Raadpleeg TimeEdit voor wijzigingen.</p>
 <p class="note" id="saveHint" data-tymo-only data-web-only>Je keuzes worden op dit toestel bewaard. Via ⚙ → “Zet op je gsm” scan je een QR-code, dan gaan je vinkjes en kleuren mee naar je gsm. Raadpleeg TimeEdit voor wijzigingen.</p>
 <p class="note" data-tymo-only><strong>Automatisch bijgewerkt:</strong> dit rooster wordt elke nacht opgehaald uit TimeEdit (laatste wijziging: __UPDATED__). Weggelaten: het C#-monitoraat en Project management van andere klasgroepen dan 2PROB. Kijk bij twijfel altijd in TimeEdit.</p>
+<p class="note" data-parent-only><strong>Automatisch bijgewerkt:</strong> dit rooster wordt elke nacht opgehaald uit TimeEdit (laatste wijziging: __UPDATED__). Het toont de lessen van Tymo. Tik op een les voor het lokaal, de docent en de route.</p>
+<p class="note">Wissel van week of dag door te swipen. Tik op een les voor meer uitleg, en op het kaartje bovenaan om naar die les te springen.</p>
+<div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
 <dialog id="colorsDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Kleuren van vakken</h2><button aria-label="Sluiten">✕</button></div><p>Kies een kleur per vak. Alle lessen van dat vak veranderen mee.</p><div id="colorRows"></div><div class="dialogactions"><button type="button" id="resetColors">Standaardkleuren</button><button class="primary">Klaar</button></div></form></dialog>
 <dialog id="lessonDialog" class="editor lessoninfo"><form method="dialog"><div class="dialogtop"><h2 id="lessonTitle"></h2><button aria-label="Sluiten">✕</button></div>
 <p id="lessonMeta"></p>
@@ -453,8 +485,8 @@ const $=id=>document.getElementById(id);
 const embeddedNode=$('embeddedSettings');
 const instanceId=embeddedNode.dataset.instance||'original';
 const storeKey=(PARENT?'pxl-ouders-rooster-2026-v1-':'pxl-tymo-rooster-2026-v1-')+instanceId;
-let settings={colors:{},skipped:{},listView:false,tasks:{},links:{},friends:[],grades:{}};
-function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},skipped:o.skipped||{},listView:!!o.listView,tasks:o.tasks||{},links:o.links||{},friends:Array.isArray(o.friends)?o.friends:[],grades:o.grades||{}}}
+let settings={colors:{},skipped:{},listView:false,tasks:{},links:{},friends:[],grades:{},travel:null};
+function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},skipped:o.skipped||{},listView:!!o.listView,tasks:o.tasks||{},links:o.links||{},friends:Array.isArray(o.friends)?o.friends:[],grades:o.grades||{},travel:o.travel||null}}
 try{useSettings(JSON.parse(embeddedNode.textContent||'{}'))}catch(err){}
 try{let raw=localStorage.getItem(storeKey)||(!PARENT&&instanceId==='original'?localStorage.getItem('pxl-tymo-rooster-2026-v1'):null);if(raw)useSettings(JSON.parse(raw))}catch(err){}
 function save(){try{localStorage.setItem(storeKey,JSON.stringify(settings))}catch(err){let hint=$('saveHint');if(hint)hint.textContent='Je browser bewaart wijzigingen in dit bestand niet automatisch.'}}
@@ -539,7 +571,7 @@ function holidayOn(date){let iso=isoDate(date);return holidays.find(h=>h.start<=
 function dayEnd(w,i){return w.events.filter(e=>e.day===i&&!isSkipped(lessonId(w,e))).reduce((max,e)=>e.end>max?e.end:max,'')}
 function cancelledHtml(c){return `<div class="listitem cancelled" style="--accent:${colorFor(c.key)}"><div class="when">${c.start}<br>– ${c.end}</div><div><div class="title">${subjects[c.key].name}</div><span class="chg">Vervalt</span><div class="detail">${c.room==='Online'?'Online':c.room}</div></div></div>`}
 
-function listItemHtml(w,e){let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id),change=changeFor(w,e);return `<div class="listitem${skipped?' skipped':''}${change?' changed':''}${e.exam?' exam':''}" style="${styleFor(e,id)}" data-start="${mins(e.start)}" data-end="${mins(e.end)}" data-open="${id}"><div class="when">${e.start}<br>– ${e.end}</div><div><div class="title">${s.name}</div>${e.exam?'<span class="examchip">📝 Examen</span>':''}${changeBadge(change)}${taskChip(w,e)}<div class="detail">${s.group?s.group+" · ":""}${roomHtml(e)}${e.teacher?" · "+e.teacher:""}</div>${linkChip(e.key)}${PARENT?'':`<label class="attend"><input type="checkbox" data-lesson="${id}" ${skipped?'':'checked'}> Ik volg deze les</label>`}</div></div>`}
+function listItemHtml(w,e){let s=subjects[e.key],id=lessonId(w,e),skipped=isSkipped(id),change=changeFor(w,e);return `<div class="listitem${skipped?' skipped':''}${change?' changed':''}${e.exam?' exam':''}" style="${styleFor(e,id)}" data-start="${mins(e.start)}" data-end="${mins(e.end)}" data-open="${id}"><div class="when">${e.start}<br>– ${e.end}</div><div><div class="title">${s.name}</div>${e.exam?'<span class="examchip">📝 Examen</span>':''}${changeBadge(change)}${taskChip(w,e)}<div class="detail">${s.group?s.group+" · ":""}${roomHtml(e)}${skipped?" · je volgt deze les niet":""}</div>${linkChip(e.key)}</div></div>`}
 function listHtml(w){return days.map((d,i)=>dayCardHtml(w,i)).join('')}
 // Eén dagkaart: in de lijst (week, alle weken) en groot in de dagweergave
 function dayCardHtml(w,i,big){
@@ -580,7 +612,16 @@ function boardHtml(w){
 const ON_PHONE=matchMedia('(hover:none) and (pointer:coarse)').matches||matchMedia('(display-mode:standalone)').matches||navigator.standalone===true;
 function menuHtml(){
  let item=(action,ico,text)=>`<button type="button" role="menuitem" data-action="${action}"><span class="ico" aria-hidden="true">${ico}</span>${text}</button>`;
- return `<div class="menuhead">Weergave</div><button type="button" role="menuitemcheckbox" class="listoption" data-action="list" aria-checked="false"><span class="ico" aria-hidden="true">☰</span>Toon als lijst<span class="switchmark" aria-hidden="true"></span></button><div class="themepick" role="group" aria-label="Thema"><span class="ico" aria-hidden="true">🌓</span><button type="button" data-theme-choice="auto">Auto</button><button type="button" data-theme-choice="light">Licht</button><button type="button" data-theme-choice="dark">Donker</button></div>${item('today','📅','Ga naar vandaag')}${item('subjects','📚','Vakken')}${PARENT?'':`${item('tasks','✏️','Taken')}${item('grades','🎓','Punten')}${item('friends','👥','Samen vrij')}<hr><div class="menuhead">Aanpassen</div>${item('colors','🎨','Kleuren aanpassen')}${item('reset','↺','Alle lessen weer volgen')}${WEB?'':item('download','⬇','Download met mijn keuzes')}`}<hr>${ON_PHONE?'':item('home','📱',WEB?'Zet op je gsm':'Zet op je beginscherm')}${item('print','🖨','Print / bewaar als PDF')}<div class="tip">${ON_PHONE?'Tip: swipe naar links of rechts om van week te wisselen.':'Tip: wissel van week met ← → op je toetsenbord. Toets T springt naar vandaag.'}</div>`;
+ let head=text=>`<div class="menuhead">${text}</div>`;
+ return head('Bekijken')
+  +'<button type="button" role="menuitemcheckbox" class="listoption" data-action="list" aria-checked="false"><span class="ico" aria-hidden="true">☰</span>Toon als lijst<span class="switchmark" aria-hidden="true"></span></button>'
+  +'<div class="themepick" role="group" aria-label="Thema"><span class="ico" aria-hidden="true">🌓</span><button type="button" data-theme-choice="auto">Auto</button><button type="button" data-theme-choice="light">Licht</button><button type="button" data-theme-choice="dark">Donker</button></div>'
+  +item('today','📅','Ga naar vandaag')+item('month','🗓️','Maandoverzicht')+item('subjects','📚','Vakken')
+  +(PARENT?'':'<hr>'+head('Mijn studie')+item('tasks','✏️','Taken')+item('grades','🎓','Punten')+item('friends','👥','Samen vrij'))
+  +'<hr>'+head('Instellingen')
+  +(PARENT?'':item('travel','🚲','Reistijd')+item('colors','🎨','Kleuren')+item('reset','↺','Alle lessen weer volgen')+(WEB?'':item('download','⬇','Download met mijn keuzes')))
+  +(ON_PHONE?'':item('home','📱',WEB?'Zet op je gsm':'Zet op je beginscherm'))
+  +item('print','🖨','Print / bewaar als PDF')+item('info','ℹ️','Over dit rooster');
 }
 
 // Kaartje bovenaan: de les van nu en de volgende les (lessen die je niet volgt tellen niet mee)
@@ -621,8 +662,8 @@ function countdownHtml(now){
  if(exam){let n=Math.round((startOfDay(exam.start)-startOfDay(now))/864e5);if(n<=45)parts.push(`📝 ${subjects[exam.e.key].name}-examen ${n===0?'vandaag':n===1?'morgen':`over ${n} dagen`}`)}
  let next=holidays.find(h=>h.start>today);
  if(next){let n=Math.round((localDate(next.start)-startOfDay(now))/864e5);if(n<=60)parts.push(`${next.emoji} ${next.name} over ${n} ${n===1?'dag':'dagen'}`)}
- let rain=rainWarning(now);
- return (rain?`<p class="countdown rain">${rain}</p>`:'')+(parts.length?`<p class="countdown">${parts.join('<span aria-hidden="true"> · </span>')}</p>`:'');
+ let top=[travelLine(now),rainWarning(now)].filter(Boolean).join('<span aria-hidden="true"> · </span>');
+ return (top?`<p class="countdown top">${top}</p>`:'')+(parts.length?`<p class="countdown">${parts.join('<span aria-hidden="true"> · </span>')}</p>`:'');
 }
 // Klein feestje na je laatste les van de week (één keer per week, per toestel)
 function maybeCelebrate(now){
@@ -710,7 +751,7 @@ function rainWarning(now){ // alleen bij echte kans op regen (≥ 60%) als je na
   for(let m of [arrive,leave]){
    if(offset===0&&m+60<now.getHours()*60+now.getMinutes())continue;
    let x=weatherAt(date,m);
-   if(x&&x.p>=60)return `${weatherIcon(x.c)} ${offset?'Morgen':'Vandaag'} kans op regen rond ${hm(m)} in ${weatherPlace.place}, neem een paraplu`;
+   if(x&&x.p>=60)return `${weatherIcon(x.c)} ${offset?'Morgen regen':'Regen'} rond ${hm(m)} (${x.p}%), neem een paraplu`;
   }
  }
  return '';
@@ -724,7 +765,7 @@ function semesterHtml(now){
  let start=localDate(s.start),exams=localDate(s.exams),pct=Math.max(0,Math.min(100,Math.round((now-start)/(exams-start)*100)));
  let monday=startOfDay(now),left=0;monday.setDate(monday.getDate()-(now.getDay()+6)%7);
  for(let m=new Date(monday);m<exams;m.setDate(m.getDate()+7)){let friday=new Date(m);friday.setDate(friday.getDate()+4);if(!holidays.some(h=>!h.exams&&h.start<=isoDate(m)&&isoDate(friday)<=h.end))left++}
- return `<div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div><span>${s.name}: ${pct}% voorbij · nog ${left} ${left===1?'lesweek':'lesweken'} tot de examens</span>`;
+ return `<div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div><span>${s.name} · ${pct}% · nog ${left} ${left===1?'lesweek':'lesweken'} tot de examens</span>`;
 }
 
 // Punten (alleen Tymo, alleen op dit toestel)
@@ -742,6 +783,60 @@ function updateGradeSummary(){
  for(let g of filled){let w=+g.sp||1;sum+=+g.score*w;weight+=w;if(+g.score>=10)earned+=+g.sp||0}
  for(let k of Object.keys(subjects))total+=+gradeOf(k).sp||0;
  $('gradeSummary').textContent=`Gemiddelde: ${(sum/weight).toFixed(1).replace('.',',')}/20${filled.some(g=>+g.sp)?' (gewogen op studiepunten)':''}${total?` · ${earned} van ${total} studiepunten behaald`:''}`;
+}
+
+// Maandoverzicht: kleine kalender met een bolletje per vak, vakanties en examens gemarkeerd
+const lessonsByDate={};for(let l of allLessons)(lessonsByDate[isoDate(l.start)]||=[]).push(l);
+const monthMin=new Date(firstDay.getFullYear(),firstDay.getMonth(),1);
+const monthMax=(()=>{let last=[lastDay,...semesters.map(s=>localDate(s.end))].reduce((a,b)=>a>b?a:b);return new Date(last.getFullYear(),last.getMonth(),1)})();
+let monthCursor=monthMin;
+function shortRange(h){let a=localDate(h.start),b=localDate(h.end);return h.start===h.end?shortDate(a):`${shortDate(a)} – ${shortDate(b)}`}
+function monthHtml(){
+ let y=monthCursor.getFullYear(),m=monthCursor.getMonth(),offset=(new Date(y,m,1).getDay()+6)%7,count=new Date(y,m+1,0).getDate(),cells=[];
+ for(let k=0;k<offset;k++)cells.push('<span></span>');
+ for(let d=1;d<=count;d++){
+  let date=new Date(y,m,d),iso=isoDate(date),weekend=date.getDay()===0||date.getDay()===6;
+  let lessons=(lessonsByDate[iso]||[]).filter(l=>!isSkipped(lessonId(l.w,l.e))),keys=[...new Set(lessons.map(l=>l.e.key))];
+  let holiday=holidayOn(date),exam=lessons.some(l=>l.e.exam),canJump=!weekend&&date>=firstDay&&date<=lastDay;
+  let cls=['mday',weekend?'weekend':'',isToday(date)?'today':'',holiday?(holiday.exams?'examperiod':'holiday'):''].filter(Boolean).join(' ');
+  let title=[`${d} ${months[m]}`,...keys.map(k=>subjects[k].name),holiday?holiday.name:'',exam?'examen':''].filter(Boolean).join(' · ');
+  cells.push(`<button type="button" class="${cls}" ${canJump?`data-month-day="${iso}"`:'disabled'} title="${escapeHtml(title)}"><b>${d}</b><span class="dots">${exam?'📝':keys.map(k=>`<i style="background:${colorFor(k)}"></i>`).join('')}</span></button>`);
+ }
+ let ym=`${y}-${pad(m+1)}`,notes=holidays.filter(h=>h.start.slice(0,7)<=ym&&h.end.slice(0,7)>=ym);
+ return `<div class="monthnav"><button type="button" data-month-shift="-1" ${monthCursor>monthMin?'':'disabled'} aria-label="Vorige maand">‹</button><b>${months[m]} ${y}</b><button type="button" data-month-shift="1" ${monthCursor<monthMax?'':'disabled'} aria-label="Volgende maand">›</button></div>`
+  +`<div class="monthgrid"><span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span><span>za</span><span>zo</span>${cells.join('')}</div>`
+  +(notes.length?`<p class="monthnote">${notes.map(h=>`${h.emoji} ${h.name} · ${shortRange(h)}`).join('<br>')}</p>`:'');
+}
+function openMonth(){let base=mode==='day'?dayDate:localDate(weeks[idx].start);monthCursor=new Date(base.getFullYear(),base.getMonth(),1);$('monthView').innerHTML=monthHtml();$('monthDialog').showModal()}
+function jumpToDate(iso){
+ let date=localDate(iso);$('monthDialog').close();
+ if(mode==='day'){dayDate=date;render();return}
+ if(mode==='all')setMode('one');
+ idx=weekIndexOf(date);render();
+ let card=[...document.querySelectorAll(`#list .listday[data-day="${(date.getDay()+6)%7}"]`)].find(visible);
+ (card||$('single')).scrollIntoView({block:'start'});
+}
+
+// Wanneer vertrekken (alleen Tymo): reistijd één keer instellen, vertrektijd voor je eerste les op de campus
+const travelModes=[['🚲','fiets'],['🚌','bus'],['🚆','trein'],['🚗','auto'],['🚶','te voet']];
+function openTravel(){
+ let t=settings.travel||{};
+ $('travelMinutes').value=t.minutes||'';
+ $('travelModes').innerHTML=travelModes.map(([ico,name])=>`<button type="button" data-travel-mode="${ico}" aria-pressed="${(t.mode||'🚲')===ico}" title="${name}" aria-label="${name}">${ico}</button>`).join('');
+ $('travelDialog').showModal();
+}
+function travelLine(now){ // vandaag, of morgen vanaf 17:00
+ let t=PARENT?null:settings.travel;if(!t||!t.minutes)return '';
+ for(let offset of [0,1]){
+  if(offset===1&&now.getHours()<17)break;
+  let date=startOfDay(now);date.setDate(date.getDate()+offset);
+  let first=(lessonsByDate[isoDate(date)]||[]).filter(l=>!isSkipped(lessonId(l.w,l.e))&&l.e.room!=='Online').sort((a,b)=>a.start-b.start)[0];
+  if(!first||first.start<=now)continue;
+  let leave=new Date(first.start-t.minutes*60000),left=leave-now,at=hm(leave.getHours()*60+leave.getMinutes());
+  if(offset)return `${t.mode} Morgen vertrek je uiterlijk om ${at}`;
+  return left<=0?`${t.mode} Tijd om te vertrekken!`:`${t.mode} Vertrek uiterlijk om ${at}${left<3*36e5?` · over ${durationText(left)}`:''}`;
+ }
+ return '';
 }
 
 function render(){
@@ -834,6 +929,9 @@ $('gearMenu').addEventListener('click',event=>{
  if(action==='subjects')openSubjects();
  if(action==='tasks'){renderTaskList();$('tasksDialog').showModal()}
  if(action==='grades'){renderGrades();$('gradesDialog').showModal()}
+ if(action==='month')openMonth();
+ if(action==='travel')openTravel();
+ if(action==='info')$('infoDialog').showModal();
  if(action==='friends'){renderFriends();$('friendsDialog').showModal()}
  if(action==='download')downloadCurrent();
  if(action==='reset'&&confirm('Alle lessen weer op “Ik volg deze les” zetten?')){settings.skipped={};save();render()}
@@ -1001,6 +1099,9 @@ document.addEventListener('click',event=>{
  if(t.id==='taskAdd'){addTask(currentLesson,$('taskInput').value);return}
  if(t.id==='friendAdd'){addFriend();return}
  if(t.closest('[data-open-grades]')){t.closest('dialog')?.close();renderGrades();$('gradesDialog').showModal();return}
+ let monthShift=t.closest('[data-month-shift]');if(monthShift){monthCursor=new Date(monthCursor.getFullYear(),monthCursor.getMonth()+ +monthShift.dataset.monthShift,1);$('monthView').innerHTML=monthHtml();return}
+ let monthDay=t.closest('[data-month-day]');if(monthDay){jumpToDate(monthDay.dataset.monthDay);return}
+ let travelMode=t.closest('[data-travel-mode]');if(travelMode){document.querySelectorAll('[data-travel-mode]').forEach(b=>b.setAttribute('aria-pressed',b===travelMode));return}
  let dayShift=t.closest('[data-day-shift]');if(dayShift){step(+dayShift.dataset.dayShift);return}
  let subject=t.closest('[data-subject]');if(subject){t.closest('dialog')?.close();openSubjects(subject.dataset.subject);return}
  let linkEdit=t.closest('[data-link-edit]');if(linkEdit){editLink(linkEdit.dataset.linkEdit);return}
@@ -1037,6 +1138,10 @@ if(!PARENT){
 
 if(WEB){importFromLink();addEventListener('hashchange',()=>{importFromLink();render()})}
 render();
+if(!PARENT){
+ $('travelSave').onclick=()=>{let minutes=parseInt($('travelMinutes').value,10),travelMode=document.querySelector('[data-travel-mode][aria-pressed=true]')?.dataset.travelMode||'🚲';settings.travel=minutes>0?{minutes:Math.min(minutes,240),mode:travelMode}:null;save();render()};
+ $('travelOff').onclick=()=>{settings.travel=null;save();$('travelDialog').close();render()};
+}
 if(!PARENT&&settings.friends.length)refreshFriends();
 loadWeather();addEventListener('focus',loadWeather); // weer hoogstens één keer per uur opnieuw ophalen // roosters van vrienden hoogstens om de 6 uur opnieuw ophalen
 setTimeout(()=>{updateNow();setInterval(updateNow,60000)},60000-Date.now()%60000); // precies op de minuut
