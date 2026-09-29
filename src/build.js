@@ -91,7 +91,7 @@ function variant(base,schedule,{web,parent}){
  s=replaceOnce(s,'__HOLIDAYS__',JSON.stringify(schedule.holidays));
  s=replaceOnce(s,'__SEMESTERS__',JSON.stringify(schedule.semesters));
  s=replaceOnce(s,'__WEATHER__',JSON.stringify(schedule.weather));
- s=replaceOnce(s,'__PERIOD__',`${longDate(schedule.firstDate,schedule.firstDate.slice(0,4)!==schedule.lastDate.slice(0,4))} – ${longDate(schedule.lastDate,true)}`);
+ s=fill(s,'__PERIOD__',`${longDate(schedule.firstDate,schedule.firstDate.slice(0,4)!==schedule.lastDate.slice(0,4))} – ${longDate(schedule.lastDate,true)}`);
  s=fill(s,'__UPDATED__',updatedText(schedule.updated));
  if(parent){
   s=replaceOnce(s,'<title>Mijn lessenrooster · PXL</title>','<title>Lessenrooster · PXL</title>');
