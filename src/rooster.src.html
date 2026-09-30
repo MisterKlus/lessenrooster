@@ -60,7 +60,9 @@ h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-
 .menuhead{padding:8px 12px 3px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
 .menu button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;background:none;border:0;border-radius:9px;text-align:left;font-weight:700}
 .menu button:hover{background:var(--chip)}
-.menu .ico{width:22px;flex:none;text-align:center}
+.menu .ico{display:grid;place-items:center;width:22px;flex:none;color:var(--muted)}
+.menu .ico svg{width:18px;height:18px}
+.menu button:hover .ico{color:var(--ink)}
 .switchmark{position:relative;flex:none;width:36px;height:20px;margin-left:auto;border-radius:20px;background:var(--switch-off);transition:background .2s}
 .switchmark::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:transform .2s}
 .menu [aria-checked=true] .switchmark{background:var(--blue)}
@@ -68,7 +70,8 @@ h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-
 .menu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
 .menu .tip{padding:6px 12px 8px;font-size:12px;color:var(--muted)}
 .themepick{display:flex;align-items:center;gap:4px;padding:4px 8px 8px 12px}
-.themepick .ico{width:22px;margin-right:6px;flex:none;text-align:center}
+.themepick .ico{display:grid;place-items:center;width:22px;margin-right:6px;flex:none;color:var(--muted)}
+.themepick .ico svg{width:18px;height:18px}
 .menu .themepick button{flex:1;justify-content:center;padding:7px 4px;background:var(--chip);border-radius:8px;font-size:13px}
 .menu .themepick button[aria-pressed=true]{background:var(--blue);color:#fff}
 
@@ -204,7 +207,8 @@ body.dayMode .dayview{display:block}
 .travelform label{display:flex;align-items:center;gap:8px;font-weight:700}
 .travelform input{width:90px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;text-align:center}
 .travelmodes{display:flex;gap:6px}
-.travelmodes button{flex:1;padding:8px 0;border:1px solid var(--line);border-radius:10px;background:var(--chip);font-size:20px}
+.travelmodes button{flex:1;min-width:0;padding:9px 2px;border:1px solid var(--line);border-radius:10px;background:var(--chip);font-size:13px;font-weight:700}
+.backupbtns svg{width:18px;height:18px;color:var(--muted)}
 .travelmodes button[aria-pressed=true]{border-color:var(--blue);background:var(--blue-soft)}
 .editor .travelpreview{margin:0;color:var(--ink);font-weight:700}
 
@@ -216,7 +220,7 @@ h1.greeting .greet{display:inline}
 .static h1 .h1title{display:inline!important}
 
 .backupbtns{display:grid;gap:8px}
-.backupbtns button,.backupload{display:block;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--chip);color:var(--ink);font-weight:700;text-align:center;cursor:pointer}
+.backupbtns button,.backupload{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--chip);color:var(--ink);font-weight:700;text-align:center;cursor:pointer}
 
 /* Legende + uitleg */
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
@@ -416,9 +420,9 @@ body.forceList .list{display:block}
 <label class="largeAttend" data-tymo-only><input type="checkbox" id="lessonAttend"> Ik volg deze les</label>
 <p data-tymo-only>Dit wijzigt ook hetzelfde lesblok in alle volgende weken. Eerdere weken blijven zoals ze waren.</p>
 <div id="lessonTasks" class="tasks" data-tymo-only></div>
-<div class="dialogactions"><button type="button" class="secondary" id="lessonSubject">📚 Alles over dit vak</button><button class="primary">Klaar</button></div></form></dialog>
-<dialog id="subjectsDialog" class="editor wide"><form method="dialog"><div class="dialogtop"><h2 id="subjectsTitle">Vakken</h2><button aria-label="Sluiten">✕</button></div><div id="subjectList"></div><div class="dialogactions"><button type="button" class="secondary" id="allSubjects">📚 Alle vakken</button><button class="primary">Klaar</button></div></form></dialog>
-<dialog id="backupDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Back-up</h2><button aria-label="Sluiten">✕</button></div><p>Je vinkjes, taken, punten, links, vrienden, reistijd en kleuren staan alleen op dit toestel. Maak af en toe een back-up, zeker voor je een nieuwe gsm krijgt of je Safari-gegevens wist.</p><div class="backupbtns"><button type="button" id="backupMake">💾 Back-up maken</button><label class="backupload">📂 Back-up terugzetten<input type="file" id="backupFile" accept=".json,application/json" hidden></label></div><p id="backupInfo"></p><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
+<div class="dialogactions"><button type="button" class="secondary" id="lessonSubject">Alles over dit vak</button><button class="primary">Klaar</button></div></form></dialog>
+<dialog id="subjectsDialog" class="editor wide"><form method="dialog"><div class="dialogtop"><h2 id="subjectsTitle">Vakken</h2><button aria-label="Sluiten">✕</button></div><div id="subjectList"></div><div class="dialogactions"><button type="button" class="secondary" id="allSubjects">Alle vakken</button><button class="primary">Klaar</button></div></form></dialog>
+<dialog id="backupDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Back-up</h2><button aria-label="Sluiten">✕</button></div><p>Je vinkjes, taken, punten, links, vrienden, reistijd en kleuren staan alleen op dit toestel. Maak af en toe een back-up, zeker voor je een nieuwe gsm krijgt of je Safari-gegevens wist.</p><div class="backupbtns"><button type="button" id="backupMake"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Back-up maken</button><label class="backupload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Back-up terugzetten<input type="file" id="backupFile" accept=".json,application/json" hidden></label></div><p id="backupInfo"></p><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
 <dialog id="gradesDialog" class="editor wide" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Punten</h2><button aria-label="Sluiten">✕</button></div><p>Vul je punten (op 20) en de studiepunten per vak in. Dit blijft alleen op dit toestel en je ouders zien het nooit.</p><div id="gradeList"></div><p class="gradesummary" id="gradeSummary"></p><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
 <dialog id="tasksDialog" class="editor wide" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Taken</h2><button aria-label="Sluiten">✕</button></div><p>Een taak hangt aan een les ("tegen die les"). Tik op een les om er een toe te voegen. Taken worden op dit toestel bewaard.</p><div id="taskList"></div><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
 <dialog id="friendsDialog" class="editor wide" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Samen vrij</h2><button aria-label="Sluiten">✕</button></div><p>Voeg het TimeEdit-rooster van een vriend toe. In je rooster zie je dan wanneer jullie allebei vrij zijn. De link blijft alleen op dit toestel.</p><div id="friendList"></div><div class="friendform"><input id="friendName" placeholder="Naam, bv. Jan" autocomplete="off"><input id="friendUrl" type="url" placeholder="TimeEdit-link van je vriend (eindigt op .ics)" autocomplete="off"><button type="button" class="primary" id="friendAdd">Toevoegen</button></div><p>Je vriend vindt de link in TimeEdit via <b>Abonneren</b>.</p><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
@@ -622,18 +626,21 @@ function boardHtml(w){
 }
 // Op een gsm/tablet of in de app op het beginscherm is "Zet op je gsm" overbodig
 const ON_PHONE=matchMedia('(hover:none) and (pointer:coarse)').matches||matchMedia('(display-mode:standalone)').matches||navigator.standalone===true;
+// Lijn-icoontjes voor het menu (gebaseerd op Lucide, ISC-licentie)
+const ICONS={"list":"<line x1=\"8\" y1=\"6\" x2=\"21\" y2=\"6\"/><line x1=\"8\" y1=\"12\" x2=\"21\" y2=\"12\"/><line x1=\"8\" y1=\"18\" x2=\"21\" y2=\"18\"/><line x1=\"3\" y1=\"6\" x2=\"3.01\" y2=\"6\"/><line x1=\"3\" y1=\"12\" x2=\"3.01\" y2=\"12\"/><line x1=\"3\" y1=\"18\" x2=\"3.01\" y2=\"18\"/>","theme":"<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 3v18a9 9 0 0 0 0-18z\" fill=\"currentColor\"/>","today":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/><path d=\"m9 16 2 2 4-4\"/>","month":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/><path d=\"M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01\"/>","subjects":"<path d=\"M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z\"/><path d=\"M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z\"/>","tasks":"<polyline points=\"9 11 12 14 22 4\"/><path d=\"M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11\"/>","grades":"<circle cx=\"12\" cy=\"8\" r=\"6\"/><path d=\"M15.48 12.89 17 22l-5-3-5 3 1.52-9.11\"/>","friends":"<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/>","travel":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>","colors":"<circle cx=\"13.5\" cy=\"6.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"17.5\" cy=\"10.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"8.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"6.5\" cy=\"12.5\" r=\".5\" fill=\"currentColor\"/><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.84-.44-1.13-.29-.29-.44-.65-.44-1.13a1.64 1.64 0 0 1 1.67-1.67h2c3.05 0 5.55-2.5 5.55-5.55C21.97 6.01 17.46 2 12 2z\"/>","backup":"<rect x=\"2\" y=\"3\" width=\"20\" height=\"5\" rx=\"1\"/><path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\"/><path d=\"M10 12h4\"/>","reset":"<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/>","download":"<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/>","upload":"<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"17 8 12 3 7 8\"/><line x1=\"12\" y1=\"3\" x2=\"12\" y2=\"15\"/>","home":"<rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"2\"/><line x1=\"12\" y1=\"18\" x2=\"12.01\" y2=\"18\"/>","print":"<polyline points=\"6 9 6 2 18 2 18 9\"/><path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\"/><rect x=\"6\" y=\"14\" width=\"12\" height=\"8\"/>","info":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"/>"};
+function icon(name){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`}
 function menuHtml(){
- let item=(action,ico,text)=>`<button type="button" role="menuitem" data-action="${action}"><span class="ico" aria-hidden="true">${ico}</span>${text}</button>`;
+ let item=(action,text)=>`<button type="button" role="menuitem" data-action="${action}"><span class="ico">${icon(action)}</span>${text}</button>`;
  let head=text=>`<div class="menuhead">${text}</div>`;
  return head('Bekijken')
-  +'<button type="button" role="menuitemcheckbox" class="listoption" data-action="list" aria-checked="false"><span class="ico" aria-hidden="true">☰</span>Toon als lijst<span class="switchmark" aria-hidden="true"></span></button>'
-  +'<div class="themepick" role="group" aria-label="Thema"><span class="ico" aria-hidden="true">🌓</span><button type="button" data-theme-choice="auto">Auto</button><button type="button" data-theme-choice="light">Licht</button><button type="button" data-theme-choice="dark">Donker</button></div>'
-  +item('today','📅','Ga naar vandaag')+item('month','🗓️','Maandoverzicht')+item('subjects','📚','Vakken')
-  +(PARENT?'':'<hr>'+head('Mijn studie')+item('tasks','✏️','Taken')+item('grades','🎓','Punten')+item('friends','👥','Samen vrij'))
+  +'<button type="button" role="menuitemcheckbox" class="listoption" data-action="list" aria-checked="false"><span class="ico">'+icon('list')+'</span>Toon als lijst<span class="switchmark" aria-hidden="true"></span></button>'
+  +'<div class="themepick" role="group" aria-label="Thema"><span class="ico">'+icon('theme')+'</span><button type="button" data-theme-choice="auto">Auto</button><button type="button" data-theme-choice="light">Licht</button><button type="button" data-theme-choice="dark">Donker</button></div>'
+  +item('today','Ga naar vandaag')+item('month','Maandoverzicht')+item('subjects','Vakken')
+  +(PARENT?'':'<hr>'+head('Mijn studie')+item('tasks','Taken')+item('grades','Punten')+item('friends','Samen vrij'))
   +'<hr>'+head('Instellingen')
-  +(PARENT?'':item('travel','🚲','Reistijd')+item('colors','🖍️','Kleuren')+item('backup','💾','Back-up')+item('reset','↺','Alle lessen weer volgen')+(WEB?'':item('download','⬇','Download met mijn keuzes')))
-  +(ON_PHONE?'':item('home','📱',WEB?'Zet op je gsm':'Zet op je beginscherm'))
-  +item('print','🖨','Print / bewaar als PDF')+item('info','ℹ️','Over dit rooster');
+  +(PARENT?'':item('travel','Reistijd')+item('colors','Kleuren')+item('backup','Back-up')+item('reset','Alle lessen weer volgen')+(WEB?'':item('download','Download met mijn keuzes')))
+  +(ON_PHONE?'':item('home',WEB?'Zet op je gsm':'Zet op je beginscherm'))
+  +item('print','Print / bewaar als PDF')+item('info','Over dit rooster');
 }
 
 // Kaartje bovenaan: de les van nu en de volgende les (lessen die je niet volgt tellen niet mee)
@@ -876,7 +883,7 @@ function updateTravelPreview(){let total=(parseInt($('travelMinutes').value,10)|
 function openTravel(){
  let t=travelSettings()||{minutes:25,margin:50,mode:'🚗'};
  $('travelMinutes').value=t.minutes;$('travelMargin').value=t.margin;
- $('travelModes').innerHTML=travelModes.map(([ico,name])=>`<button type="button" data-travel-mode="${ico}" aria-pressed="${t.mode===ico}" title="${name}" aria-label="${name}">${ico}</button>`).join('');
+ $('travelModes').innerHTML=travelModes.map(([ico,name])=>`<button type="button" data-travel-mode="${ico}" aria-pressed="${t.mode===ico}">${name[0].toUpperCase()+name.slice(1)}</button>`).join('');
  updateTravelPreview();
  $('travelDialog').showModal();
 }
