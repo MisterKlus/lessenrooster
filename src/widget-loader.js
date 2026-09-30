@@ -7,13 +7,20 @@ const SKIP = __SKIP__; // lessen die je niet volgt
 
 const fm = FileManager.local();
 const cache = fm.joinPath(fm.documentsDirectory(), "lessenrooster-widget-code.js");
-let code = null;
-try {
-  code = await new Request(SITE + "widget.js?t=" + Date.now()).loadString(); // altijd de verse versie
-  if (!code.includes("LESSENROOSTER_WIDGET")) throw new Error("onverwacht antwoord");
-  fm.writeString(cache, code);
-} catch (e) {
-  if (fm.fileExists(cache)) code = fm.readString(cache);
+const cached = fm.fileExists(cache);
+// In de widget hoogstens om de 6 uur ophalen (dan tekent hij sneller); in de app altijd de verse versie
+let code = cached && config.runsInWidget && Date.now() - fm.modificationDate(cache) < 6 * 3600000 ? fm.readString(cache) : null;
+if (!code) {
+  try {
+    const req = new Request(SITE + "widget.js?t=" + Date.now());
+    req.timeoutInterval = 8; // een trage verbinding mag de widget niet blokkeren
+    const fresh = await req.loadString();
+    if (!fresh.includes("LESSENROOSTER_WIDGET")) throw new Error("onverwacht antwoord");
+    fm.writeString(cache, fresh);
+    code = fresh;
+  } catch (e) {
+    if (cached) code = fm.readString(cache);
+  }
 }
 if (code) {
   const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;

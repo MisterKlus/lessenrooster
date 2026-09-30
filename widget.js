@@ -3,9 +3,14 @@
 // dat geeft SITE (adres van het rooster) en SKIP (lessen die je niet volgt) mee.
 // Toont je les van nu met een voortgangsbalkje (of -ring) en de volgende les.
 // Werkt op het beginscherm (klein, middel, groot) en op het vergrendelscherm.
+//
+// iOS bepaalt zelf wanneer een widget opnieuw getekend wordt, met een beperkt aantal keer per dag.
+// Daarom: aftellen met tekst die iOS zelf elke minuut bijwerkt, op het vergrendelscherm vaste uren
+// ("tot 11:45") die niet verouderen, en zo weinig mogelijk vragen om opnieuw te tekenen.
 
-const VERSION = "30 september 2026 om 10:44"; // ingevuld door src/build.js
+const VERSION = "30 september 2026 om 10:50"; // ingevuld door src/build.js
 const DATA_URL = SITE + "rooster.json?t=" + Date.now(); // altijd de verse versie, niet uit de cache
+const DATA_MAX_AGE = 60; // minuten: het rooster verandert hoogstens 's nachts, dus niet elke keer ophalen
 console.log("Lessenrooster-widget, versie " + VERSION);
 const SKIPSET = new Set(SKIP || []);
 
@@ -18,13 +23,16 @@ const days = ["zondag", "maandag", "dinsdag", "woensdag", "donderdag", "vrijdag"
 async function loadData() {
   const fm = FileManager.local();
   const cache = fm.joinPath(fm.documentsDirectory(), "lessenrooster-cache-" + SITE.replace(/[^a-z0-9]+/gi, "-") + ".json"); // per rooster
+  const cached = fm.fileExists(cache);
+  if (cached && config.runsInWidget && Date.now() - fm.modificationDate(cache) < DATA_MAX_AGE * 60000) return JSON.parse(fm.readString(cache));
   try {
-    const data = await new Request(DATA_URL).loadJSON();
+    const req = new Request(DATA_URL);
+    req.timeoutInterval = 8; // een trage verbinding mag de widget niet blokkeren
+    const data = await req.loadJSON();
     fm.writeString(cache, JSON.stringify(data));
     return data;
   } catch (e) {
-    if (fm.fileExists(cache)) return JSON.parse(fm.readString(cache));
-    return null;
+    return cached ? JSON.parse(fm.readString(cache)) : null;
   }
 }
 
@@ -36,10 +44,6 @@ function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDat
 function dayLabel(date, now) {
   const diff = Math.round((startOfDay(date) - startOfDay(now)) / 864e5);
   return diff === 0 ? "Vandaag" : diff === 1 ? "Morgen" : days[date.getDay()][0].toUpperCase() + days[date.getDay()].slice(1);
-}
-function duration(ms) {
-  const m = Math.max(1, Math.round(ms / 60000));
-  return m < 60 ? m + " min" : Math.floor(m / 60) + " u" + (m % 60 ? " " + (m % 60) + " min" : "");
 }
 
 // Dun afgerond balkje: grijs spoor, gevuld in de kleur van het vak
@@ -98,25 +102,24 @@ if (!data) {
   const weekend = now.getDay() === 0 || now.getDay() === 6;
   const freeToday = !lessons.some(l => startOfDay(l.s).getTime() === startOfDay(now).getTime());
   const dayShort = focus ? days[focus.s.getDay()].slice(0, 2) : "";
-  const label = !focus ? "" : current ? "Nu" : isToday ? "Straks"
-    : weekend ? "Weekend · " + dayLabel(next.s, now).toLowerCase()
+  const label = !focus ? "" : current ? "Nu" : isToday ? "Straks" : weekend ? "Weekend · " + dayLabel(next.s, now).toLowerCase()
     : freeToday ? "Vandaag vrij · " + dayLabel(next.s, now).toLowerCase()
     : dayLabel(next.s, now);
-  const when = !focus ? "" : current ? "nog " + duration(current.e - now) : dayLabel(next.s, now) === "Vandaag" ? "over " + duration(next.s - now) : next.s.getDate() + "/" + (next.s.getMonth() + 1);
+  // Aftellen: iOS werkt de tijd zelf bij ("nog 45 min", "over 12 min"); voor een andere dag gewoon de datum
+  const when = !focus ? null : current ? { prefix: "nog", date: current.e } : isToday ? { prefix: "over", date: next.s } : { text: next.s.getDate() + "/" + (next.s.getMonth() + 1) };
 
   if (family === "accessoryInline") {
-    widget.addText(focus ? (current ? "Nu " + focus.name + " · nog " + duration(current.e - now) : (isToday ? "" : dayShort + " ") + focus.start + " " + focus.name + " · " + focus.room) : "Geen lessen gepland");
+    widget.addText(focus ? (current ? "Nu " + focus.name + " · tot " + focus.end : (isToday ? "" : dayShort + " ") + focus.start + " " + focus.name + " · " + focus.room) : "Geen lessen gepland");
   } else if (family === "accessoryCircular") {
-    // Bovenaan het vak (kort), eronder de resterende tijd of het beginuur
-    const minutes = current ? Math.max(1, Math.round((current.e - now) / 60000)) : 0;
-    const time = current ? (minutes >= 60 ? Math.floor(minutes / 60) + "u" + String(minutes % 60).padStart(2, "0") : minutes + " min") : focus ? (isToday ? "" : dayShort + " ") + focus.start : "";
+    // Bovenaan het vak (kort), eronder het einduur of het beginuur: klopt ook als iOS de widget later hertekent
+    const time = current ? "tot " + focus.end : focus ? (isToday ? "" : dayShort + " ") + focus.start : "";
     widget.setPadding(0, 0, 0, 0);
     const img = widget.addImage(progressRing(pct, 72, focus ? focus.short : "–", time));
     img.imageSize = new Size(72, 72); img.centerAlignImage();
   } else if (family === "accessoryRectangular") {
     if (!focus) addText(widget, "Geen lessen gepland", 13, ink, true);
     else {
-      addText(widget, current ? "Nu · nog " + duration(current.e - now) : isToday ? "Straks · " + focus.start + "–" + focus.end : label + " · " + focus.start, 12, ink, false, 1);
+      addText(widget, current ? "Nu · tot " + focus.end : isToday ? "Straks · " + focus.start + "–" + focus.end : label + " · " + focus.start, 12, ink, false, 1);
       addText(widget, focus.name, 14, ink, true);
       if (current) { widget.addSpacer(3); const img = widget.addImage(progressBar(pct, 130, Color.white())); img.imageSize = new Size(130, 4); }
       else addText(widget, focus.room, 12, ink);
@@ -140,8 +143,9 @@ if (!data) {
     side.addSpacer(4);
     for (const l of later) addText(side, l.start + "  " + l.name, 13, ink, false, 1);
   }
-  // Opnieuw tekenen: tijdens een les om de 5 min (voor het balkje), anders bij de volgende verandering of na 30 min
-  const changes = [current?.e, next?.s, new Date(now.getTime() + (current ? 5 : 30) * 60000)].filter(Boolean);
+  // Opnieuw tekenen bij het begin of einde van een les, en tijdens een les elke 15 min voor het balkje.
+  // Niet vaker: iOS geeft een widget maar een beperkt aantal beurten per dag en slaat er anders over.
+  const changes = [current?.e, next?.s, new Date(now.getTime() + (current ? 15 : 60) * 60000)].filter(Boolean);
   widget.refreshAfterDate = new Date(Math.min(...changes.map(d => d.getTime())));
 }
 
@@ -154,7 +158,7 @@ function lessonBlock(parent, l, label, when, small, pct) {
     addText(parent, l.start + "–" + l.end, 13, muted);
     addText(parent, l.room, 13, muted);
     parent.addSpacer();
-    addText(parent, when, 12, accent, true);
+    addWhen(parent, "", when, 12, accent);
     if (pct > 0) { parent.addSpacer(4); const img = parent.addImage(progressBar(pct, 120, new Color(l.color))); img.imageSize = new Size(120, 4); }
     return;
   }
@@ -163,11 +167,21 @@ function lessonBlock(parent, l, label, when, small, pct) {
   bar.size = new Size(4, 58); bar.cornerRadius = 2; bar.backgroundColor = new Color(l.color);
   line.addSpacer(8);
   const text = line.addStack(); text.layoutVertically();
-  addText(text, label + " · " + when, 12, accent, true);
+  addWhen(text, label + " · ", when, 12, accent);
   text.addSpacer(2);
   addText(text, l.name, 15, ink, true, 2);
   addText(text, l.start + "–" + l.end + " · " + l.room, 13, muted);
   if (pct > 0) { text.addSpacer(6); const img = text.addImage(progressBar(pct, 140, new Color(l.color))); img.imageSize = new Size(140, 4); }
+}
+
+// Eén regel met vaste tekst en eventueel een tijd die iOS zelf bijwerkt ("over 12 min")
+function addWhen(parent, lead, when, size, color) {
+  const row = parent.addStack(); row.centerAlignContent();
+  addText(row, lead + (when.date ? when.prefix + " " : when.text), size, color, true, 1);
+  if (when.date) {
+    const d = row.addDate(when.date);
+    d.applyRelativeStyle(); d.font = Font.semiboldSystemFont(size); d.textColor = color; d.lineLimit = 1;
+  }
 }
 
 function addText(parent, value, size, color, bold, lines) {
