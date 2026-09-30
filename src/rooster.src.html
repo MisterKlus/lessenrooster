@@ -185,7 +185,6 @@ body.dayMode .dayview{display:block}
 .editor .gradesummary{margin:14px 0 0;color:var(--ink);font-size:14px;font-weight:600}
 .static .semester,.static .wx,.static .dayview{display:none!important}
 .menu{max-height:calc(100vh - 180px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
-html.menu-open,html.menu-open body{overflow:hidden}
 @media(max-width:640px){.menu button{padding:10px 12px}.menuhead{padding:6px 12px 2px}.menu hr{margin:3px 6px}}
 .editor .note{margin:0 0 10px;padding:12px 14px;border:0;background:var(--chip);color:var(--ink);font-size:13px}
 .monthnav{display:flex;align-items:center;justify-content:space-between;margin:12px 0 8px}
@@ -970,9 +969,11 @@ function goTo(i){if(i<0||i>=weeks.length)return;idx=i;render();if(mode==='all')$
 function goToday(){if(mode==='day'){dayDate=defaultDay();render();return}idx=todayIdx;render();scrollToWeekOrToday()}
 function setMenu(open){
  $('gearMenu').hidden=!open;$('gearBtn').setAttribute('aria-expanded',open);
- document.documentElement.classList.toggle('menu-open',open); // pagina erachter ligt stil
+ // Pagina erachter stilhouden door vegen buiten het menu te blokkeren (overflow:hidden zou de vaste balk loskoppelen)
+ if(open)document.addEventListener('touchmove',blockPageScroll,{passive:false});else document.removeEventListener('touchmove',blockPageScroll);
  if(open){fitMenu();$('gearMenu').scrollTop=0;[...$('gearMenu').querySelectorAll('button')].find(visible)?.focus({preventScroll:true})}
 }
+function blockPageScroll(event){if(!event.target.closest('#gearMenu'))event.preventDefault()}
 // Menu precies zo hoog als het zichtbare deel van het scherm (100vh telt op iPhone ook de Safari-balken mee)
 function fitMenu(){
  let menu=$('gearMenu');if(menu.hidden)return;
