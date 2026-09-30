@@ -13,7 +13,7 @@ const src=__dirname,root=path.join(src,'..');
 // met vakken en lessen in src/<id>/ en een eigen TimeEdit-link (geheim TIMEEDIT_URL_<ID>).
 const PEOPLE=[
  {id:'tymo',name:'Tymo',main:true,program:'Graduaat Programmeren',note:'Weggelaten: het C#-monitoraat, Project management van andere klasgroepen dan 2PROB en Data Expert op dinsdag.'},
- {id:'thomas',name:'Thomas',program:'Elektromechanica',note:'Het toont je vakken van het eerste en het tweede jaar, zoals gekozen in TimeEdit.'},
+ {id:'thomas',name:'Thomas',program:'Elektromechanica',androidApp:'https://github.com/MisterKlus/lessenrooster/releases/download/widget-app-thomas/lessenrooster-widget.apk',note:'Het toont je vakken van het eerste en het tweede jaar, zoals gekozen in TimeEdit.'},
 ];
 const siteDir=p=>p.main?'':p.id; // map op de site
 const srcDir=p=>p.main?src:path.join(src,p.id);
@@ -130,6 +130,8 @@ function variant(base,schedule,p,{web,parent}){
  s=fill(s,'__NAME__',p.name);
  s=fill(s,'__PROGRAM__',p.program);
  s=fill(s,'__NOTE__',p.note);
+ // Eigen Android widget-app (android/): downloadknop in het widgetvenster, anders alleen Google Agenda
+ s=p.androidApp?fill(s,'__ANDROID_APP__',p.androidApp).replace(/<!--@\/?androidapp-->/g,''):dropBlock(s,'androidapp');
  s=replaceOnce(s,'__SUBJECTS__',JSON.stringify(schedule.subjects));
  s=replaceOnce(s,'__WEEKS__',JSON.stringify(schedule.weeks));
  s=replaceOnce(s,'__CHANGES__',JSON.stringify(schedule.changes));

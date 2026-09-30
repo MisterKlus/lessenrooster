@@ -38,14 +38,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@string/pin" />
+            android:backgroundTint="@color/accent"
+            android:minHeight="52dp"
+            android:text="@string/pin"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/open"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/open" />
+            android:text="@string/open"
+            android:textAllCaps="false"
+            android:textColor="@color/accent"
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="match_parent"
