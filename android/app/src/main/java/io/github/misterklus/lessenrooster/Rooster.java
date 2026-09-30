@@ -202,8 +202,7 @@ final class Rooster {
         v.setInt(R.id.bar, "setColorFilter", l.color);
         v.setTextViewText(R.id.label, st.label);
         v.setTextViewText(R.id.name, l.name);
-        v.setTextViewText(R.id.meta, l.start + "–" + l.end + "
-" + l.room); // uur en lokaal elk op een regel: naast de klok is weinig plaats
+        v.setTextViewText(R.id.meta, l.start + "–" + l.end + "\n" + l.room); // uur en lokaal elk op een regel: naast de klok is weinig plaats
         if (st.current != null) {
             v.setViewVisibility(R.id.progress, View.VISIBLE);
             v.setProgressBar(R.id.progress, 1000, (int) Math.round(Math.max(0, Math.min(1, st.progress)) * 1000), false);

@@ -60,8 +60,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:text="10:45–12:45
-DH.z3v02.04"
+                android:text="10:45–12:45\nDH.z3v02.04"
                 android:textColor="@color/muted"
                 android:textSize="13sp" />
 
