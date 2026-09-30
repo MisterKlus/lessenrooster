@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Roosterwidget</string>
+    <string name="widget_name">Lessenrooster</string>
+    <string name="widget_description">Je les van nu en je volgende les</string>
+    <string name="site_url" translatable="false">https://misterklus.github.io/lessenrooster/thomas/</string>
+    <string name="intro">Je les van nu en je volgende les op je beginscherm. Zo ziet je widget eruit:</string>
+    <string name="pin">Zet widget op beginscherm</string>
+    <string name="open">Open je rooster</string>
+    <string name="pin_manual">Houd je beginscherm ingedrukt → Widgets → Lessenrooster</string>
+    <string name="help">Lukt de knop niet? Houd je beginscherm ingedrukt → Widgets → Lessenrooster en sleep de widget naar je beginscherm.\n\nDe widget haalt je rooster zelf op van je rooster-site, dus wijzigingen uit TimeEdit komen vanzelf door. Tik op de widget om je volledige rooster te openen.</string>
+</resources>

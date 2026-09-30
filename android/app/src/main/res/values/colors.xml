@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dezelfde kleuren als het rooster en de iPhone-widget; donkere versie in values-night -->
+<resources>
+    <color name="widget_bg">#FFFFFF</color>
+    <color name="ink">#17223B</color>
+    <color name="muted">#65718A</color>
+    <color name="accent">#7C4DDB</color>
+    <color name="track">#4D8A94A5</color>
+    <color name="page_bg">#F5F7FC</color>
+    <color name="icon_bg">#FFFFFF</color>
+</resources>
