@@ -818,8 +818,8 @@ function updateGradeSummary(){
  $('gradeSummary').textContent=`Gemiddelde: ${(sum/weight).toFixed(1).replace('.',',')}/20${filled.some(g=>+g.sp)?' (gewogen op studiepunten)':''}${total?` · ${earned} van ${total} studiepunten behaald`:''}`;
 }
 
-// Persoonlijke begroeting (alleen Tymo): "Goeiemorgen Tymo ☀️" in plaats van de titel
-function greetingText(now){let h=now.getHours();return h<5||h>=23?'Goeienacht Tymo 😴':h<12?'Goeiemorgen Tymo ☀️':h<18?'Goeiemiddag Tymo 🌤️':'Goeienavond Tymo 🌙'}
+// Persoonlijke begroeting (alleen Tymo): "Goeiemorgen Tymo" in plaats van de titel
+function greetingText(now){let h=now.getHours();return h<5||h>=23?'Goeienacht Tymo':h<12?'Goeiemorgen Tymo':h<18?'Goeiemiddag Tymo':'Goeienavond Tymo'}
 function updateGreeting(now){
  if(PARENT)return;
  let h1=document.querySelector('h1');
