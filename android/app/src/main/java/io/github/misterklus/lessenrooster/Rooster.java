@@ -83,8 +83,8 @@ final class Rooster {
         try {
             URL url = new URL(c.getString(R.string.site_url) + "rooster.json?t=" + System.currentTimeMillis());
             con = (HttpURLConnection) url.openConnection();
-            con.setConnectTimeout(5000); // een trage verbinding mag de widget niet blokkeren
-            con.setReadTimeout(5000);
+            con.setConnectTimeout(10000); // een trage verbinding mag de widget niet blokkeren
+            con.setReadTimeout(10000);
             con.setUseCaches(false);
             if (con.getResponseCode() != 200) return false;
             String body;
@@ -232,7 +232,8 @@ final class Rooster {
         JSONObject data = readCache(c);
         State st = data == null ? null : state(data, now);
         manager.updateAppWidget(ids, render(c, st, data != null));
-        schedule(c, nextUpdate(st, now));
+        // Nog geen rooster (geen internet bij de eerste keer): na 2 minuten opnieuw proberen
+        schedule(c, data == null ? System.currentTimeMillis() + 2 * 60_000L : nextUpdate(st, now));
     }
 
     /**

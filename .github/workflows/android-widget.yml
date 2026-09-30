@@ -80,7 +80,7 @@ jobs:
             adb shell setprop persist.sys.timezone Europe/Brussels || true
             adb install -r lessenrooster-widget.apk
             adb shell am start -W -n io.github.misterklus.lessenrooster.thomas/io.github.misterklus.lessenrooster.MainActivity
-            sleep 15
+            sleep 25
             adb exec-out screencap -p > licht.png
             adb shell cmd uimode night yes
             sleep 8
