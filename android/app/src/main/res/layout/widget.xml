@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Straks · over 12 min"
+                android:text="Straks"
                 android:textColor="@color/accent"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -74,6 +74,34 @@
                 android:progress="400"
                 android:progressDrawable="@drawable/progress"
                 android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Live aftelklok: Android laat hem zelf elke seconde verspringen, ook zonder bijwerken -->
+        <LinearLayout
+            android:id="@+id/countdown_box"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:gravity="end"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/countdown_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="nog"
+                android:textColor="@color/muted"
+                android:textSize="11sp" />
+
+            <Chronometer
+                android:id="@+id/countdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFeatureSettings="tnum"
+                android:textColor="@color/ink"
+                android:textSize="24sp"
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 

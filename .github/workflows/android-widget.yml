@@ -2,7 +2,8 @@
 # https://github.com/MisterKlus/lessenrooster/releases/download/widget-app-thomas/lessenrooster-widget.apk
 # Ondertekend met de vaste sleutel (geheimen ANDROID_KEYSTORE_B64 en ANDROID_KEYSTORE_PASSWORD),
 # zodat een nieuwe versie gewoon over de oude installeert.
-# Daarna start de app op een emulator en wordt er een schermafbeelding gemaakt (artefact "schermafbeelding").
+# Daarna start de app op een emulator en worden er schermafbeeldingen gemaakt (artefact "schermafbeelding"):
+# nu, in het donker en tijdens een les (klok op donderdag 1 oktober 09:15) voor de aftelklok.
 name: Widget-app voor Android bouwen
 
 on:
@@ -85,6 +86,13 @@ jobs:
             adb shell cmd uimode night yes
             sleep 8
             adb exec-out screencap -p > donker.png
+            adb shell cmd uimode night no
+            adb shell settings put global auto_time 0 || true
+            adb shell date -u 100107152026.00 || true
+            adb shell am force-stop io.github.misterklus.lessenrooster.thomas
+            adb shell am start -W -n io.github.misterklus.lessenrooster.thomas/io.github.misterklus.lessenrooster.MainActivity
+            sleep 20
+            adb exec-out screencap -p > tijdens-les.png
 
       - uses: actions/upload-artifact@v4
         with:

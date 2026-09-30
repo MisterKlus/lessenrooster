@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
+import android.os.SystemClock;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
@@ -57,7 +58,8 @@ final class Rooster {
     static final class State {
         Lesson current, next, focus;
         final List<Lesson> later = new ArrayList<>();
-        String label;
+        String label, countdownCaption;
+        LocalDateTime countdownTo; // live aftelklok tot het einde van de les of het begin van de volgende
         double progress;
     }
 
@@ -148,10 +150,14 @@ final class Rooster {
 
         LocalDate today = now.toLocalDate(), day = st.focus.from.toLocalDate();
         if (st.current != null) {
-            st.label = "Nu · nog " + duration(now, st.current.to);
+            st.label = "Nu";
+            st.countdownTo = st.current.to;
+            st.countdownCaption = "nog";
             st.progress = (double) Duration.between(st.current.from, now).toMillis() / Duration.between(st.current.from, st.current.to).toMillis();
         } else if (day.equals(today)) {
-            st.label = "Straks · over " + duration(now, st.next.from);
+            st.label = "Straks";
+            st.countdownTo = st.next.from;
+            st.countdownCaption = "begint over";
         } else {
             // Vrije dag (of weekend): zeg dat erbij, zodat de volgende les niet op vandaag lijkt
             boolean weekend = now.getDayOfWeek().getValue() >= 6, freeToday = true;
@@ -171,11 +177,6 @@ final class Rooster {
         if (diff == 1) return "Morgen";
         String d = DAYS[day.getDayOfWeek().getValue() - 1];
         return Character.toUpperCase(d.charAt(0)) + d.substring(1);
-    }
-
-    private static String duration(LocalDateTime from, LocalDateTime to) {
-        long m = Math.max(1, (long) Math.ceil(Duration.between(from, to).getSeconds() / 60.0));
-        return m < 60 ? m + " min" : m / 60 + " u" + (m % 60 != 0 ? " " + m % 60 + " min" : "");
     }
 
     // ---- Tekenen
@@ -208,6 +209,15 @@ final class Rooster {
         } else {
             v.setViewVisibility(R.id.progress, View.GONE);
         }
+        if (st.countdownTo != null) {
+            long left = st.countdownTo.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis();
+            v.setChronometer(R.id.countdown, SystemClock.elapsedRealtime() + left, null, true);
+            v.setChronometerCountDown(R.id.countdown, true);
+            v.setTextViewText(R.id.countdown_caption, st.countdownCaption);
+            v.setViewVisibility(R.id.countdown_box, View.VISIBLE);
+        } else {
+            v.setViewVisibility(R.id.countdown_box, View.GONE);
+        }
         SpannableStringBuilder later = new SpannableStringBuilder(st.later.isEmpty() ? "Daarna vrij" : "Daarna");
         later.setSpan(new StyleSpan(Typeface.BOLD), 0, later.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         for (Lesson x : st.later) later.append('\n').append(x.start).append("  ").append(x.name);
@@ -237,16 +247,14 @@ final class Rooster {
     }
 
     /**
-     * Tijdens een les en het uur ervoor elke minuut ("nog 12 min"), anders bij de volgende les of na 30 min.
-     * De wekker maakt de gsm niet wakker: staat het scherm uit, dan wordt de widget bijgewerkt zodra het aangaat.
+     * Opnieuw tekenen net na het einde van de les (of het begin van de volgende), tijdens een les elke 5 min
+     * voor het balkje, en anders na 30 min (bv. om middernacht wordt "Morgen" "Vandaag"). De aftelklok loopt
+     * vanzelf. De wekker maakt de gsm niet wakker: staat het scherm uit, dan volgt het bijwerken zodra het aangaat.
      */
     private static long nextUpdate(State st, LocalDateTime now) {
-        LocalDateTime at = now.plusMinutes(30);
-        if (st != null && (st.current != null || (st.next != null && st.next.from.isBefore(now.plusMinutes(61))))) {
-            at = now.truncatedTo(ChronoUnit.MINUTES).plusMinutes(1).plusSeconds(1);
-        } else if (st != null && st.next != null && st.next.from.minusMinutes(60).isBefore(at)) {
-            at = st.next.from.minusMinutes(60);
-        }
+        LocalDateTime at = now.plusMinutes(st != null && st.current != null ? 5 : 30);
+        LocalDateTime change = st == null ? null : st.current != null ? st.current.to : st.next != null ? st.next.from : null;
+        if (change != null && change.plusSeconds(1).isBefore(at)) at = change.plusSeconds(1);
         return at.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
