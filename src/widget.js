@@ -91,22 +91,30 @@ if (!data) {
   const next = lessons.find(l => l.s > now);
   const focus = current || next;
   const pct = current ? (now - current.s) / (current.e - current.s) : 0;
-  const label = !focus ? "" : current ? "Nu" : dayLabel(next.s, now) === "Vandaag" ? "Straks" : dayLabel(next.s, now);
+  const isToday = focus && dayLabel(focus.s, now) === "Vandaag";
+  // Vrije dag (of alle lessen van vandaag uitgevinkt): zeg dat erbij, zodat de volgende les niet op vandaag lijkt
+  const weekend = now.getDay() === 0 || now.getDay() === 6;
+  const freeToday = !lessons.some(l => startOfDay(l.s).getTime() === startOfDay(now).getTime());
+  const dayShort = focus ? days[focus.s.getDay()].slice(0, 2) : "";
+  const label = !focus ? "" : current ? "Nu" : isToday ? "Straks"
+    : weekend ? "Weekend · " + dayLabel(next.s, now).toLowerCase()
+    : freeToday ? "Vandaag vrij · " + dayLabel(next.s, now).toLowerCase()
+    : dayLabel(next.s, now);
   const when = !focus ? "" : current ? "nog " + duration(current.e - now) : dayLabel(next.s, now) === "Vandaag" ? "over " + duration(next.s - now) : next.s.getDate() + "/" + (next.s.getMonth() + 1);
 
   if (family === "accessoryInline") {
-    widget.addText(focus ? (current ? "Nu " + focus.name + " · nog " + duration(current.e - now) : focus.start + " " + focus.name + " · " + focus.room) : "Geen lessen gepland");
+    widget.addText(focus ? (current ? "Nu " + focus.name + " · nog " + duration(current.e - now) : (isToday ? "" : dayShort + " ") + focus.start + " " + focus.name + " · " + focus.room) : "Geen lessen gepland");
   } else if (family === "accessoryCircular") {
     // Bovenaan het vak (kort), eronder de resterende tijd of het beginuur
     const minutes = current ? Math.max(1, Math.round((current.e - now) / 60000)) : 0;
-    const time = current ? (minutes >= 60 ? Math.floor(minutes / 60) + "u" + String(minutes % 60).padStart(2, "0") : minutes + " min") : focus ? focus.start : "";
+    const time = current ? (minutes >= 60 ? Math.floor(minutes / 60) + "u" + String(minutes % 60).padStart(2, "0") : minutes + " min") : focus ? (isToday ? "" : dayShort + " ") + focus.start : "";
     widget.setPadding(0, 0, 0, 0);
     const img = widget.addImage(progressRing(pct, 72, focus ? focus.short : "–", time));
     img.imageSize = new Size(72, 72); img.centerAlignImage();
   } else if (family === "accessoryRectangular") {
     if (!focus) addText(widget, "Geen lessen gepland", 13, ink, true);
     else {
-      addText(widget, label + " · " + (current ? "nog " + duration(current.e - now) : focus.start + "–" + focus.end), 12, ink);
+      addText(widget, current ? "Nu · nog " + duration(current.e - now) : isToday ? "Straks · " + focus.start + "–" + focus.end : label + " · " + focus.start, 12, ink, false, 1);
       addText(widget, focus.name, 14, ink, true);
       if (current) { widget.addSpacer(3); const img = widget.addImage(progressBar(pct, 130, Color.white())); img.imageSize = new Size(130, 4); }
       else addText(widget, focus.room, 12, ink);
