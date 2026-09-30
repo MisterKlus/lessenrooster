@@ -12,7 +12,7 @@ const src=__dirname,root=path.join(src,'..');
 // Wie een eigen rooster krijgt. Tymo staat in de hoofdmap; ieder ander in een eigen map (bv. thomas/),
 // met vakken en lessen in src/<id>/ en een eigen TimeEdit-link (geheim TIMEEDIT_URL_<ID>).
 const PEOPLE=[
- {id:'tymo',name:'Tymo',main:true,program:'Graduaat Programmeren',note:'Weggelaten: het C#-monitoraat en Project management van andere klasgroepen dan 2PROB.'},
+ {id:'tymo',name:'Tymo',main:true,program:'Graduaat Programmeren',note:'Weggelaten: het C#-monitoraat, Project management van andere klasgroepen dan 2PROB en Data Expert op dinsdag.'},
  {id:'thomas',name:'Thomas',program:'Elektromechanica',note:'Het toont je vakken van het eerste en het tweede jaar, zoals gekozen in TimeEdit.'},
 ];
 const siteDir=p=>p.main?'':p.id; // map op de site

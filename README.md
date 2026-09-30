@@ -16,6 +16,8 @@ Elke nacht haalt de GitHub-actie `.github/workflows/publiceren.yml` de roosters 
 - `src/rooster-data.json`: alle bekende lessen van Tymo. Lessen van vóór de TimeEdit-periode blijven bewaard.
 - `src/thomas/`: hetzelfde voor Thomas.
 
+Past niet alles in één TimeEdit-selectie, zet dan meerdere links in het geheim (één per regel): ze worden samengevoegd en lessen die in meer links staan tellen maar één keer. Tymo gebruikt zo twee links (de ene met IT-organisation, de andere met Data Expert).
+
 Zelf starten: Actions → "Rooster bijwerken en publiceren" → Run workflow.
 
 ## Iemand toevoegen

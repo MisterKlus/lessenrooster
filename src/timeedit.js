@@ -12,7 +12,7 @@ function parseIcs(text){
  const unfolded=text.replace(/\r?\n[ \t]/g,'');
  return unfolded.split('BEGIN:VEVENT').slice(1).map(block=>{
   const field=name=>{const m=block.match(new RegExp(`^${name}(;[^:]*)?:(.*)$`,'m'));return m?{params:m[1]||'',value:m[2].trim()}:null};
-  return {start:field('DTSTART'),end:field('DTEND'),summary:unescapeText(field('SUMMARY')?.value||''),location:unescapeText(field('LOCATION')?.value||''),description:unescapeText(field('DESCRIPTION')?.value||'')};
+  return {uid:field('UID')?.value||'',start:field('DTSTART'),end:field('DTEND'),summary:unescapeText(field('SUMMARY')?.value||''),location:unescapeText(field('LOCATION')?.value||''),description:unescapeText(field('DESCRIPTION')?.value||'')};
  });
 }
 const localParts=new Intl.DateTimeFormat('en-CA',{timeZone:shared.timezone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
@@ -60,18 +60,25 @@ function timeEdit(dir){
   const lower=title.toLowerCase();
   return config.subjects.find(s=>s.codes.includes(code))||config.subjects.find(s=>s.title&&lower.includes(s.title.toLowerCase()));
  }
+ const dayName=iso=>['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'][new Date(iso+'T12:00:00Z').getUTCDay()];
  function isExcluded(lesson){
-  return config.exclude.find(rule=>(!rule.code||rule.code===lesson.code)&&(!rule.teacher||lesson.teacher===rule.teacher)&&(!rule.descriptionContains||lesson.notes.toLowerCase().includes(rule.descriptionContains.toLowerCase())));
+  return config.exclude.find(rule=>(!rule.code||rule.code===lesson.code)&&(!rule.teacher||lesson.teacher===rule.teacher)&&(!rule.day||dayName(lesson.date)===rule.day)&&(!rule.descriptionContains||lesson.notes.toLowerCase().includes(rule.descriptionContains.toLowerCase())));
  }
 
- async function syncFromTimeEdit(url){
-  const response=await fetch(url);
-  if(!response.ok)throw new Error(`TimeEdit gaf HTTP ${response.status}`);
-  const text=await response.text();
-  if(!text.includes('BEGIN:VCALENDAR'))throw new Error('TimeEdit gaf geen agenda terug');
+ // links: één of meer TimeEdit-links (gescheiden door een spatie of nieuwe regel). Past niet alles in één
+ // TimeEdit-selectie, dan worden de links samengevoegd; lessen die in meer links staan tellen één keer (zelfde UID).
+ async function syncFromTimeEdit(links){
+  const events=new Map(),urls=links.split(/\s+/).filter(Boolean);
+  for(const url of urls){ // lukt één link niet, dan niets bijwerken (anders lijken die lessen te vervallen)
+   const response=await fetch(url);
+   if(!response.ok)throw new Error(`TimeEdit gaf HTTP ${response.status}`);
+   const text=await response.text();
+   if(!text.includes('BEGIN:VCALENDAR'))throw new Error('TimeEdit gaf geen agenda terug');
+   for(const ev of parseIcs(text))events.set(ev.uid||`${ev.start?.value}|${ev.summary}`,ev);
+  }
   const extra={};let extraIndex=0;
   const feed=[],skipped=[];
-  for(const ev of parseIcs(text)){
+  for(const ev of events.values()){
    if(!ev.start||!ev.end||!/T\d{6}Z$/.test(ev.start.value)||!ev.summary)continue; // lege dagmarkeringen overslaan
    const start=toLocal(ev.start.value),end=toLocal(ev.end.value);
    // Gedeelde lessen staan er soms meermaals in ("11EMA1190 Mechanische machines 1, 11EMA1190 ..."): de eerste telt
@@ -103,7 +110,7 @@ function timeEdit(dir){
   const changes=[...(stored.changes||[]).filter(isStillRelevant),...found];
   const result={updated:changed?new Date().toISOString():stored.updated,extraSubjects:Object.values(extra),changes,lessons};
   if(changed||JSON.stringify(stored.extraSubjects||[])!==JSON.stringify(result.extraSubjects)||JSON.stringify(stored.changes||[])!==JSON.stringify(changes))fs.writeFileSync(dataFile,JSON.stringify(result,null,1));
-  console.log(`TimeEdit: ${feed.length} lessen vanaf ${windowStart}, ${skipped.length} weggelaten, ${changed?'rooster gewijzigd':'geen wijzigingen'}`);
+  console.log(`TimeEdit: ${feed.length} lessen vanaf ${windowStart} (${urls.length} ${urls.length===1?'link':'links'}), ${skipped.length} weggelaten, ${changed?'rooster gewijzigd':'geen wijzigingen'}`);
   found.forEach(c=>console.log(`  ${c.kind}: ${c.date} ${c.start} ${c.key}${c.was?` (was ${c.was.start} ${c.was.room})`:''}`));
   skipped.forEach(s=>console.log('  weggelaten:',s));
   if(missing.length)console.log('  let op, ontbreekt in TimeEdit (bekende lessen behouden):',missing.join(', '));
