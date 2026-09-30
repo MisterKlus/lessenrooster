@@ -89,7 +89,7 @@ function variant(base,schedule,{web,parent}){
  s=replaceOnce(s,'__WEEKS__',JSON.stringify(schedule.weeks));
  s=replaceOnce(s,'__CHANGES__',JSON.stringify(schedule.changes));
  s=replaceOnce(s,'__HOLIDAYS__',JSON.stringify(schedule.holidays));
- s=fill(s,'__WIDGET__',web&&!parent?JSON.stringify(fs.readFileSync(path.join(src,'widget.js'),'utf8')):'""');
+ s=fill(s,'__WIDGET__',web&&!parent?JSON.stringify(fs.readFileSync(path.join(src,'widget-loader.js'),'utf8')):'""');
  s=replaceOnce(s,'__SEMESTERS__',JSON.stringify(schedule.semesters));
  s=replaceOnce(s,'__WEATHER__',JSON.stringify(schedule.weather));
  s=fill(s,'__PERIOD__',`${longDate(schedule.firstDate,schedule.firstDate.slice(0,4)!==schedule.lastDate.slice(0,4))} – ${longDate(schedule.lastDate,true)}`);
@@ -129,6 +129,7 @@ async function main(){
  const data=loadSchedule();
  const addDays=(iso,n)=>{const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10)};
  fs.writeFileSync(out('rooster.json'),JSON.stringify({updated:data.updated,subjects:Object.fromEntries(Object.entries(data.subjects).map(([k,v])=>[k,{name:v.name,color:v.color}])),lessons:data.weeks.flatMap(w=>w.events.map(e=>({id:`${w.start}|${e.day}|${e.start}|${e.key}`,date:addDays(w.start,e.day),start:e.start,end:e.end,key:e.key,room:e.room==='Online'?'Online':e.room,...(e.exam?{exam:true}:{})})))}));
+ fs.copyFileSync(path.join(src,'widget.js'),out('widget.js')); // de eigenlijke widget, opgehaald door het opstartscript
  // 3. Pagina's
  fs.mkdirSync(out('bestanden'),{recursive:true});
  const base=fs.readFileSync(path.join(src,'rooster.src.html'),'utf8'),schedule=loadSchedule();
