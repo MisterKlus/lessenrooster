@@ -9,7 +9,7 @@ const fm = FileManager.local();
 const cache = fm.joinPath(fm.documentsDirectory(), "lessenrooster-widget-code.js");
 let code = null;
 try {
-  code = await new Request(SITE + "widget.js").loadString();
+  code = await new Request(SITE + "widget.js?t=" + Date.now()).loadString(); // altijd de verse versie
   if (!code.includes("LESSENROOSTER_WIDGET")) throw new Error("onverwacht antwoord");
   fm.writeString(cache, code);
 } catch (e) {
