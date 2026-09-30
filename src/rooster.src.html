@@ -68,6 +68,8 @@ h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-
 .menu [aria-checked=true] .switchmark{background:var(--blue)}
 .menu [aria-checked=true] .switchmark::after{transform:translateX(16px)}
 .menu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
+.menu .chev{margin-left:auto;color:var(--muted);font-size:20px;line-height:1}
+.menu .menuback{color:var(--muted);font-weight:500}
 .menu .tip{padding:6px 12px 8px;font-size:12px;color:var(--muted)}
 .themepick{display:flex;align-items:center;gap:4px;padding:4px 8px 8px 12px}
 .themepick .ico{display:grid;place-items:center;width:22px;margin-right:6px;flex:none;color:var(--muted)}
@@ -205,14 +207,7 @@ body.dayMode .dayview{display:block}
 .mday:disabled{cursor:default}
 .mday:not(:disabled):hover{border-color:var(--line)}
 .monthnote{margin:12px 0 0;font-size:12px}
-.travelform{display:grid;gap:12px;margin-bottom:6px}
-.travelform label{display:flex;align-items:center;gap:8px;font-weight:600}
-.travelform input{width:90px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;text-align:center}
-.travelmodes{display:flex;gap:6px}
-.travelmodes button{flex:1;min-width:0;padding:9px 2px;border:1px solid var(--line);border-radius:8px;background:var(--chip);font-size:13px;font-weight:600}
 .backupbtns svg{width:18px;height:18px;color:var(--muted)}
-.travelmodes button[aria-pressed=true]{border-color:var(--blue);background:var(--blue-soft)}
-.editor .travelpreview{margin:0;color:var(--ink);font-weight:600}
 
 /* Begroeting, back-up */
 h1 .greet{display:none}
@@ -426,7 +421,6 @@ body.forceList .list{display:block}
 <p class="weekstats" id="weekStats"></p>
 <div class="allweeks" id="allweeks" hidden></div>
 <dialog id="monthDialog" class="editor wide"><form method="dialog"><div class="dialogtop"><h2>Maand</h2><button aria-label="Sluiten">✕</button></div><div id="monthView"></div><div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
-<dialog id="travelDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Reistijd</h2><button aria-label="Sluiten">✕</button></div><p>Bovenaan zie je wanneer je ten laatste moet vertrekken voor je eerste les op de campus: je reistijd plus wat extra marge, bv. om een plek op de parking te vinden.</p><div class="travelform"><label><input type="number" id="travelMinutes" inputmode="numeric" min="0" max="240" step="5" placeholder="25"> minuten reistijd</label><label><input type="number" id="travelMargin" inputmode="numeric" min="0" max="180" step="5" placeholder="50"> minuten extra marge (parking)</label><div class="travelmodes" id="travelModes"></div><p class="travelpreview" id="travelPreview"></p></div><div class="dialogactions"><button type="button" class="secondary" id="travelOff">Uitzetten</button><button class="primary" id="travelSave">Bewaren</button></div></form></dialog>
 <dialog id="infoDialog" class="editor"><form method="dialog"><div class="dialogtop"><h2>Over dit rooster</h2><button aria-label="Sluiten">✕</button></div>
 <p class="note" id="saveHint" data-tymo-only data-file-only>Je keuzes worden op dit apparaat bewaard. Gebruik het tandwiel → “Download met mijn keuzes” om je huidige kleuren en leskeuzes mee te sturen naar je gsm, en het tandwiel → “Zet op je beginscherm” om het rooster met een eigen icoontje op je gsm te zetten. Raadpleeg TimeEdit voor wijzigingen.</p>
 <p class="note" id="saveHint" data-tymo-only data-web-only>Je keuzes worden op dit toestel bewaard. Via het tandwiel → “Zet op je gsm” scan je een QR-code, dan gaan je vinkjes en kleuren mee naar je gsm. Raadpleeg TimeEdit voor wijzigingen.</p>
@@ -524,8 +518,8 @@ const $=id=>document.getElementById(id);
 const embeddedNode=$('embeddedSettings');
 const instanceId=embeddedNode.dataset.instance||'original';
 const storeKey=(PARENT?'pxl-ouders-rooster-2026-v1-':'pxl-tymo-rooster-2026-v1-')+instanceId;
-let settings={colors:{},skipped:{},listView:false,tasks:{},links:{},friends:[],grades:{},travel:null};
-function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},skipped:o.skipped||{},listView:!!o.listView,tasks:o.tasks||{},links:o.links||{},friends:Array.isArray(o.friends)?o.friends:[],grades:o.grades||{},travel:o.travel||null}}
+let settings={colors:{},skipped:{},listView:false,tasks:{},links:{},friends:[],grades:{}};
+function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},skipped:o.skipped||{},listView:!!o.listView,tasks:o.tasks||{},links:o.links||{},friends:Array.isArray(o.friends)?o.friends:[],grades:o.grades||{}}}
 try{useSettings(JSON.parse(embeddedNode.textContent||'{}'))}catch(err){}
 try{let raw=localStorage.getItem(storeKey)||(!PARENT&&instanceId==='original'?localStorage.getItem('pxl-tymo-rooster-2026-v1'):null);if(raw)useSettings(JSON.parse(raw))}catch(err){}
 function save(){try{localStorage.setItem(storeKey,JSON.stringify(settings))}catch(err){let hint=$('saveHint');if(hint)hint.textContent='Je browser bewaart wijzigingen in dit bestand niet automatisch.'}}
@@ -650,20 +644,26 @@ function boardHtml(w){
 // Op een gsm/tablet of in de app op het beginscherm is "Zet op je gsm" overbodig
 const ON_PHONE=matchMedia('(hover:none) and (pointer:coarse)').matches||matchMedia('(display-mode:standalone)').matches||navigator.standalone===true;
 // Lijn-icoontjes voor het menu (gebaseerd op Lucide, ISC-licentie)
-const ICONS={"list":"<line x1=\"8\" y1=\"6\" x2=\"21\" y2=\"6\"/><line x1=\"8\" y1=\"12\" x2=\"21\" y2=\"12\"/><line x1=\"8\" y1=\"18\" x2=\"21\" y2=\"18\"/><line x1=\"3\" y1=\"6\" x2=\"3.01\" y2=\"6\"/><line x1=\"3\" y1=\"12\" x2=\"3.01\" y2=\"12\"/><line x1=\"3\" y1=\"18\" x2=\"3.01\" y2=\"18\"/>","theme":"<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 3v18a9 9 0 0 0 0-18z\" fill=\"currentColor\"/>","today":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/><path d=\"m9 16 2 2 4-4\"/>","month":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/><path d=\"M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01\"/>","subjects":"<path d=\"M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z\"/><path d=\"M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z\"/>","tasks":"<polyline points=\"9 11 12 14 22 4\"/><path d=\"M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11\"/>","grades":"<circle cx=\"12\" cy=\"8\" r=\"6\"/><path d=\"M15.48 12.89 17 22l-5-3-5 3 1.52-9.11\"/>","friends":"<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/>","travel":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>","colors":"<circle cx=\"13.5\" cy=\"6.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"17.5\" cy=\"10.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"8.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"6.5\" cy=\"12.5\" r=\".5\" fill=\"currentColor\"/><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.84-.44-1.13-.29-.29-.44-.65-.44-1.13a1.64 1.64 0 0 1 1.67-1.67h2c3.05 0 5.55-2.5 5.55-5.55C21.97 6.01 17.46 2 12 2z\"/>","backup":"<rect x=\"2\" y=\"3\" width=\"20\" height=\"5\" rx=\"1\"/><path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\"/><path d=\"M10 12h4\"/>","reset":"<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/>","download":"<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/>","upload":"<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"17 8 12 3 7 8\"/><line x1=\"12\" y1=\"3\" x2=\"12\" y2=\"15\"/>","home":"<rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"2\"/><line x1=\"12\" y1=\"18\" x2=\"12.01\" y2=\"18\"/>","print":"<polyline points=\"6 9 6 2 18 2 18 9\"/><path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\"/><rect x=\"6\" y=\"14\" width=\"12\" height=\"8\"/>","info":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"/>","link":"<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/>","alert":"<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>","pin":"<path d=\"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>","user":"<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>","exam":"<path d=\"M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z\"/><polyline points=\"14 2 14 8 20 8\"/><line x1=\"16\" y1=\"13\" x2=\"8\" y2=\"13\"/><line x1=\"16\" y1=\"17\" x2=\"8\" y2=\"17\"/>","check":"<polyline points=\"20 6 9 17 4 12\"/>","x":"<line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/>","umbrella":"<path d=\"M22 12a10.06 10.06 1 0 0-20 0Z\"/><path d=\"M12 12v8a2 2 0 0 0 4 0\"/><path d=\"M12 2v1\"/>","bike":"<circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"15\" cy=\"5\" r=\"1\"/><path d=\"M12 17.5V14l-3-3 4-3 2 3h2\"/>","bus":"<path d=\"M8 6v6\"/><path d=\"M15 6v6\"/><path d=\"M2 12h19.6\"/><path d=\"M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3\"/><circle cx=\"7\" cy=\"18\" r=\"2\"/><path d=\"M9 18h5\"/><circle cx=\"16\" cy=\"18\" r=\"2\"/>","train":"<rect x=\"4\" y=\"3\" width=\"16\" height=\"16\" rx=\"2\"/><path d=\"M4 11h16\"/><path d=\"M12 3v8\"/><path d=\"m8 19-2 3\"/><path d=\"m18 22-2-3\"/>","car":"<path d=\"M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2\"/><circle cx=\"7\" cy=\"17\" r=\"2\"/><path d=\"M9 17h6\"/><circle cx=\"17\" cy=\"17\" r=\"2\"/>","walk":"<path d=\"M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z\"/><path d=\"M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z\"/>","sun":"<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41\"/>","cloudsun":"<path d=\"M12 2v2M4.93 4.93l1.41 1.41M20 12h2M19.07 4.93l-1.41 1.41M15.95 12.65a4 4 0 0 0-5.93-4.61\"/><path d=\"M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z\"/>","cloud":"<path d=\"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z\"/>","fog":"<path d=\"M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2\"/><path d=\"M16 17H7M17 21H9\"/>","rain":"<path d=\"M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2\"/><path d=\"M16 14v6M8 14v6M12 16v6\"/>","snow":"<path d=\"M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2\"/><path d=\"M8 15h.01M8 19h.01M12 17h.01M12 21h.01M16 15h.01M16 19h.01\"/>","storm":"<path d=\"M6 16.33A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.3 8.37\"/><path d=\"m13 12-3 5h4l-3 5\"/>","widget":"<rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/>"};
+const ICONS={"list":"<line x1=\"8\" y1=\"6\" x2=\"21\" y2=\"6\"/><line x1=\"8\" y1=\"12\" x2=\"21\" y2=\"12\"/><line x1=\"8\" y1=\"18\" x2=\"21\" y2=\"18\"/><line x1=\"3\" y1=\"6\" x2=\"3.01\" y2=\"6\"/><line x1=\"3\" y1=\"12\" x2=\"3.01\" y2=\"12\"/><line x1=\"3\" y1=\"18\" x2=\"3.01\" y2=\"18\"/>","theme":"<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 3v18a9 9 0 0 0 0-18z\" fill=\"currentColor\"/>","today":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/><path d=\"m9 16 2 2 4-4\"/>","month":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/><path d=\"M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01\"/>","subjects":"<path d=\"M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z\"/><path d=\"M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z\"/>","tasks":"<polyline points=\"9 11 12 14 22 4\"/><path d=\"M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11\"/>","grades":"<circle cx=\"12\" cy=\"8\" r=\"6\"/><path d=\"M15.48 12.89 17 22l-5-3-5 3 1.52-9.11\"/>","friends":"<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/>","colors":"<circle cx=\"13.5\" cy=\"6.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"17.5\" cy=\"10.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"8.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"6.5\" cy=\"12.5\" r=\".5\" fill=\"currentColor\"/><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.84-.44-1.13-.29-.29-.44-.65-.44-1.13a1.64 1.64 0 0 1 1.67-1.67h2c3.05 0 5.55-2.5 5.55-5.55C21.97 6.01 17.46 2 12 2z\"/>","backup":"<rect x=\"2\" y=\"3\" width=\"20\" height=\"5\" rx=\"1\"/><path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\"/><path d=\"M10 12h4\"/>","reset":"<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/>","download":"<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/>","upload":"<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"17 8 12 3 7 8\"/><line x1=\"12\" y1=\"3\" x2=\"12\" y2=\"15\"/>","home":"<rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"2\"/><line x1=\"12\" y1=\"18\" x2=\"12.01\" y2=\"18\"/>","print":"<polyline points=\"6 9 6 2 18 2 18 9\"/><path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\"/><rect x=\"6\" y=\"14\" width=\"12\" height=\"8\"/>","info":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"/>","link":"<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/>","alert":"<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>","pin":"<path d=\"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>","user":"<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>","exam":"<path d=\"M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z\"/><polyline points=\"14 2 14 8 20 8\"/><line x1=\"16\" y1=\"13\" x2=\"8\" y2=\"13\"/><line x1=\"16\" y1=\"17\" x2=\"8\" y2=\"17\"/>","check":"<polyline points=\"20 6 9 17 4 12\"/>","x":"<line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/>","umbrella":"<path d=\"M22 12a10.06 10.06 1 0 0-20 0Z\"/><path d=\"M12 12v8a2 2 0 0 0 4 0\"/><path d=\"M12 2v1\"/>","sun":"<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41\"/>","cloudsun":"<path d=\"M12 2v2M4.93 4.93l1.41 1.41M20 12h2M19.07 4.93l-1.41 1.41M15.95 12.65a4 4 0 0 0-5.93-4.61\"/><path d=\"M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z\"/>","cloud":"<path d=\"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z\"/>","fog":"<path d=\"M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2\"/><path d=\"M16 17H7M17 21H9\"/>","rain":"<path d=\"M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2\"/><path d=\"M16 14v6M8 14v6M12 16v6\"/>","snow":"<path d=\"M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2\"/><path d=\"M8 15h.01M8 19h.01M12 17h.01M12 21h.01M16 15h.01M16 19h.01\"/>","storm":"<path d=\"M6 16.33A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.3 8.37\"/><path d=\"m13 12-3 5h4l-3 5\"/>","widget":"<rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/>","back":"<path d=\"m15 18-6-6 6-6\"/>","studie":"<path d=\"M22 10v6\"/><path d=\"M2 10l10-5 10 5-10 5z\"/><path d=\"M6 12v5c3 3 9 3 12 0v-5\"/>","instellingen":"<line x1=\"4\" y1=\"21\" x2=\"4\" y2=\"14\"/><line x1=\"4\" y1=\"10\" x2=\"4\" y2=\"3\"/><line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"3\"/><line x1=\"20\" y1=\"21\" x2=\"20\" y2=\"16\"/><line x1=\"20\" y1=\"12\" x2=\"20\" y2=\"3\"/><line x1=\"2\" y1=\"14\" x2=\"6\" y2=\"14\"/><line x1=\"10\" y1=\"8\" x2=\"14\" y2=\"8\"/><line x1=\"18\" y1=\"16\" x2=\"22\" y2=\"16\"/>"};
 function icon(name){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`}
-function menuHtml(){
+function menuHtml(view='main'){
  let item=(action,text)=>`<button type="button" role="menuitem" data-action="${action}"><span class="ico">${icon(action)}</span>${text}</button>`;
- let head=text=>`<div class="menuhead">${text}</div>`;
- return head('Bekijken')
+ let open=(view,text)=>`<button type="button" role="menuitem" data-menu-view="${view}"><span class="ico">${icon(view)}</span>${text}<span class="chev" aria-hidden="true">›</span></button>`;
+ let back=title=>`<button type="button" class="menuback" data-menu-view="main"><span class="ico">${icon('back')}</span>Terug</button><div class="menuhead">${title}</div>`;
+ if(view==='studie')return back('Mijn studie')+item('tasks','Taken')+item('grades','Punten')+item('friends','Samen vrij');
+ if(view==='instellingen')return back('Instellingen')
   +'<button type="button" role="menuitemcheckbox" class="listoption" data-action="list" aria-checked="false"><span class="ico">'+icon('list')+'</span>Toon als lijst<span class="switchmark" aria-hidden="true"></span></button>'
   +'<div class="themepick" role="group" aria-label="Thema"><span class="ico">'+icon('theme')+'</span><button type="button" data-theme-choice="auto">Auto</button><button type="button" data-theme-choice="light">Licht</button><button type="button" data-theme-choice="dark">Donker</button></div>'
-  +item('today','Ga naar vandaag')+item('month','Maandoverzicht')+item('subjects','Vakken')
-  +(PARENT?'':'<hr>'+head('Mijn studie')+item('tasks','Taken')+item('grades','Punten')+item('friends','Samen vrij'))
-  +'<hr>'+head('Instellingen')
-  +(PARENT?'':item('travel','Reistijd')+item('colors','Kleuren')+(WEB?item('widget','Widget'):'')+item('backup','Back-up')+item('reset','Alle lessen weer volgen')+(WEB?'':item('download','Download met mijn keuzes')))
+  +(PARENT?'':item('colors','Kleuren')+(WEB?item('widget','Widget'):'')+item('backup','Back-up')+item('reset','Alle lessen weer volgen')+(WEB?'':item('download','Download met mijn keuzes')))
   +(ON_PHONE?'':item('home',WEB?'Zet op je gsm':'Zet op je beginscherm'))
   +item('print','Print / bewaar als PDF')+item('info','Over dit rooster');
+ return item('today','Ga naar vandaag')+item('month','Maandoverzicht')+item('subjects','Vakken')
+  +'<hr>'+(PARENT?'':open('studie','Mijn studie'))+open('instellingen','Instellingen');
+}
+function showMenuView(view){
+ let menu=$('gearMenu');menu.innerHTML=menuHtml(view);
+ updateThemeUi();menu.querySelector('[data-action=list]')?.setAttribute('aria-checked',settings.listView);
+ fitMenu();menu.scrollTop=0;[...menu.querySelectorAll('button')].find(visible)?.focus({preventScroll:true});
 }
 
 // Kaartje bovenaan: de les van nu en de volgende les (lessen die je niet volgt tellen niet mee)
@@ -704,7 +704,7 @@ function countdownHtml(now){
  if(exam){let n=Math.round((startOfDay(exam.start)-startOfDay(now))/864e5);if(n<=45)parts.push(`${subjects[exam.e.key].name}-examen ${n===0?'vandaag':n===1?'morgen':`over ${n} dagen`}`)}
  let next=holidays.find(h=>h.start>today);
  if(next){let n=Math.round((localDate(next.start)-startOfDay(now))/864e5);if(n<=60)parts.push(`${next.name} over ${n} ${n===1?'dag':'dagen'}`)}
- let top=[travelLine(now),rainWarning(now)].filter(Boolean).join('<span aria-hidden="true"> · </span>');
+ let top=[rainWarning(now)].filter(Boolean).join('<span aria-hidden="true"> · </span>');
  let lines=(top?`<p class="countdown top">${top}</p>`:'')+(parts.length?`<p class="countdown">${parts.join('<span aria-hidden="true"> · </span>')}</p>`:'');
  return lines?`<div class="infostrip">${lines}</div>`:'';
 }
@@ -899,33 +899,6 @@ function jumpToDate(iso){
  (card||$('single')).scrollIntoView({block:'start'});
 }
 
-// Wanneer vertrekken (alleen Tymo): reistijd één keer instellen, vertrektijd voor je eerste les op de campus
-const travelModes=[['🚲','fiets'],['🚌','bus'],['🚆','trein'],['🚗','auto'],['🚶','te voet']]; // de tekens zijn alleen interne codes
-const travelIcons={'🚲':'bike','🚌':'bus','🚆':'train','🚗':'car','🚶':'walk'};
-// Standaard 25 min reistijd + 50 min marge voor de parking: les om 08:30 = vertrek ten laatste om 07:15
-function travelSettings(){let t=settings.travel;return PARENT||t?.off?null:{minutes:25,margin:50,mode:'🚗',...(t||{})}}
-function updateTravelPreview(){let total=(parseInt($('travelMinutes').value,10)||0)+(parseInt($('travelMargin').value,10)||0);$('travelPreview').textContent=total?`Les om 08:30 → vertrek ten laatste om ${hm(510-total)}`:''}
-function openTravel(){
- let t=travelSettings()||{minutes:25,margin:50,mode:'🚗'};
- $('travelMinutes').value=t.minutes;$('travelMargin').value=t.margin;
- $('travelModes').innerHTML=travelModes.map(([ico,name])=>`<button type="button" data-travel-mode="${ico}" aria-pressed="${t.mode===ico}">${name[0].toUpperCase()+name.slice(1)}</button>`).join('');
- updateTravelPreview();
- $('travelDialog').showModal();
-}
-function travelLine(now){ // vandaag, of morgen vanaf 17:00
- let t=travelSettings();if(!t||!(t.minutes+t.margin))return '';
- for(let offset of [0,1]){
-  if(offset===1&&now.getHours()<17)break;
-  let date=startOfDay(now);date.setDate(date.getDate()+offset);
-  let first=(lessonsByDate[isoDate(date)]||[]).filter(l=>!isSkipped(lessonId(l.w,l.e))&&l.e.room!=='Online').sort((a,b)=>a.start-b.start)[0];
-  if(!first||first.start<=now)continue;
-  let leave=new Date(first.start-(t.minutes+t.margin)*60000),left=leave-now,at=hm(leave.getHours()*60+leave.getMinutes());
-  if(offset)return `${icon(travelIcons[t.mode]||'car')}Morgen vertrek je ten laatste om ${at}`;
-  return left<=0?`${icon(travelIcons[t.mode]||'car')}Tijd om te vertrekken!`:`${icon(travelIcons[t.mode]||'car')}Vertrek ten laatste om ${at}${left<3*36e5?` · over ${durationText(left)}`:''}`;
- }
- return '';
-}
-
 function render(){
  if(mode==='day'&&innerWidth>999)mode='one'; // dagweergave is voor gsm en tablet
  if(mode==='day')idx=weekIndexOf(dayDate);
@@ -943,7 +916,7 @@ function render(){
  $('dayBtn').setAttribute('aria-pressed',mode==='day');$('one').setAttribute('aria-pressed',mode==='one');$('all').setAttribute('aria-pressed',mode==='all');
  let semester=semesterHtml(new Date());$('semester').innerHTML=semester;$('semester').hidden=!semester;
  document.body.classList.toggle('forceList',settings.listView);
- $('gearMenu').querySelector('[data-action=list]').setAttribute('aria-checked',settings.listView);
+ $('gearMenu').querySelector('[data-action=list]')?.setAttribute('aria-checked',settings.listView);
  updateNow();
  refreshOpenDialogs();
 }
@@ -971,7 +944,7 @@ function setMenu(open){
  $('gearMenu').hidden=!open;$('gearBtn').setAttribute('aria-expanded',open);
  // Pagina erachter stilhouden door vegen buiten het menu te blokkeren (overflow:hidden zou de vaste balk loskoppelen)
  if(open)document.addEventListener('touchmove',blockPageScroll,{passive:false});else document.removeEventListener('touchmove',blockPageScroll);
- if(open){fitMenu();$('gearMenu').scrollTop=0;[...$('gearMenu').querySelectorAll('button')].find(visible)?.focus({preventScroll:true})}
+ if(open)showMenuView('main'); // altijd starten in het hoofdmenu
 }
 function blockPageScroll(event){if(!event.target.closest('#gearMenu'))event.preventDefault()}
 // Menu precies zo hoog als het zichtbare deel van het scherm (100vh telt op iPhone ook de Safari-balken mee)
@@ -1019,6 +992,7 @@ function updateThemeUi(){
 darkQuery.addEventListener('change',updateThemeUi);
 updateThemeUi();
 $('gearMenu').addEventListener('click',event=>{
+ let viewButton=event.target.closest('[data-menu-view]');if(viewButton){event.stopPropagation();showMenuView(viewButton.dataset.menuView);return} // submenu openen of terug
  let themeButton=event.target.closest('[data-theme-choice]');if(themeButton){applyTheme(themeButton.dataset.themeChoice);return}
  let button=event.target.closest('[data-action]');if(!button)return;
  let action=button.dataset.action;
@@ -1032,7 +1006,6 @@ $('gearMenu').addEventListener('click',event=>{
  if(action==='tasks'){renderTaskList();$('tasksDialog').showModal()}
  if(action==='grades'){renderGrades();$('gradesDialog').showModal()}
  if(action==='month')openMonth();
- if(action==='travel')openTravel();
  if(action==='info')$('infoDialog').showModal();
  if(action==='backup'){backupInfo();$('backupDialog').showModal()}
  if(action==='widget')$('widgetDialog').showModal();
@@ -1205,7 +1178,6 @@ document.addEventListener('click',event=>{
  if(t.closest('[data-open-grades]')){t.closest('dialog')?.close();renderGrades();$('gradesDialog').showModal();return}
  let monthShift=t.closest('[data-month-shift]');if(monthShift){monthCursor=new Date(monthCursor.getFullYear(),monthCursor.getMonth()+ +monthShift.dataset.monthShift,1);$('monthView').innerHTML=monthHtml();return}
  let monthDay=t.closest('[data-month-day]');if(monthDay){jumpToDate(monthDay.dataset.monthDay);return}
- let travelMode=t.closest('[data-travel-mode]');if(travelMode){document.querySelectorAll('[data-travel-mode]').forEach(b=>b.setAttribute('aria-pressed',b===travelMode));return}
  let dayShift=t.closest('[data-day-shift]');if(dayShift){step(+dayShift.dataset.dayShift);return}
  let subject=t.closest('[data-subject]');if(subject){t.closest('dialog')?.close();openSubjects(subject.dataset.subject);return}
  let linkEdit=t.closest('[data-link-edit]');if(linkEdit){editLink(linkEdit.dataset.linkEdit);return}
@@ -1244,8 +1216,6 @@ if(!PARENT){
 if(WEB){importFromLink();addEventListener('hashchange',()=>{importFromLink();render()})}
 render();
 if(!PARENT){
- $('travelSave').onclick=()=>{let minutes=parseInt($('travelMinutes').value,10),travelMode=document.querySelector('[data-travel-mode][aria-pressed=true]')?.dataset.travelMode||'🚲';let margin=parseInt($('travelMargin').value,10)||0;settings.travel={minutes:Math.max(0,Math.min(minutes||0,240)),margin:Math.max(0,Math.min(margin,180)),mode:travelMode};save();render()};
- $('travelMinutes').oninput=updateTravelPreview;$('travelMargin').oninput=updateTravelPreview;
  $('backupMake').onclick=makeBackup;
  if(WEB)$('widgetCopy').onclick=async()=>{
   let today=isoDate(new Date()),skip=Object.keys(settings.skipped).filter(id=>{let f=settings.skipped[id]&&findLesson(id);return f&&isoDate(localDate(f.w.start,f.e.day))>=today});
@@ -1254,7 +1224,6 @@ if(!PARENT){
   catch(err){let box=$('widgetScriptBox')||document.createElement('textarea');box.id='widgetScriptBox';box.className='scriptbox';box.readOnly=true;box.value=text;$('widgetCopy').after(box);box.focus();box.select();toast('Kopieer het script hieronder')}
  };
  $('backupFile').onchange=event=>{let f=event.target.files[0];if(f)restoreBackup(f);event.target.value=''};
- $('travelOff').onclick=()=>{settings.travel={off:true};save();$('travelDialog').close();render()};
 }
 if(!PARENT&&settings.friends.length)refreshFriends();
 loadWeather();addEventListener('focus',loadWeather); // weer hoogstens één keer per uur opnieuw ophalen // roosters van vrienden hoogstens om de 6 uur opnieuw ophalen
