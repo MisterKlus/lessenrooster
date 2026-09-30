@@ -1,11 +1,11 @@
 {
  "timezone": "Europe/Brussels",
  "subjects": [
-  {"key": "web", "codes": ["41PRO1010"], "title": "Web Essentials", "name": "Web Essentials", "group": "1PROA", "color": "#4377df"},
-  {"key": "cs", "codes": ["41PRO1020"], "title": "C# Essentials", "name": "C# Essentials", "group": "1PROA", "color": "#8859c9"},
-  {"key": "it", "codes": ["41PRO1120"], "title": "IT-organisation", "name": "IT Organisation", "group": "1PROA", "color": "#d68a27"},
-  {"key": "data", "codes": [], "title": "Data Expert", "name": "Data Expert", "group": "2PROA", "color": "#24977b", "keepIfMissing": true},
-  {"key": "pm", "codes": ["42PRO1040"], "title": "Project management", "name": "Project Management", "group": "2PROB", "color": "#d35f78"}
+  {"key": "web", "codes": ["41PRO1010"], "title": "Web Essentials", "name": "Web Essentials", "group": "1PROA", "color": "#5b7bd5"},
+  {"key": "cs", "codes": ["41PRO1020"], "title": "C# Essentials", "name": "C# Essentials", "group": "1PROA", "color": "#8b6cc4"},
+  {"key": "it", "codes": ["41PRO1120"], "title": "IT-organisation", "name": "IT Organisation", "group": "1PROA", "color": "#c79443"},
+  {"key": "data", "codes": [], "title": "Data Expert", "name": "Data Expert", "group": "2PROA", "color": "#3a9580", "keepIfMissing": true},
+  {"key": "pm", "codes": ["42PRO1040"], "title": "Project management", "name": "Project Management", "group": "2PROB", "color": "#c46b80"}
  ],
  "exclude": [
   {"reason": "C#-monitoraat", "descriptionContains": "monitoraat"},
