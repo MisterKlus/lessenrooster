@@ -184,7 +184,9 @@ body.dayMode .dayview{display:block}
 .grade .status{text-align:center}
 .editor .gradesummary{margin:14px 0 0;color:var(--ink);font-size:14px;font-weight:600}
 .static .semester,.static .wx,.static .dayview{display:none!important}
-.menu{max-height:calc(100vh - 180px);overflow-y:auto;overscroll-behavior:contain}
+.menu{max-height:calc(100vh - 180px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+html.menu-open,html.menu-open body{overflow:hidden}
+@media(max-width:640px){.menu button{padding:10px 12px}.menuhead{padding:6px 12px 2px}.menu hr{margin:3px 6px}}
 .editor .note{margin:0 0 10px;padding:12px 14px;border:0;background:var(--chip);color:var(--ink);font-size:13px}
 .monthnav{display:flex;align-items:center;justify-content:space-between;margin:12px 0 8px}
 .monthnav b{font-size:16px}
@@ -966,7 +968,20 @@ function scrollToWeekOrToday(){
 }
 function goTo(i){if(i<0||i>=weeks.length)return;idx=i;render();if(mode==='all')$('week-'+idx).scrollIntoView({block:'start'})}
 function goToday(){if(mode==='day'){dayDate=defaultDay();render();return}idx=todayIdx;render();scrollToWeekOrToday()}
-function setMenu(open){$('gearMenu').hidden=!open;$('gearBtn').setAttribute('aria-expanded',open);if(open)$('gearMenu').querySelector('button').focus()}
+function setMenu(open){
+ $('gearMenu').hidden=!open;$('gearBtn').setAttribute('aria-expanded',open);
+ document.documentElement.classList.toggle('menu-open',open); // pagina erachter ligt stil
+ if(open){fitMenu();$('gearMenu').scrollTop=0;[...$('gearMenu').querySelectorAll('button')].find(visible)?.focus({preventScroll:true})}
+}
+// Menu precies zo hoog als het zichtbare deel van het scherm (100vh telt op iPhone ook de Safari-balken mee)
+function fitMenu(){
+ let menu=$('gearMenu');if(menu.hidden)return;
+ menu.style.maxHeight='';
+ let visibleHeight=window.visualViewport?window.visualViewport.height:innerHeight;
+ menu.style.maxHeight=Math.max(220,Math.floor(visibleHeight-menu.getBoundingClientRect().top-12))+'px';
+}
+addEventListener('resize',fitMenu);
+if(window.visualViewport)visualViewport.addEventListener('resize',fitMenu);
 
 $('weekname').innerHTML=weeks.map((w,i)=>`<option value="${i}">${label(w)}</option>`).join('');
 $('weekname').onchange=e=>{let i=Number(e.target.value);if(mode!=='day')return goTo(i);let d=localDate(weeks[i].start,(dayDate.getDay()+6)%7);dayDate=d>lastDay?new Date(lastDay):d;render()};
