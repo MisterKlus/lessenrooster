@@ -80,6 +80,32 @@ self.addEventListener('fetch',event=>{
 `);
 }
 
+// Agenda-abonnement (rooster.ics): voor Google Agenda en zijn widget op Android.
+// Bevat alle lessen van het rooster; wat je in de app uitvinkt, staat alleen op je toestel.
+const addDays=(iso,n)=>{const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10)};
+function calendarIcs(p,schedule){
+ const esc=s=>String(s).replace(/[\\,;]/g,m=>'\\'+m).replace(/\n/g,'\\n');
+ const fold=line=>line.length<=74?line:line.match(/.{1,73}/g).join('\r\n '); // regels van hoogstens 75 tekens
+ const local=(iso,time)=>iso.replace(/-/g,'')+'T'+time.replace(':','')+'00';
+ const stamp=new Date(schedule.updated||Date.now()).toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z');
+ const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Lessenrooster//NL','CALSCALE:GREGORIAN','METHOD:PUBLISH',
+  'X-WR-CALNAME:'+esc('Lessenrooster '+p.name),'X-WR-TIMEZONE:Europe/Brussels','X-PUBLISHED-TTL:PT6H',
+  'BEGIN:VTIMEZONE','TZID:Europe/Brussels',
+  'BEGIN:DAYLIGHT','TZOFFSETFROM:+0100','TZOFFSETTO:+0200','TZNAME:CEST','DTSTART:19700329T020000','RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU','END:DAYLIGHT',
+  'BEGIN:STANDARD','TZOFFSETFROM:+0200','TZOFFSETTO:+0100','TZNAME:CET','DTSTART:19701025T030000','RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU','END:STANDARD',
+  'END:VTIMEZONE'];
+ for(const w of schedule.weeks)for(const e of w.events){
+  const date=addDays(w.start,e.day);
+  lines.push('BEGIN:VEVENT',`UID:${p.id}-${date}-${e.start.replace(':','')}-${e.key}@misterklus.github.io`,'DTSTAMP:'+stamp,
+   `DTSTART;TZID=Europe/Brussels:${local(date,e.start)}`,`DTEND;TZID=Europe/Brussels:${local(date,e.end)}`,
+   'SUMMARY:'+esc(schedule.subjects[e.key].name+(e.exam?' (examen)':'')),
+   'LOCATION:'+esc(e.room+(e.old&&e.room!=='Online'?` (${e.old})`:'')),
+   ...(e.teacher?['DESCRIPTION:'+esc(e.teacher)]:[]),'END:VEVENT');
+ }
+ lines.push('END:VCALENDAR');
+ return lines.map(fold).join('\r\n')+'\r\n';
+}
+
 const months=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
 function longDate(iso,withYear){const [y,m,d]=iso.split('-').map(Number);return `${d} ${months[m-1]}${withYear?' '+y:''}`}
 function updatedText(iso){
@@ -137,7 +163,6 @@ function prerender(html,file){
 async function main(){
  if(process.argv.includes('--icons')||!fs.existsSync(out('icons','apple-touch-icon.png')))buildIcons();
  const base=fs.readFileSync(path.join(src,'rooster.src.html'),'utf8');
- const addDays=(iso,n)=>{const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10)};
  for(const p of PEOPLE){
   console.log(`\n${p.name}`);
   const te=timeEdit(srcDir(p)),dir=siteDir(p);
@@ -155,6 +180,7 @@ async function main(){
   // Gegevens voor de widget (Scriptable): alle lessen met hetzelfde id als in het rooster
   fs.writeFileSync(out(dir,'rooster.json'),JSON.stringify({updated:schedule.updated,subjects:Object.fromEntries(Object.entries(schedule.subjects).map(([k,v])=>[k,{name:v.name,short:v.short||v.name.split(/\s+/).map(w=>w[0]).join('').slice(0,4),color:v.color}])),lessons:schedule.weeks.flatMap(w=>w.events.map(e=>({id:`${w.start}|${e.day}|${e.start}|${e.key}`,date:addDays(w.start,e.day),start:e.start,end:e.end,key:e.key,room:e.room==='Online'?'Online':e.room,...(e.exam?{exam:true}:{})})))}));
   fs.writeFileSync(out(dir,'widget.js'),fs.readFileSync(path.join(src,'widget.js'),'utf8').replace('__VERSION__',updatedText(new Date().toISOString()))); // de eigenlijke widget, opgehaald door het opstartscript
+  fs.writeFileSync(out(dir,'rooster.ics'),calendarIcs(p,schedule)); // agenda-abonnement, voor de widget van Google Agenda (Android)
   // 3. Pagina's
   prerender(variant(base,schedule,p,{web:true,parent:false}),out(dir,'index.html'));
   if(!p.main)continue;
