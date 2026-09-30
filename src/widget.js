@@ -50,8 +50,9 @@ function progressBar(pct, width, color) {
   ctx.addPath(fill); ctx.setFillColor(color); ctx.fillPath();
   return ctx.getImage();
 }
-// Ring voor het ronde vergrendelscherm-widget (iOS kleurt die zelf in)
-function progressRing(pct, size) {
+// Ring met tekst in het midden, als één afbeelding voor het ronde vergrendelscherm-widget
+// (iOS kleurt die zelf in; achtergrondafbeeldingen werken daar niet altijd)
+function progressRing(pct, size, label, sub) {
   const line = 5, r = size / 2 - line / 2, c = size / 2, ctx = new DrawContext();
   ctx.size = new Size(size, size); ctx.opaque = false; ctx.respectScreenScale = true; ctx.setLineWidth(line);
   const arc = (to) => {
@@ -64,6 +65,10 @@ function progressRing(pct, size) {
   };
   ctx.addPath(arc(1)); ctx.setStrokeColor(new Color("#ffffff", 0.25)); ctx.strokePath();
   if (pct > 0) { ctx.addPath(arc(pct)); ctx.setStrokeColor(Color.white()); ctx.strokePath(); }
+  ctx.setTextColor(Color.white()); ctx.setTextAlignedCenter();
+  ctx.setFont(Font.semiboldSystemFont(sub ? 17 : 15));
+  ctx.drawTextInRect(label, new Rect(0, sub ? c - 15 : c - 10, size, 22));
+  if (sub) { ctx.setFont(Font.systemFont(10)); ctx.drawTextInRect(sub, new Rect(0, c + 5, size, 14)); }
   return ctx.getImage();
 }
 
@@ -92,15 +97,11 @@ if (!data) {
   if (family === "accessoryInline") {
     widget.addText(focus ? (current ? "Nu " + focus.name + " · nog " + duration(current.e - now) : focus.start + " " + focus.name + " · " + focus.room) : "Geen lessen gepland");
   } else if (family === "accessoryCircular") {
-    widget.backgroundImage = progressRing(pct, 72);
-    const stack = widget.addStack(); stack.layoutVertically();
-    if (current) {
-      const minutes = Math.max(1, Math.round((current.e - now) / 60000));
-      centered(stack, minutes >= 60 ? Math.floor(minutes / 60) + "u" + String(minutes % 60).padStart(2, "0") : String(minutes), 16, true);
-      if (minutes < 60) centered(stack, "min", 10, false);
-    } else {
-      centered(stack, focus ? focus.start : "–", 14, true);
-    }
+    const minutes = current ? Math.max(1, Math.round((current.e - now) / 60000)) : 0;
+    const text = current ? (minutes >= 60 ? Math.floor(minutes / 60) + "u" + String(minutes % 60).padStart(2, "0") : String(minutes)) : focus ? focus.start : "–";
+    widget.setPadding(0, 0, 0, 0);
+    const img = widget.addImage(progressRing(pct, 72, text, current && minutes < 60 ? "min" : ""));
+    img.imageSize = new Size(72, 72); img.centerAlignImage();
   } else if (family === "accessoryRectangular") {
     if (!focus) addText(widget, "Geen lessen gepland", 13, ink, true);
     else {
@@ -164,11 +165,6 @@ function addText(parent, value, size, color, bold, lines) {
   t.textColor = color;
   if (lines) t.lineLimit = lines;
   return t;
-}
-function centered(stack, value, size, bold) {
-  const row = stack.addStack(); row.addSpacer();
-  const t = row.addText(value); t.font = bold ? Font.semiboldSystemFont(size) : Font.systemFont(size);
-  row.addSpacer();
 }
 
 if (config.runsInWidget) Script.setWidget(widget);
