@@ -184,6 +184,11 @@ body.dayMode .dayview{display:block}
 .grade label{display:flex;align-items:center;gap:4px}
 .grade input{width:58px;padding:8px 6px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;text-align:center}
 .grade .status{text-align:center}
+@media (max-width:560px){ /* gsm: vaknaam over de hele breedte, invulvakjes eronder (lange namen overlappen anders) */
+ .grade{grid-template-columns:auto auto 1fr;row-gap:8px}
+ .grade>div{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px}
+ .grade .status{text-align:left}
+}
 .editor .gradesummary{margin:14px 0 0;color:var(--ink);font-size:14px;font-weight:600}
 .static .semester,.static .wx,.static .dayview{display:none!important}
 .menu{max-height:calc(100vh - 180px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
@@ -1066,9 +1071,16 @@ document.addEventListener('keydown',event=>{
  else if(event.key==='t'||event.key==='T')goToday();
 });
 // Swipen op gsm: links = volgende week, rechts = vorige week
-let touchX=null,touchY=0;
-$('single').addEventListener('touchstart',event=>{if(event.touches.length!==1){touchX=null;return}touchX=event.touches[0].clientX;touchY=event.touches[0].clientY},{passive:true});
-$('single').addEventListener('touchend',event=>{if(touchX===null)return;let dx=event.changedTouches[0].clientX-touchX,dy=event.changedTouches[0].clientY-touchY;touchX=null;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5)step(dx<0?1:-1)},{passive:true});
+// De eerste beweging beslist: zijwaarts = wisselen (de pagina blijft dan stil staan), anders gewoon scrollen
+let touchX=null,touchY=0,swipeAxis=null;
+$('single').addEventListener('touchstart',event=>{if(event.touches.length!==1){touchX=null;return}touchX=event.touches[0].clientX;touchY=event.touches[0].clientY;swipeAxis=null},{passive:true});
+$('single').addEventListener('touchmove',event=>{
+ if(touchX===null)return;
+ let dx=Math.abs(event.touches[0].clientX-touchX),dy=Math.abs(event.touches[0].clientY-touchY);
+ if(!swipeAxis&&(dx||dy))swipeAxis=dx>dy?'x':'y';
+ if(swipeAxis==='x'&&event.cancelable)event.preventDefault();
+},{passive:false});
+$('single').addEventListener('touchend',event=>{if(touchX===null)return;let dx=event.changedTouches[0].clientX-touchX;touchX=null;if(swipeAxis==='x'&&Math.abs(dx)>60)step(dx<0?1:-1)},{passive:true});
 
 // Lesvenster: lokaal (met uitleg en route), docent, wijziging, link; buiten de ouderversie ook "Ik volg deze les" en taken
 let currentLesson=null;
