@@ -220,19 +220,16 @@ body.dayMode .dayview{display:block}
 .travelmodes button[aria-pressed=true]{border-color:var(--blue);background:var(--blue-soft)}
 .editor .travelpreview{margin:0;color:var(--ink);font-weight:700}
 
-/* Begroeting, emoji, accentkeuze, back-up */
+/* Begroeting, accentkeuze, back-up */
 h1 .greet{display:none}
 h1.greeting .h1title{display:none}
 h1.greeting .greet{display:inline}
 .static h1 .greet{display:none!important}
 .static h1 .h1title{display:inline!important}
-.emo{margin-right:6px;font-weight:400}
 .accentpick{display:flex;align-items:center;gap:8px;padding:2px 8px 8px 12px}
 .accentpick .ico{width:22px;margin-right:6px;flex:none;text-align:center}
 .menu .accentpick button{width:30px;height:30px;padding:0;border:2px solid transparent;border-radius:50%;background:var(--dot);flex:none}
 .menu .accentpick button[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--card)}
-.colorRow .emojiinput{width:48px;height:36px;margin-right:8px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font-size:18px;text-align:center}
-.colorRow>span:last-child{display:flex;align-items:center}
 
 .backupbtns{display:grid;gap:8px}
 .backupbtns button,.backupload{display:block;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--chip);color:var(--ink);font-weight:700;text-align:center;cursor:pointer}
@@ -428,7 +425,7 @@ body.forceList .list{display:block}
 <p class="note" data-parent-only><strong>Automatisch bijgewerkt:</strong> dit rooster wordt elke nacht opgehaald uit TimeEdit (laatste wijziging: __UPDATED__). Het toont de lessen van Tymo. Tik op een les voor het lokaal, de docent en de route.</p>
 <p class="note">Wissel van week of dag door te swipen. Tik op een les voor meer uitleg, en op het kaartje bovenaan om naar die les te springen.</p>
 <div class="dialogactions"><button class="primary">Klaar</button></div></form></dialog>
-<dialog id="colorsDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Kleuren en emoji</h2><button aria-label="Sluiten">✕</button></div><p>Kies per vak een kleur en een emoji. Alle lessen van dat vak veranderen mee.</p><div id="colorRows"></div><div class="dialogactions"><button type="button" id="resetColors">Standaardkleuren</button><button class="primary">Klaar</button></div></form></dialog>
+<dialog id="colorsDialog" class="editor" data-tymo-only><form method="dialog"><div class="dialogtop"><h2>Kleuren van vakken</h2><button aria-label="Sluiten">✕</button></div><p>Kies een kleur per vak. Alle lessen van dat vak veranderen mee.</p><div id="colorRows"></div><div class="dialogactions"><button type="button" id="resetColors">Standaardkleuren</button><button class="primary">Klaar</button></div></form></dialog>
 <dialog id="lessonDialog" class="editor lessoninfo"><form method="dialog"><div class="dialogtop"><h2 id="lessonTitle"></h2><button aria-label="Sluiten">✕</button></div>
 <p id="lessonMeta"></p>
 <div id="lessonInfo" class="infolist"></div>
@@ -516,8 +513,8 @@ const $=id=>document.getElementById(id);
 const embeddedNode=$('embeddedSettings');
 const instanceId=embeddedNode.dataset.instance||'original';
 const storeKey=(PARENT?'pxl-ouders-rooster-2026-v1-':'pxl-tymo-rooster-2026-v1-')+instanceId;
-let settings={colors:{},skipped:{},listView:false,tasks:{},links:{},friends:[],grades:{},travel:null,emojis:{}};
-function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},skipped:o.skipped||{},listView:!!o.listView,tasks:o.tasks||{},links:o.links||{},friends:Array.isArray(o.friends)?o.friends:[],grades:o.grades||{},travel:o.travel||null,emojis:o.emojis||{}}}
+let settings={colors:{},skipped:{},listView:false,tasks:{},links:{},friends:[],grades:{},travel:null};
+function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},skipped:o.skipped||{},listView:!!o.listView,tasks:o.tasks||{},links:o.links||{},friends:Array.isArray(o.friends)?o.friends:[],grades:o.grades||{},travel:o.travel||null}}
 try{useSettings(JSON.parse(embeddedNode.textContent||'{}'))}catch(err){}
 try{let raw=localStorage.getItem(storeKey)||(!PARENT&&instanceId==='original'?localStorage.getItem('pxl-tymo-rooster-2026-v1'):null);if(raw)useSettings(JSON.parse(raw))}catch(err){}
 function save(){try{localStorage.setItem(storeKey,JSON.stringify(settings))}catch(err){let hint=$('saveHint');if(hint)hint.textContent='Je browser bewaart wijzigingen in dit bestand niet automatisch.'}}
@@ -651,7 +648,7 @@ function menuHtml(){
   +item('today','📅','Ga naar vandaag')+item('month','🗓️','Maandoverzicht')+item('subjects','📚','Vakken')
   +(PARENT?'':'<hr>'+head('Mijn studie')+item('tasks','✏️','Taken')+item('grades','🎓','Punten')+item('friends','👥','Samen vrij'))
   +'<hr>'+head('Instellingen')
-  +(PARENT?'':item('travel','🚲','Reistijd')+item('colors','🖍️','Kleuren en emoji')+item('backup','💾','Back-up')+item('reset','↺','Alle lessen weer volgen')+(WEB?'':item('download','⬇','Download met mijn keuzes')))
+  +(PARENT?'':item('travel','🚲','Reistijd')+item('colors','🖍️','Kleuren')+item('backup','💾','Back-up')+item('reset','↺','Alle lessen weer volgen')+(WEB?'':item('download','⬇','Download met mijn keuzes')))
   +(ON_PHONE?'':item('home','📱',WEB?'Zet op je gsm':'Zet op je beginscherm'))
   +item('print','🖨','Print / bewaar als PDF')+item('info','ℹ️','Over dit rooster');
 }
@@ -827,10 +824,8 @@ function updateGreeting(now){
  h1.classList.add('greeting');h1.querySelector('.greet').textContent=greetingText(now);
 }
 
-// Emoji per vak (standaard uit de instellingen, aan te passen via ⚙ → Kleuren en emoji)
-function emojiFor(key){let own=settings.emojis[key];return (own!==undefined&&own!==null?own:subjects[key]?.emoji)||''}
-function nameHtml(key){let emoji=emojiFor(key);return `${emoji?`<span class="emo" aria-hidden="true">${escapeHtml(emoji)}</span>`:''}${subjects[key].name}`}
-function nameText(key){let emoji=emojiFor(key);return `${emoji?emoji+' ':''}${subjects[key].name}`}
+function nameHtml(key){return subjects[key].name}
+function nameText(key){return subjects[key].name}
 
 // Accentkleur: vervangt het blauw van de app; per toestel bewaard
 const ACCENT_KEY='lessenrooster-accent';
@@ -1202,7 +1197,6 @@ document.addEventListener('click',event=>{
 // Punten meteen bewaren tijdens het typen, zonder het venster opnieuw op te bouwen
 document.addEventListener('input',event=>{
  let t=event.target;
- if(t.dataset.emoji){settings.emojis[t.dataset.emoji]=t.value.trim();save();render();return}
  if(!t.dataset.grade)return;
  let g=settings.grades[t.dataset.grade]||={},value=t.value.trim();
  g[t.dataset.field]=value===''?'':Math.max(0,Math.min(t.dataset.field==='score'?20:60,Number(value)));
@@ -1222,8 +1216,8 @@ document.addEventListener('keydown',event=>{
 
 if(!PARENT){
  function setAttendanceFromHere(id,attending){let found=findLesson(id);if(!found)return;let {w:startWeek,e:source}=found;for(let w of weeks){if(w.start<startWeek.start)continue;for(let e of w.events){if(e.key===source.key&&e.day===source.day&&e.start===source.start&&e.end===source.end)settings.skipped[lessonId(w,e)]=!attending}}save();render()}
- window.renderColors=function(){$('colorRows').innerHTML=Object.entries(subjects).map(([key,s])=>`<div class="colorRow"><span>${s.name}<small>${s.group}</small></span><span><input class="emojiinput" data-emoji="${key}" value="${escapeHtml(emojiFor(key))}" maxlength="4" aria-label="Emoji voor ${s.name}"><input type="color" data-color="${key}" value="${colorFor(key)}" aria-label="Kleur voor ${s.name}"></span></div>`).join('')};
- $('resetColors').onclick=()=>{settings.colors={};settings.emojis={};save();renderColors();render()};
+ window.renderColors=function(){$('colorRows').innerHTML=Object.entries(subjects).map(([key,s])=>`<label class="colorRow"><span>${s.name}<small>${s.group}</small></span><input type="color" data-color="${key}" value="${colorFor(key)}" aria-label="Kleur voor ${s.name}"></label>`).join('')};
+ $('resetColors').onclick=()=>{settings.colors={};save();renderColors();render()};
  document.addEventListener('change',event=>{let t=event.target;if(t.dataset.lesson)setAttendanceFromHere(t.dataset.lesson,t.checked);if(t.dataset.color){settings.colors[t.dataset.color]=t.value;save();render()}});
 }
 

@@ -1,11 +1,11 @@
 {
  "timezone": "Europe/Brussels",
  "subjects": [
-  {"key": "web", "emoji": "🌐", "codes": ["41PRO1010"], "title": "Web Essentials", "name": "Web Essentials", "group": "1PROA", "color": "#4377df"},
-  {"key": "cs", "emoji": "💻", "codes": ["41PRO1020"], "title": "C# Essentials", "name": "C# Essentials", "group": "1PROA", "color": "#8859c9"},
-  {"key": "it", "emoji": "🖥️", "codes": ["41PRO1120"], "title": "IT-organisation", "name": "IT Organisation", "group": "1PROA", "color": "#d68a27"},
-  {"key": "data", "emoji": "📊", "codes": [], "title": "Data Expert", "name": "Data Expert", "group": "2PROA", "color": "#24977b", "keepIfMissing": true},
-  {"key": "pm", "emoji": "📋", "codes": ["42PRO1040"], "title": "Project management", "name": "Project Management", "group": "2PROB", "color": "#d35f78"}
+  {"key": "web", "codes": ["41PRO1010"], "title": "Web Essentials", "name": "Web Essentials", "group": "1PROA", "color": "#4377df"},
+  {"key": "cs", "codes": ["41PRO1020"], "title": "C# Essentials", "name": "C# Essentials", "group": "1PROA", "color": "#8859c9"},
+  {"key": "it", "codes": ["41PRO1120"], "title": "IT-organisation", "name": "IT Organisation", "group": "1PROA", "color": "#d68a27"},
+  {"key": "data", "codes": [], "title": "Data Expert", "name": "Data Expert", "group": "2PROA", "color": "#24977b", "keepIfMissing": true},
+  {"key": "pm", "codes": ["42PRO1040"], "title": "Project management", "name": "Project Management", "group": "2PROB", "color": "#d35f78"}
  ],
  "exclude": [
   {"reason": "C#-monitoraat", "descriptionContains": "monitoraat"},
@@ -18,13 +18,13 @@
  "weather": {"place": "Diepenbeek", "latitude": 50.928, "longitude": 5.393},
  "examPattern": "examen|\\bexam\\b|evaluatie|toets",
  "holidays": [
-  {"name": "Herfstvakantie", "emoji": "🍂", "start": "2026-11-02", "end": "2026-11-08"},
-  {"name": "Wapenstilstand", "emoji": "🕊️", "start": "2026-11-11", "end": "2026-11-11"},
-  {"name": "Kerstvakantie", "emoji": "🎄", "start": "2026-12-18", "end": "2027-01-03"},
-  {"name": "Examenperiode", "emoji": "📝", "start": "2027-01-18", "end": "2027-01-30", "exams": true},
-  {"name": "Lesvrije week", "emoji": "☀️", "start": "2027-02-08", "end": "2027-02-14"},
-  {"name": "Paasvakantie", "emoji": "🐣", "start": "2027-03-29", "end": "2027-04-11"},
-  {"name": "Examenperiode", "emoji": "📝", "start": "2027-06-07", "end": "2027-06-26", "exams": true}
+  {"name": "Herfstvakantie", "start": "2026-11-02", "end": "2026-11-08"},
+  {"name": "Wapenstilstand", "start": "2026-11-11", "end": "2026-11-11"},
+  {"name": "Kerstvakantie", "start": "2026-12-18", "end": "2027-01-03"},
+  {"name": "Examenperiode", "start": "2027-01-18", "end": "2027-01-30", "exams": true},
+  {"name": "Lesvrije week", "start": "2027-02-08", "end": "2027-02-14"},
+  {"name": "Paasvakantie", "start": "2027-03-29", "end": "2027-04-11"},
+  {"name": "Examenperiode", "start": "2027-06-07", "end": "2027-06-26", "exams": true}
  ],
  "extraColors": ["#0e9aa7", "#b5651d", "#6a5acd", "#2e8b57", "#c2185b", "#5d7a1f"]
 }
