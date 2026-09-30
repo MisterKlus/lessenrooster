@@ -4,7 +4,7 @@
 // Toont je les van nu met een voortgangsbalkje (of -ring) en de volgende les.
 // Werkt op het beginscherm (klein, middel, groot) en op het vergrendelscherm.
 
-const VERSION = "30 september 2026 om 10:00"; // ingevuld door src/build.js
+const VERSION = "30 september 2026 om 10:10"; // ingevuld door src/build.js
 const DATA_URL = SITE + "rooster.json?t=" + Date.now(); // altijd de verse versie, niet uit de cache
 console.log("Lessenrooster-widget, versie " + VERSION);
 const SKIPSET = new Set(SKIP || []);

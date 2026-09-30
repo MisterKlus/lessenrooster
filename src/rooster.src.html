@@ -698,9 +698,10 @@ function countdownHtml(now){
  let parts=[],{count,left}=weekStatus(now),today=isoDate(now),holiday=holidays.find(h=>h.start<=today&&today<=h.end);
  if(holiday)parts.push(`${holiday.name}`);
  else if(count){
+  let later=[...left].filter(d=>d!==now.toDateString()).length; // vandaag telt niet mee: op woensdag is "nog 2" donderdag en vrijdag
   if(!left.size)parts.push('Weekend! Deze week zit erop');
-  else if(left.size===1&&left.has(now.toDateString()))parts.push('Laatste lesdag van de week');
-  else parts.push(`Nog ${left.size} lesdagen tot het weekend`);
+  else if(!later)parts.push('Laatste lesdag van de week');
+  else parts.push(`Nog ${later} ${later===1?'lesdag':'lesdagen'} tot het weekend`);
  }
  let exam=allLessons.find(l=>l.e.exam&&l.start>now&&!isSkipped(lessonId(l.w,l.e)));
  if(exam){let n=Math.round((startOfDay(exam.start)-startOfDay(now))/864e5);if(n<=45)parts.push(`${subjects[exam.e.key].name}-examen ${n===0?'vandaag':n===1?'morgen':`over ${n} dagen`}`)}
