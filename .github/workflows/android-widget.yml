@@ -3,7 +3,8 @@
 # Ondertekend met de vaste sleutel (geheimen ANDROID_KEYSTORE_B64 en ANDROID_KEYSTORE_PASSWORD),
 # zodat een nieuwe versie gewoon over de oude installeert.
 # Daarna start de app op een emulator en worden er schermafbeeldingen gemaakt (artefact "schermafbeelding"):
-# nu, in het donker en tijdens een les (klok op donderdag 1 oktober 09:15) voor de aftelklok.
+# nu, in het donker en tijdens een les (klok op donderdag 1 oktober 09:15) voor de aftelklok,
+# en de widget echt op het beginscherm (android/test/widget-op-beginscherm.sh).
 name: Widget-app voor Android bouwen
 
 on:
@@ -60,6 +61,8 @@ jobs:
     needs: bouwen
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4 # voor android/test/
+
       - uses: actions/download-artifact@v4
         with:
           name: apk
@@ -93,6 +96,7 @@ jobs:
             adb shell am start -W -n io.github.misterklus.lessenrooster.thomas/io.github.misterklus.lessenrooster.MainActivity
             sleep 20
             adb exec-out screencap -p > tijdens-les.png
+            bash android/test/widget-op-beginscherm.sh .
 
       - uses: actions/upload-artifact@v4
         with:
