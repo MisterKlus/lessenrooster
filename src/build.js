@@ -128,7 +128,7 @@ async function main(){
  // Gegevens voor de widget (Scriptable): alle lessen met hetzelfde id als in het rooster
  const data=loadSchedule();
  const addDays=(iso,n)=>{const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10)};
- fs.writeFileSync(out('rooster.json'),JSON.stringify({updated:data.updated,subjects:Object.fromEntries(Object.entries(data.subjects).map(([k,v])=>[k,{name:v.name,color:v.color}])),lessons:data.weeks.flatMap(w=>w.events.map(e=>({id:`${w.start}|${e.day}|${e.start}|${e.key}`,date:addDays(w.start,e.day),start:e.start,end:e.end,key:e.key,room:e.room==='Online'?'Online':e.room,...(e.exam?{exam:true}:{})})))}));
+ fs.writeFileSync(out('rooster.json'),JSON.stringify({updated:data.updated,subjects:Object.fromEntries(Object.entries(data.subjects).map(([k,v])=>[k,{name:v.name,short:v.short||v.name.split(/\s+/).map(w=>w[0]).join('').slice(0,4),color:v.color}])),lessons:data.weeks.flatMap(w=>w.events.map(e=>({id:`${w.start}|${e.day}|${e.start}|${e.key}`,date:addDays(w.start,e.day),start:e.start,end:e.end,key:e.key,room:e.room==='Online'?'Online':e.room,...(e.exam?{exam:true}:{})})))}));
  fs.copyFileSync(path.join(src,'widget.js'),out('widget.js')); // de eigenlijke widget, opgehaald door het opstartscript
  // 3. Pagina's
  fs.mkdirSync(out('bestanden'),{recursive:true});

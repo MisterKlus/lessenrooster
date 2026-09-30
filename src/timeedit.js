@@ -107,7 +107,7 @@ function detectChanges(before,after,windowStart){
 function loadSchedule(){
  const data=JSON.parse(fs.readFileSync(dataFile,'utf8'));
  const subjects={};
- for(const s of [...config.subjects,...(data.extraSubjects||[])])subjects[s.key]={name:s.name,group:s.group||'',color:s.color};
+ for(const s of [...config.subjects,...(data.extraSubjects||[])])subjects[s.key]={name:s.name,group:s.group||'',color:s.color,short:s.short||''};
  const dayMs=864e5,toUtc=iso=>{const [y,m,d]=iso.split('-').map(Number);return Date.UTC(y,m-1,d)},isoOf=ms=>new Date(ms).toISOString().slice(0,10);
  const mondayOf=iso=>{const t=toUtc(iso),wd=(new Date(t).getUTCDay()+6)%7;return t-wd*dayMs};
  const isoWeek=monday=>{const thursday=monday+3*dayMs,jan4=Date.UTC(new Date(thursday).getUTCFullYear(),0,4),firstThursday=jan4+(3-(new Date(jan4).getUTCDay()+6)%7)*dayMs;return 1+Math.round((thursday-firstThursday)/(7*dayMs))};

@@ -66,9 +66,9 @@ function progressRing(pct, size, label, sub) {
   ctx.addPath(arc(1)); ctx.setStrokeColor(new Color("#ffffff", 0.25)); ctx.strokePath();
   if (pct > 0) { ctx.addPath(arc(pct)); ctx.setStrokeColor(Color.white()); ctx.strokePath(); }
   ctx.setTextColor(Color.white()); ctx.setTextAlignedCenter();
-  ctx.setFont(Font.semiboldSystemFont(sub ? 17 : 15));
-  ctx.drawTextInRect(label, new Rect(0, sub ? c - 15 : c - 10, size, 22));
-  if (sub) { ctx.setFont(Font.systemFont(10)); ctx.drawTextInRect(sub, new Rect(0, c + 5, size, 14)); }
+  ctx.setFont(Font.semiboldSystemFont(label.length > 3 ? 13 : 15));
+  ctx.drawTextInRect(label, new Rect(4, c - 17, size - 8, 20));
+  if (sub) { ctx.setFont(Font.systemFont(11)); ctx.drawTextInRect(sub, new Rect(4, c + 2, size - 8, 16)); }
   return ctx.getImage();
 }
 
@@ -85,7 +85,7 @@ if (!data) {
 } else {
   const lessons = data.lessons
     .filter(l => !SKIPSET.has(l.id))
-    .map(l => ({ ...l, s: at(l.date, l.start), e: at(l.date, l.end), name: data.subjects[l.key]?.name || l.key, color: data.subjects[l.key]?.color || "#7c4ddb" }))
+    .map(l => ({ ...l, s: at(l.date, l.start), e: at(l.date, l.end), name: data.subjects[l.key]?.name || l.key, short: data.subjects[l.key]?.short || (data.subjects[l.key]?.name || l.key).slice(0, 4), color: data.subjects[l.key]?.color || "#7c4ddb" }))
     .sort((a, b) => a.s - b.s);
   const current = lessons.find(l => l.s <= now && now < l.e);
   const next = lessons.find(l => l.s > now);
@@ -97,10 +97,11 @@ if (!data) {
   if (family === "accessoryInline") {
     widget.addText(focus ? (current ? "Nu " + focus.name + " · nog " + duration(current.e - now) : focus.start + " " + focus.name + " · " + focus.room) : "Geen lessen gepland");
   } else if (family === "accessoryCircular") {
+    // Bovenaan het vak (kort), eronder de resterende tijd of het beginuur
     const minutes = current ? Math.max(1, Math.round((current.e - now) / 60000)) : 0;
-    const text = current ? (minutes >= 60 ? Math.floor(minutes / 60) + "u" + String(minutes % 60).padStart(2, "0") : String(minutes)) : focus ? focus.start : "–";
+    const time = current ? (minutes >= 60 ? Math.floor(minutes / 60) + "u" + String(minutes % 60).padStart(2, "0") : minutes + " min") : focus ? focus.start : "";
     widget.setPadding(0, 0, 0, 0);
-    const img = widget.addImage(progressRing(pct, 72, text, current && minutes < 60 ? "min" : ""));
+    const img = widget.addImage(progressRing(pct, 72, focus ? focus.short : "–", time));
     img.imageSize = new Size(72, 72); img.centerAlignImage();
   } else if (family === "accessoryRectangular") {
     if (!focus) addText(widget, "Geen lessen gepland", 13, ink, true);
