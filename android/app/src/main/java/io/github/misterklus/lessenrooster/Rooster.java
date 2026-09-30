@@ -15,6 +15,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
 import android.view.View;
+import android.util.SizeF;
 import android.widget.RemoteViews;
 
 import org.json.JSONArray;
@@ -36,7 +37,9 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Het rooster voor de widget: ophalen van de rooster-site (rooster.json, hetzelfde als de iPhone-widget),
@@ -181,6 +184,21 @@ final class Rooster {
 
     // ---- Tekenen
 
+    /**
+     * Voor het beginscherm: op Android 12+ kiest de gsm zelf per widgetgrootte. Is de widget niet hoog genoeg
+     * voor "Daarna", dan valt dat weg in plaats van half afgekapt te worden.
+     */
+    private static RemoteViews fitted(Context c, State st, boolean hasData) {
+        RemoteViews full = render(c, st, hasData);
+        if (Build.VERSION.SDK_INT < 31) return full;
+        RemoteViews compact = render(c, st, hasData);
+        compact.setViewVisibility(R.id.later, View.GONE);
+        Map<SizeF, RemoteViews> sizes = new HashMap<>();
+        sizes.put(new SizeF(150f, 60f), compact);
+        sizes.put(new SizeF(150f, 185f), full);
+        return new RemoteViews(sizes);
+    }
+
     static RemoteViews render(Context c, JSONObject data, LocalDateTime now) {
         return render(c, data == null ? null : state(data, now), data != null);
     }
@@ -241,7 +259,7 @@ final class Rooster {
         LocalDateTime now = LocalDateTime.now();
         JSONObject data = readCache(c);
         State st = data == null ? null : state(data, now);
-        manager.updateAppWidget(ids, render(c, st, data != null));
+        manager.updateAppWidget(ids, fitted(c, st, data != null));
         // Nog geen rooster (geen internet bij de eerste keer): na 2 minuten opnieuw proberen
         schedule(c, data == null ? System.currentTimeMillis() + 2 * 60_000L : nextUpdate(st, now));
     }
