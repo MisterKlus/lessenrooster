@@ -1,13 +1,23 @@
-// Bouwt het lessenrooster uit src/rooster.src.html:
-//  - haalt eerst het rooster op uit TimeEdit (als TIMEEDIT_URL of src/timeedit-url.txt bestaat)
-//  - index.html + ouders.html (GitHub Pages: installeerbaar als app, werkt offline)
-//  - bestanden/Lessenrooster_Tymo.html + bestanden/Lessenrooster.html (losse bestanden om door te sturen)
-//  - manifests en sw.js; iconen alleen als ze ontbreken of met --icons (vraagt Windows)
+// Bouwt de lessenroosters uit src/rooster.src.html, voor elke persoon in PEOPLE:
+//  - haalt eerst het rooster op uit TimeEdit (geheim TIMEEDIT_URL / TIMEEDIT_URL_<ID> of een lokaal timeedit-url.txt)
+//  - index.html (GitHub Pages: installeerbaar als app, werkt offline), manifest, sw.js, rooster.json en widget.js
+//  - voor Tymo ook ouders.html en de losse bestanden in bestanden/ om door te sturen
+//  - iconen alleen als ze ontbreken of met --icons (vraagt Windows); iedereen gebruikt dezelfde
 // Alle pagina's worden vooraf gerenderd, zodat het rooster ook zichtbaar is zonder JavaScript.
 // Gebruik: node src/build.js [--icons]
 const fs=require('fs'),path=require('path'),{execFileSync}=require('child_process'),{pathToFileURL}=require('url');
-const {syncFromTimeEdit,loadSchedule}=require('./timeedit');
+const {timeEdit}=require('./timeedit');
 const src=__dirname,root=path.join(src,'..');
+
+// Wie een eigen rooster krijgt. Tymo staat in de hoofdmap; ieder ander in een eigen map (bv. thomas/),
+// met vakken en lessen in src/<id>/ en een eigen TimeEdit-link (geheim TIMEEDIT_URL_<ID>).
+const PEOPLE=[
+ {id:'tymo',name:'Tymo',main:true,program:'Graduaat Programmeren',note:'Weggelaten: het C#-monitoraat en Project management van andere klasgroepen dan 2PROB.'},
+ {id:'thomas',name:'Thomas',program:'Elektromechanica',note:'Het toont je vakken van het eerste en het tweede jaar, zoals gekozen in TimeEdit.'},
+];
+const siteDir=p=>p.main?'':p.id; // map op de site
+const srcDir=p=>p.main?src:path.join(src,p.id);
+const urlEnv=p=>p.main?'TIMEEDIT_URL':'TIMEEDIT_URL_'+p.id.toUpperCase();
 const chrome=process.env.CHROME||'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const out=(...p)=>path.join(root,...p);
 
@@ -42,18 +52,22 @@ function buildIcons(){
  fs.unlinkSync(transparent);
 }
 
-function writeManifestsAndWorker(){
- // Manifests (zonder start_url voor Tymo: zo blijft de link met je keuzes bewaard als je de app toevoegt)
- const icons=[{src:'icons/icon-192.png',sizes:'192x192',type:'image/png'},{src:'icons/icon-512.png',sizes:'512x512',type:'image/png'},{src:'icons/icon-maskable-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'}];
+function writeManifestAndWorker(p){
+ // Manifest zonder start_url: zo blijft de link met je keuzes bewaard als je de app toevoegt
+ const dir=siteDir(p),up=p.main?'':'../';
+ const icons=[{src:up+'icons/icon-192.png',sizes:'192x192',type:'image/png'},{src:up+'icons/icon-512.png',sizes:'512x512',type:'image/png'},{src:up+'icons/icon-maskable-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'}];
  const manifestBase={lang:'nl',display:'standalone',background_color:'#f5f7fc',theme_color:'#f5f7fc',icons};
- fs.writeFileSync(out('manifest.webmanifest'),JSON.stringify({name:'Mijn lessenrooster',short_name:'Lessenrooster',description:'Lessenrooster PXL Graduaat Programmeren',...manifestBase},null,1));
- fs.writeFileSync(out('ouders.webmanifest'),JSON.stringify({name:'Lessenrooster van Tymo',short_name:'Rooster Tymo',description:'Lessenrooster van Tymo, PXL Graduaat Programmeren',start_url:'ouders.html',...manifestBase},null,1));
+ fs.writeFileSync(out(dir,'manifest.webmanifest'),JSON.stringify({name:p.main?'Mijn lessenrooster':`Lessenrooster ${p.name}`,short_name:'Lessenrooster',description:'Lessenrooster PXL '+p.program,...manifestBase},null,1));
+ if(p.main)fs.writeFileSync(out('ouders.webmanifest'),JSON.stringify({name:`Lessenrooster van ${p.name}`,short_name:'Rooster '+p.name,description:`Lessenrooster van ${p.name}, PXL ${p.program}`,start_url:'ouders.html',...manifestBase},null,1));
  // Service worker: eerst het netwerk (roosterwijzigingen komen meteen door), zonder internet de bewaarde versie
- const cached=['./','index.html','ouders.html','manifest.webmanifest','ouders.webmanifest','icons/favicon-48.png','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png','icons/apple-touch-icon.png'];
- fs.writeFileSync(out('sw.js'),`const CACHE='lessenrooster-${Date.now().toString(36)}';
+ const pages=p.main?['./','index.html','ouders.html','manifest.webmanifest','ouders.webmanifest']:['./','index.html','manifest.webmanifest'];
+ const cached=[...pages,...['favicon-48','icon-192','icon-512','icon-maskable-512','apple-touch-icon'].map(name=>`${up}icons/${name}.png`)];
+ const prefix=`lessenrooster-${p.id}-`; // elke persoon zijn eigen cache: ze delen dezelfde site
+ fs.writeFileSync(out(dir,'sw.js'),`const CACHE='${prefix}${Date.now().toString(36)}';
 const FILES=${JSON.stringify(cached)};
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()))});
-self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
+// Oude versies opruimen (ook de oude naam zonder persoon), niet die van de andere roosters
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE&&(key.startsWith('${prefix}')||/^lessenrooster-[^-]+$/.test(key))).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
  const request=event.request;
  if(request.method!=='GET'||new URL(request.url).origin!==location.origin)return;
@@ -74,7 +88,7 @@ function updatedText(iso){
  return `${longDate(`${p.year}-${p.month}-${p.day}`,true)} om ${p.hour}:${p.minute}`;
 }
 
-function variant(base,schedule,{web,parent}){
+function variant(base,schedule,p,{web,parent}){
  const faviconBase64=fs.readFileSync(out('icons','favicon-48.png')).toString('base64');
  const pngBase64=fs.readFileSync(out('icons','apple-touch-icon.png')).toString('base64');
  let s=base;
@@ -84,7 +98,12 @@ function variant(base,schedule,{web,parent}){
  if(web)s=replaceOnce(s,'const WEB=false;','const WEB=true;');
  else s=replaceOnce(replaceOnce(s,'__FAVICON_PNG__',faviconBase64),'__ICON_PNG__',pngBase64);
  s=fill(s,'__MANIFEST__',parent?'ouders.webmanifest':'manifest.webmanifest');
- s=replaceOnce(s,'__APP_TITLE__',parent?'Rooster Tymo':'Lessenrooster');
+ if(!p.main)s=fill(s,'href="icons/','href="../icons/'); // iconen staan in de hoofdmap
+ s=replaceOnce(s,'__APP_TITLE__',parent?'Rooster '+p.name:'Lessenrooster');
+ s=replaceOnce(s,'__PERSON__',JSON.stringify({id:p.id,name:p.name}));
+ s=fill(s,'__NAME__',p.name);
+ s=fill(s,'__PROGRAM__',p.program);
+ s=fill(s,'__NOTE__',p.note);
  s=replaceOnce(s,'__SUBJECTS__',JSON.stringify(schedule.subjects));
  s=replaceOnce(s,'__WEEKS__',JSON.stringify(schedule.weeks));
  s=replaceOnce(s,'__CHANGES__',JSON.stringify(schedule.changes));
@@ -116,26 +135,33 @@ function prerender(html,file){
 }
 
 async function main(){
- // 1. Rooster bijwerken vanuit TimeEdit (bij een fout: verder met de bewaarde lessen)
- const urlFile=path.join(src,'timeedit-url.txt');
- const url=process.env.TIMEEDIT_URL||(fs.existsSync(urlFile)?fs.readFileSync(urlFile,'utf8').trim():'');
- if(process.env.SKIP_TIMEEDIT)console.log('TimeEdit overgeslagen (SKIP_TIMEEDIT)');
- else if(url){try{await syncFromTimeEdit(url)}catch(err){console.warn('TimeEdit niet bijgewerkt:',err.message)}}
- else console.log('Geen TimeEdit-link ingesteld: bewaarde lessen gebruikt');
- // 2. Iconen, manifests, service worker
  if(process.argv.includes('--icons')||!fs.existsSync(out('icons','apple-touch-icon.png')))buildIcons();
- writeManifestsAndWorker();
- // Gegevens voor de widget (Scriptable): alle lessen met hetzelfde id als in het rooster
- const data=loadSchedule();
+ const base=fs.readFileSync(path.join(src,'rooster.src.html'),'utf8');
  const addDays=(iso,n)=>{const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10)};
- fs.writeFileSync(out('rooster.json'),JSON.stringify({updated:data.updated,subjects:Object.fromEntries(Object.entries(data.subjects).map(([k,v])=>[k,{name:v.name,short:v.short||v.name.split(/\s+/).map(w=>w[0]).join('').slice(0,4),color:v.color}])),lessons:data.weeks.flatMap(w=>w.events.map(e=>({id:`${w.start}|${e.day}|${e.start}|${e.key}`,date:addDays(w.start,e.day),start:e.start,end:e.end,key:e.key,room:e.room==='Online'?'Online':e.room,...(e.exam?{exam:true}:{})})))}));
- fs.writeFileSync(out('widget.js'),fs.readFileSync(path.join(src,'widget.js'),'utf8').replace('__VERSION__',updatedText(new Date().toISOString()))); // de eigenlijke widget, opgehaald door het opstartscript
- // 3. Pagina's
- fs.mkdirSync(out('bestanden'),{recursive:true});
- const base=fs.readFileSync(path.join(src,'rooster.src.html'),'utf8'),schedule=loadSchedule();
- prerender(variant(base,schedule,{web:true,parent:false}),out('index.html'));
- prerender(variant(base,schedule,{web:true,parent:true}),out('ouders.html'));
- prerender(variant(base,schedule,{web:false,parent:false}),out('bestanden','Lessenrooster_Tymo.html'));
- prerender(variant(base,schedule,{web:false,parent:true}),out('bestanden','Lessenrooster.html'));
+ for(const p of PEOPLE){
+  console.log(`\n${p.name}`);
+  const te=timeEdit(srcDir(p)),dir=siteDir(p);
+  // 1. Rooster bijwerken vanuit TimeEdit (bij een fout: verder met de bewaarde lessen)
+  const urlFile=path.join(srcDir(p),'timeedit-url.txt');
+  const url=process.env[urlEnv(p)]||(fs.existsSync(urlFile)?fs.readFileSync(urlFile,'utf8').trim():'');
+  if(process.env.SKIP_TIMEEDIT)console.log('TimeEdit overgeslagen (SKIP_TIMEEDIT)');
+  else if(url){try{await te.syncFromTimeEdit(url)}catch(err){console.warn('TimeEdit niet bijgewerkt:',err.message)}}
+  else console.log(`Geen TimeEdit-link ingesteld (${urlEnv(p)}): bewaarde lessen gebruikt`);
+  const schedule=te.loadSchedule();
+  if(!schedule){console.warn('Nog geen lessen: dit rooster wordt overgeslagen');continue}
+  // 2. Manifest en service worker
+  fs.mkdirSync(out(dir),{recursive:true});
+  writeManifestAndWorker(p);
+  // Gegevens voor de widget (Scriptable): alle lessen met hetzelfde id als in het rooster
+  fs.writeFileSync(out(dir,'rooster.json'),JSON.stringify({updated:schedule.updated,subjects:Object.fromEntries(Object.entries(schedule.subjects).map(([k,v])=>[k,{name:v.name,short:v.short||v.name.split(/\s+/).map(w=>w[0]).join('').slice(0,4),color:v.color}])),lessons:schedule.weeks.flatMap(w=>w.events.map(e=>({id:`${w.start}|${e.day}|${e.start}|${e.key}`,date:addDays(w.start,e.day),start:e.start,end:e.end,key:e.key,room:e.room==='Online'?'Online':e.room,...(e.exam?{exam:true}:{})})))}));
+  fs.writeFileSync(out(dir,'widget.js'),fs.readFileSync(path.join(src,'widget.js'),'utf8').replace('__VERSION__',updatedText(new Date().toISOString()))); // de eigenlijke widget, opgehaald door het opstartscript
+  // 3. Pagina's
+  prerender(variant(base,schedule,p,{web:true,parent:false}),out(dir,'index.html'));
+  if(!p.main)continue;
+  prerender(variant(base,schedule,p,{web:true,parent:true}),out('ouders.html'));
+  fs.mkdirSync(out('bestanden'),{recursive:true});
+  prerender(variant(base,schedule,p,{web:false,parent:false}),out('bestanden',`Lessenrooster_${p.name}.html`));
+  prerender(variant(base,schedule,p,{web:false,parent:true}),out('bestanden','Lessenrooster.html'));
+ }
 }
 main().catch(err=>{console.error(err);process.exit(1)});

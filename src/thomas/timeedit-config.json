@@ -1,0 +1,12 @@
+{
+ "subjects": [
+  {"key": "auto", "short": "Auto", "codes": ["12EMA1130"], "title": "Automatisering", "name": "Automatisering 2", "group": "2e jaar", "color": "#5b7bd5"},
+  {"key": "reken", "short": "Reken", "codes": ["11EMA1023"], "title": "Rekentechnieken", "name": "Rekentechnieken 1", "group": "1e jaar", "color": "#8b6cc4"},
+  {"key": "statica", "short": "Stat", "codes": ["11EMA1040"], "title": "Statica", "name": "Statica", "group": "1e jaar", "color": "#c79443"},
+  {"key": "onderzoek", "short": "PGO", "codes": ["11EMA1080"], "title": "Praktijkgericht onderzoek", "name": "Praktijkgericht onderzoek 1", "group": "1e jaar", "color": "#3a9580"},
+  {"key": "skills", "short": "Skills", "codes": ["12EMA1100"], "title": "Project skills", "name": "Project skills 1", "group": "2e jaar", "color": "#c46b80"},
+  {"key": "mech", "short": "Mech", "codes": ["11EMA1190"], "title": "Mechanische machines", "name": "Mechanische machines 1", "group": "1e jaar", "color": "#4a9cb8"},
+  {"key": "sterkte", "short": "Sterk", "codes": ["12EMA1160", "12EMO3040"], "title": "Toegepaste sterkteleer", "name": "Toegepaste sterkteleer", "group": "2e jaar", "color": "#b0704a"}
+ ],
+ "exclude": []
+}

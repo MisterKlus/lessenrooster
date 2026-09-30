@@ -17,7 +17,7 @@ const days = ["zondag", "maandag", "dinsdag", "woensdag", "donderdag", "vrijdag"
 
 async function loadData() {
   const fm = FileManager.local();
-  const cache = fm.joinPath(fm.documentsDirectory(), "lessenrooster-cache.json");
+  const cache = fm.joinPath(fm.documentsDirectory(), "lessenrooster-cache-" + SITE.replace(/[^a-z0-9]+/gi, "-") + ".json"); // per rooster
   try {
     const data = await new Request(DATA_URL).loadJSON();
     fm.writeString(cache, JSON.stringify(data));

@@ -1,8 +1,8 @@
-const CACHE='lessenrooster-tymo-muntfi5o';
-const FILES=["./","index.html","ouders.html","manifest.webmanifest","ouders.webmanifest","icons/favicon-48.png","icons/icon-192.png","icons/icon-512.png","icons/icon-maskable-512.png","icons/apple-touch-icon.png"];
+const CACHE='lessenrooster-thomas-muntfksn';
+const FILES=["./","index.html","manifest.webmanifest","../icons/favicon-48.png","../icons/icon-192.png","../icons/icon-512.png","../icons/icon-maskable-512.png","../icons/apple-touch-icon.png"];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()))});
 // Oude versies opruimen (ook de oude naam zonder persoon), niet die van de andere roosters
-self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE&&(key.startsWith('lessenrooster-tymo-')||/^lessenrooster-[^-]+$/.test(key))).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE&&(key.startsWith('lessenrooster-thomas-')||/^lessenrooster-[^-]+$/.test(key))).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
  const request=event.request;
  if(request.method!=='GET'||new URL(request.url).origin!==location.origin)return;
