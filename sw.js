@@ -1,4 +1,4 @@
-const CACHE='lessenrooster-tymo-mupapy3l';
+const CACHE='lessenrooster-tymo-mupay2oa';
 const FILES=["./","index.html","ouders.html","manifest.webmanifest","ouders.webmanifest","icons/favicon-48.png","icons/icon-192.png","icons/icon-512.png","icons/icon-maskable-512.png","icons/apple-touch-icon.png"];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()))});
 // Oude versies opruimen (ook de oude naam zonder persoon), niet die van de andere roosters
