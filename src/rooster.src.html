@@ -119,6 +119,25 @@ h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-
 /* Geheim thema blauwdruk: wit op technisch blauw met een raster, zoals een bouwtekening */
 html:root[data-egg=blauwdruk]{color-scheme:dark;--on-blue:#1d4e89;--ink:#fff;--muted:#b9d3f5;--faint:#9cbde6;--line:#4f7fbf;--bg:#1d4e89;--card:#215893;--chip:#2a63a0;--head:#235b96;--grid:#2c64a1;--hover:#2d68a8;--blue:#fff;--blue-ink:#fff;--blue-soft:#2d68a8;--pill-line:#6f9fd8;--today-bg:#2a64a2;--today-line:#9cc2f0;--today-ring:#2d68a8;--skip-bg:#24578f;--skip-ink:#9cbde6;--switch-off:#4f7fbf;--bar:rgba(29,78,137,.94);--shadow:0 14px 40px rgba(0,0,0,.25);--menu-shadow:0 15px 40px #0006}
 html:root[data-egg=blauwdruk] body{background-image:linear-gradient(#ffffff12 1px,transparent 1px),linear-gradient(90deg,#ffffff12 1px,transparent 1px);background-size:24px 24px}
+/* Geheime PLC-modus: groen op zwart, zoals een oud industrieel bedieningsscherm */
+html:root[data-plc]{color-scheme:dark;--on-blue:#000;--ink:#39ff6a;--muted:#25b84d;--faint:#1f9a40;--line:#1f6b33;--bg:#000;--card:#020a04;--chip:#05140a;--head:#031008;--grid:#0b2a14;--hover:#0a2412;--blue:#39ff6a;--blue-ink:#39ff6a;--blue-soft:#08200f;--pill-line:#1f6b33;--today-bg:#06200d;--today-line:#39ff6a;--today-ring:#0a2a12;--skip-bg:#031008;--skip-ink:#1f9a40;--switch-off:#1f6b33;--bar:rgba(0,0,0,.94);--shadow:none;--menu-shadow:0 0 0 1px #1f6b33}
+html:root[data-plc] body{font-family:ui-monospace,"Cascadia Mono","Courier New",monospace;background-image:repeating-linear-gradient(0deg,#39ff6a0f 0 1px,transparent 1px 3px)}
+html:root[data-plc] [style*="--accent"]{--accent:#39ff6a!important}
+html:root[data-plc] .weekname{font-size:14px;letter-spacing:-.03em} /* typemachineletters zijn breder */
+html:root[data-plc] h1 .greet::after{content:"_";animation:plc-blink 1s steps(1) infinite}
+@keyframes plc-blink{50%{opacity:0}}
+/* Lang indrukken (trofeeënkast, hoofdrekenen): geen tekstselectie of menu */
+html[data-eggs] h1,html[data-eggs] [data-open]{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.eggdialog .eggsum{margin:6px 0 12px;font-size:30px;font-weight:700;text-align:center}
+.eggdialog input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:20px;text-align:center}
+.eggdialog .eggresult{min-height:1.4em;margin:10px 0 0;font-weight:600;text-align:center;color:var(--muted)}
+.eggdialog .eggresult.ok{color:var(--blue)}
+.trophies{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.trophy{display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--chip);color:var(--muted)}
+.trophy svg{width:22px;height:22px;flex:none}
+.trophy.got{background:var(--blue-soft);border-color:var(--pill-line);color:var(--blue)}
+.trophy b{display:block;color:var(--ink)}
+.trophy small{display:block;font-size:12px;color:var(--muted)}
 .static .eggbanner,.static .eggsecret{display:none!important}
 @media print{.eggbanner,.eggsecret,.gears{display:none!important}}
 
@@ -1057,7 +1076,8 @@ function toast(text){let el=document.createElement('div');el.className='toast';e
 
 // Easter eggs (alleen als EGGS is ingevuld, dus op het rooster van Thomas; dezelfde zitten in zijn Android-app):
 // 7 keer op de titel tikken (blauwdruk), schudden (tandwielen), verjaardag, nachtuil en een geheime boodschap onderaan
-var eggState={taps:0,tapAt:0,shakes:0,shakeAt:0,gears:null};
+var eggState={taps:0,tapAt:0,shakes:0,shakeAt:0,gears:null,plcTaps:0,plcAt:0,plcTimer:0,pressTimer:0,pressAt:null,suppressClick:false};
+const eggsLive=()=>!!EGGS&&location.protocol!=='file:'; // niet tijdens het vooraf renderen (src/build.js)
 function eggToast(text){document.querySelectorAll('.toast').forEach(el=>el.remove());toast(text)}
 function setBlueprint(on){if(on)document.documentElement.dataset.egg='blauwdruk';else delete document.documentElement.dataset.egg}
 function eggTitleTap(){ // zoals de verborgen ontwikkelaarsopties van Android
@@ -1066,21 +1086,25 @@ function eggTitleTap(){ // zoals de verborgen ontwikkelaarsopties van Android
   eggState.taps=0;let on=document.documentElement.dataset.egg!=='blauwdruk';setBlueprint(on);
   try{if(on)localStorage.setItem(personKey('lessenrooster-blauwdruk'),'1');else localStorage.removeItem(personKey('lessenrooster-blauwdruk'))}catch(err){}
   eggToast(on?'Je bent nu roosteringenieur! Je rooster staat in blauwdruk.':'Blauwdruk uit. Gewoon weer student.');
+  if(on)earn('blauwdruk');
  }else if(eggState.taps>=3)eggToast(`Nog ${7-eggState.taps} keer tikken…`);
 }
 function isBirthday(now){return !!EGGS&&EGGS.birthday===`${pad(now.getMonth()+1)}-${pad(now.getDate())}`}
 // Bovenaan: verjaardag, of "nachtuil" tussen middernacht en 5 uur (wordt elke minuut bijgewerkt)
 function eggBanner(now){
- if(!EGGS)return;
+ if(!eggsLive())return;
  let banner=$('eggBanner');
  if(!banner){banner=document.createElement('p');banner.id='eggBanner';banner.className='eggbanner';document.querySelector('.top').after(banner)}
  let text='';
- if(isBirthday(now))text=`Gelukkige verjaardag, ${PERSON.name}!`;
+ if(isBirthday(now)){text=`Gelukkige verjaardag, ${PERSON.name}!`;earn('jarig')}
  else if(now.getHours()<5){
   let first=allLessons.find(l=>l.start>now&&l.start.toDateString()===now.toDateString()&&!isSkipped(lessonId(l.w,l.e)));
   text=first?`Nachtuil! Je eerste les begint al om ${first.e.start}. Ga maar lekker slapen.`:'Nachtuil! Vandaag heb je geen les, maar slapen mag ook.';
+  earn('nachtuil');
  }
  banner.textContent=text;banner.hidden=!text;
+ if(now.getHours()>=5&&now.getHours()<7)earn('vroegevogel');
+ if(now.getDay()===0||now.getDay()===6)earn('weekend');
 }
 // Schudden: tandwielen die draaien (hoe harder, hoe sneller; wrijving remt ze af), zoals in de app
 function onShake(event){
@@ -1090,7 +1114,7 @@ function onShake(event){
   if(now-eggState.shakeAt<120)return; // één schok geeft meerdere metingen
   eggState.shakes=now-eggState.shakeAt<900?eggState.shakes+1:1;eggState.shakeAt=now;
   if(eggState.shakes<3)return; // echt schudden, niet per ongeluk
-  eggState.gears=showGears();
+  eggState.gears=showGears();earn('tandwielen');
  }
  eggState.shakeAt=now;eggState.gears.kick(force*30);
 }
@@ -1125,16 +1149,123 @@ function showGears(){
  box.addEventListener('click',hide);
  return {kick(force){speed=Math.min(speed+force,2400)}};
 }
+
+// PLC-modus: 3 keer snel op een les Automatisering tikken (één tik opent de les gewoon, iets later)
+function setPlc(on){if(on)document.documentElement.dataset.plc='run';else delete document.documentElement.dataset.plc}
+function togglePlc(){
+ let on=!document.documentElement.dataset.plc;setPlc(on);
+ try{if(on)localStorage.setItem(personKey('lessenrooster-plc'),'1');else localStorage.removeItem(personKey('lessenrooster-plc'))}catch(err){}
+ eggToast(on?'PLC-modus: RUN. Je rooster draait nu op een PLC.':'PLC-modus: STOP. Terug naar gewoon.');
+ if(on)earn('plc');
+}
+const lessonKey=el=>el.dataset.open.split('|')[3];
+function eggClick(event){
+ let lesson=event.target.closest('[data-open]');
+ if(eggState.suppressClick&&(lesson||event.target.closest('h1'))){ // de tik waarmee je een lang indrukken loslaat
+  eggState.suppressClick=false;event.stopPropagation();event.preventDefault();return;
+ }
+ if(!lesson||lessonKey(lesson)!==EGGS.plc)return;
+ event.stopPropagation();event.preventDefault();
+ let now=Date.now(),id=lesson.dataset.open;eggState.plcTaps=now-eggState.plcAt<450?eggState.plcTaps+1:1;eggState.plcAt=now;
+ clearTimeout(eggState.plcTimer);
+ if(eggState.plcTaps>=3){eggState.plcTaps=0;togglePlc();return}
+ eggState.plcTimer=setTimeout(()=>{eggState.plcTaps=0;openLesson(id)},450);
+}
+
+// Lang indrukken: op je naam de trofeeënkast, op een les Rekentechnieken een hoofdrekensom
+function eggPressStart(event){
+ if(event.button>0)return;
+ let lesson=event.target.closest('[data-open]');
+ let kind=event.target.closest('h1')?'kast':lesson&&lessonKey(lesson)===EGGS.quiz?'som':null;
+ if(!kind)return;
+ clearTimeout(eggState.pressTimer);eggState.pressAt=[event.clientX,event.clientY];
+ eggState.pressTimer=setTimeout(()=>{
+  eggState.suppressClick=true;setTimeout(()=>{eggState.suppressClick=false},900);
+  navigator.vibrate?.(25);
+  if(kind==='kast')openTrophies();else showQuiz();
+ },650);
+}
+function eggPressEnd(event){
+ if(event.type==='pointermove'&&eggState.pressAt&&Math.hypot(event.clientX-eggState.pressAt[0],event.clientY-eggState.pressAt[1])<10)return;
+ clearTimeout(eggState.pressTimer);eggState.pressAt=null;
+}
+function eggDialog(title,body,primary){
+ let d=document.createElement('dialog');d.className='editor eggdialog';
+ d.innerHTML=`<form method="dialog"><div class="dialogtop"><h2>${title}</h2><button aria-label="Sluiten">✕</button></div>${body}<div class="dialogactions"><button class="primary">${primary}</button></div></form>`;
+ document.body.append(d);d.addEventListener('close',()=>d.remove());d.showModal();return d;
+}
+function showQuiz(){
+ let a=12+Math.floor(Math.random()*18),b=3+Math.floor(Math.random()*17),answered=false;
+ let d=eggDialog('Hoofdrekenen',`<p>Snel, zonder rekenmachine:</p><p class="eggsum">${a} × ${b} = ?</p><input type="number" inputmode="numeric" aria-label="Je antwoord" autocomplete="off"><p class="eggresult" aria-live="polite"></p>`,'Controleer');
+ let input=d.querySelector('input'),button=d.querySelector('.primary'),result=d.querySelector('.eggresult');
+ d.querySelector('form').addEventListener('submit',event=>{
+  if(answered||(event.submitter&&event.submitter!==button))return; // daarna (of met ✕) gewoon sluiten
+  event.preventDefault();
+  if(input.value.trim()===''){input.focus();return}
+  answered=true;let ok=+input.value===a*b;
+  result.textContent=ok?`Rekenwonder! ${a} × ${b} = ${a*b}.`:`Toch maar naar de les gaan. Het was ${a*b}.`;
+  result.classList.toggle('ok',ok);input.disabled=true;button.textContent='Klaar';
+  if(ok)earn('rekenwonder');
+ });
+ setTimeout(()=>input.focus(),50);
+}
+
+// Trofeeënkast: wat je al gevonden hebt; de rest blijft geheim, met een hint
+const TROPHIES=[
+ ['kast','Trofeeënjager','Je vond de trofeeënkast.',''],
+ ['blauwdruk','Roosteringenieur','7 keer op je naam getikt.','Wie volhoudt, ziet alles in het blauw.'],
+ ['tandwielen','In beweging','Je gsm geschud.','Soms moet je de boel eens opschudden.'],
+ ['geheim','Doorzetter','Voorbij het einde van je rooster gescrold.','Je rooster is langer dan je denkt.'],
+ ['plc','PLC-programmeur','3 keer snel op een les Automatisering getikt.','Sommige lessen zijn sneller geautomatiseerd.'],
+ ['rekenwonder','Rekenwonder','Een hoofdrekensom juist.','Houd vol bij Rekentechnieken.'],
+ ['nachtuil','Nachtuil','Je rooster bekeken tussen middernacht en 5 uur.','Sommigen slapen nooit.'],
+ ['jarig','Jarig','Je rooster bekeken op je verjaardag.','Eén keer per jaar te verdienen.'],
+ ['vroegevogel','Vroege vogel','Je rooster bekeken vóór 7 uur.','De vroege vogel…'],
+ ['weekend','Weekendstrijder','Je rooster bekeken in het weekend.','Ook op rustdagen nieuwsgierig.'],
+];
+const EGG_IDS=['kast','blauwdruk','tandwielen','geheim','plc','rekenwonder','nachtuil','jarig']; // de easter eggs zelf (vroege vogel en weekend zijn gewone trofeeën)
+ICONS.trophy='<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>';
+ICONS.lock='<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>';
+function trophies(){try{return JSON.parse(localStorage.getItem(personKey('lessenrooster-trofeeen'))||'{}')}catch(err){return {}}}
+function earn(id){
+ if(!eggsLive())return;
+ let got=trophies();if(got[id])return;got[id]=Date.now();
+ try{localStorage.setItem(personKey('lessenrooster-trofeeen'),JSON.stringify(got))}catch(err){return}
+ updateSecret();
+ if(id==='kast')return;
+ let name=TROPHIES.find(t=>t[0]===id)[1],first=Object.keys(got).length===1;
+ setTimeout(()=>eggToast(first?`Je eerste trofee: ${name}! Houd je naam ingedrukt voor je trofeeënkast.`:`Nieuwe trofee: ${name}`),1800);
+}
+function openTrophies(){
+ earn('kast');
+ let got=trophies(),count=TROPHIES.filter(t=>got[t[0]]).length;
+ let rows=TROPHIES.map(([id,name,done,hint])=>got[id]?`<li class="trophy got">${icon('trophy')}<div><b>${name}</b><small>${done}</small></div></li>`:`<li class="trophy">${icon('lock')}<div><b>???</b><small>${hint}</small></div></li>`).join('');
+ eggDialog('Trofeeënkast',`<p>${count} van ${TROPHIES.length} gevonden</p><ul class="trophies">${rows}</ul>`,'Klaar');
+}
+// De geheime boodschap telt mee hoeveel easter eggs er nog te vinden zijn
+function updateSecret(){
+ let p=document.querySelector('#eggSecret p');if(!p)return;
+ let left=EGG_IDS.filter(id=>!trophies()[id]).length;
+ p.textContent=left?`Nog ${left} easter ${left===1?'egg':'eggs'} te gaan…`:'Je hebt alle easter eggs gevonden!';
+}
+
 function initEggs(){
- if(!EGGS)return;
- try{setBlueprint(localStorage.getItem(personKey('lessenrooster-blauwdruk'))==='1')}catch(err){}
+ if(!eggsLive())return;
+ document.documentElement.dataset.eggs='';
+ try{setBlueprint(localStorage.getItem(personKey('lessenrooster-blauwdruk'))==='1');setPlc(localStorage.getItem(personKey('lessenrooster-plc'))==='1')}catch(err){}
  let h1=document.querySelector('h1');h1.classList.add('eggtitle');h1.addEventListener('click',eggTitleTap);
  addEventListener('devicemotion',onShake);
+ document.addEventListener('click',eggClick,true); // vóór de gewone klikken op lessen
+ addEventListener('pointerdown',eggPressStart);
+ ['pointerup','pointercancel','pointermove'].forEach(type=>addEventListener(type,eggPressEnd));
+ document.addEventListener('contextmenu',event=>{if(event.target.closest('h1,[data-open]'))event.preventDefault()});
  if(!$('eggSecret')){ // ver onder het einde: alleen te vinden als je blijft doorscrollen
   let secret=document.createElement('div');secret.id='eggSecret';secret.className='eggsecret';
-  secret.innerHTML='<b>Je hebt me gevonden!</b><p>Nog 4 easter eggs te gaan…</p><small>Groetjes Tymo Xxx</small>';
+  secret.innerHTML='<b>Je hebt me gevonden!</b><p></p><small>Groetjes Tymo Xxx</small>';
   document.querySelector('main.shell').append(secret);
+  new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting))earn('geheim')}).observe(secret);
  }
+ updateSecret();
  let now=new Date();eggBanner(now);
  if(isBirthday(now))setTimeout(()=>throwConfetti(120),600);
 }
