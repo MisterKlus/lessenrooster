@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
         } else if (now.getHour() < 5) {
             Rooster.State st = data == null ? null : Rooster.state(data, now);
             boolean lessonToday = st != null && st.next != null && st.next.from.toLocalDate().equals(now.toLocalDate());
-            banner.setText(lessonToday ? "Nachtuil! Je eerste les begint pas om " + st.next.start + ". Ga maar lekker slapen."
+            banner.setText(lessonToday ? "Nachtuil! Je eerste les begint al om " + st.next.start + ". Ga maar lekker slapen."
                     : "Nachtuil! Vandaag heb je geen les, maar slapen mag ook.");
         } else {
             banner.setVisibility(View.GONE);

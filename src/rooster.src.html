@@ -1078,7 +1078,7 @@ function eggBanner(now){
  if(isBirthday(now))text=`Gelukkige verjaardag, ${PERSON.name}!`;
  else if(now.getHours()<5){
   let first=allLessons.find(l=>l.start>now&&l.start.toDateString()===now.toDateString()&&!isSkipped(lessonId(l.w,l.e)));
-  text=first?`Nachtuil! Je eerste les begint pas om ${first.e.start}. Ga maar lekker slapen.`:'Nachtuil! Vandaag heb je geen les, maar slapen mag ook.';
+  text=first?`Nachtuil! Je eerste les begint al om ${first.e.start}. Ga maar lekker slapen.`:'Nachtuil! Vandaag heb je geen les, maar slapen mag ook.';
  }
  banner.textContent=text;banner.hidden=!text;
 }
