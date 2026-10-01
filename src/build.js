@@ -12,7 +12,7 @@ const src=__dirname,root=path.join(src,'..');
 // Wie een eigen rooster krijgt. Tymo staat in de hoofdmap; ieder ander in een eigen map (bv. thomas/),
 // met vakken en lessen in src/<id>/ en een eigen TimeEdit-link (geheim TIMEEDIT_URL_<ID>).
 const PEOPLE=[
- {id:'tymo',name:'Tymo',main:true,program:'Graduaat Programmeren',note:'Weggelaten: het C#-monitoraat, Project management van andere klasgroepen dan 2PROB en Data Expert op dinsdag.'},
+ {id:'tymo',name:'Tymo',main:true,styles:true,program:'Graduaat Programmeren',note:'Weggelaten: het C#-monitoraat, Project management van andere klasgroepen dan 2PROB en Data Expert op dinsdag.'},
  {id:'thomas',name:'Thomas',program:'Elektromechanica',androidApp:'https://github.com/MisterKlus/lessenrooster/releases/download/widget-app-thomas/lessenrooster-widget.apk',eggs:{birthday:'01-14',plc:'auto',quiz:'reken'},note:'Het toont je vakken van het eerste en het tweede jaar, zoals gekozen in TimeEdit.'},
 ];
 const siteDir=p=>p.main?'':p.id; // map op de site
@@ -143,6 +143,8 @@ function variant(base,schedule,p,{web,parent}){
  if(!p.main)s=fill(s,'href="icons/','href="../icons/'); // iconen staan in de hoofdmap
  s=replaceOnce(s,'__APP_TITLE__',parent?'Rooster '+p.name:'Lessenrooster');
  s=replaceOnce(s,'__PERSON__',JSON.stringify({id:p.id,name:p.name}));
+ s=fill(s,'__STYLE_KEY__',p.styles&&!parent?'lessenrooster-stijl':''); // stijlkiezer (Instellingen → Stijl), alleen Tymo
+ s=replaceOnce(s,'__STYLES__',p.styles&&!parent?'true':'false');
  s=replaceOnce(s,'__EGGS__',web&&!parent&&p.eggs?JSON.stringify(p.eggs):'null'); // easter eggs: verjaardag (alleen dag en maand, de site is openbaar), vak voor de PLC-modus en voor hoofdrekenen
  s=fill(s,'__NAME__',p.name);
  s=fill(s,'__PROGRAM__',p.program);
