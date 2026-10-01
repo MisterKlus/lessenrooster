@@ -195,9 +195,9 @@ final class Rooster {
      * voor "Daarna", dan valt dat weg in plaats van half afgekapt te worden.
      */
     private static RemoteViews fitted(Context c, State st, boolean hasData) {
-        RemoteViews full = render(c, st, hasData);
+        RemoteViews full = render(c, st, hasData, false);
         if (Build.VERSION.SDK_INT < 31) return full;
-        RemoteViews compact = render(c, st, hasData);
+        RemoteViews compact = render(c, st, hasData, false);
         compact.setViewVisibility(R.id.later, View.GONE);
         Map<SizeF, RemoteViews> sizes = new HashMap<>();
         sizes.put(new SizeF(150f, 60f), compact);
@@ -206,18 +206,16 @@ final class Rooster {
     }
 
     static RemoteViews render(Context c, JSONObject data, LocalDateTime now) {
-        return render(c, data == null ? null : state(data, now), data != null);
+        return render(c, data == null ? null : state(data, now), data != null, true);
     }
 
-    private static RemoteViews render(Context c, State st, boolean hasData) {
+    /** inApp: het voorbeeld in de app (daar volgt het de easter eggs); anders de widget op het beginscherm (altijd gewoon). */
+    private static RemoteViews render(Context c, State st, boolean hasData, boolean inApp) {
         RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.widget);
         Intent open = new Intent(Intent.ACTION_VIEW, Uri.parse(c.getString(R.string.site_url)));
         v.setOnClickPendingIntent(R.id.root, PendingIntent.getActivity(c, 0, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
-        boolean blueprint = Eggs.blueprint(c);
+        boolean blueprint = inApp && Eggs.blueprint(c);
         if (blueprint) blueprint(v);
-        boolean birthday = Eggs.birthday(LocalDate.now());
-        v.setViewVisibility(R.id.birthday, birthday ? View.VISIBLE : View.GONE);
-        if (birthday) v.setTextViewText(R.id.birthday, "Gelukkige verjaardag, " + Eggs.NAME + "!");
         if (st == null || st.focus == null) {
             v.setViewVisibility(R.id.lesson, View.GONE);
             v.setViewVisibility(R.id.later, View.GONE);
@@ -257,10 +255,10 @@ final class Rooster {
         return v;
     }
 
-    /** Geheim thema "blauwdruk" (easter egg: 7 keer op de titel in de app tikken): wit op technisch blauw. */
+    /** Geheim thema "blauwdruk" (easter egg: 7 keer op de titel in de app tikken), alleen in de app: wit op technisch blauw. */
     private static void blueprint(RemoteViews v) {
         v.setInt(R.id.root, "setBackgroundResource", R.drawable.widget_bg_blueprint);
-        for (int id : new int[]{R.id.label, R.id.name, R.id.countdown, R.id.birthday}) v.setTextColor(id, Color.WHITE);
+        for (int id : new int[]{R.id.label, R.id.name, R.id.countdown}) v.setTextColor(id, Color.WHITE);
         for (int id : new int[]{R.id.meta, R.id.later, R.id.message, R.id.countdown_caption}) v.setTextColor(id, 0xFFB9D3F5);
     }
 

@@ -7,6 +7,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -44,6 +46,7 @@ public class MainActivity extends Activity {
         findViewById(R.id.open).setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.site_url)))));
         findViewById(R.id.title).setOnClickListener(v -> onTitleTap());
         findViewById(R.id.gears_overlay).setOnClickListener(v -> hideGears());
+        if (Eggs.blueprint(this)) applyBlueprint();
         // Android 13+: toestemming vragen voor meldingen bij een roosterwijziging
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
@@ -90,23 +93,26 @@ public class MainActivity extends Activity {
         if (data == null && loading) ((TextView) widget.findViewById(R.id.message)).setText("Rooster ophalen…");
         box.removeAllViews();
         box.addView(widget);
-        showOwl(data);
+        showBanner(data);
     }
 
-    // ---- Easter egg "nachtuil": de app openen tussen middernacht en 5 uur
+    // ---- Easter eggs bovenaan: verjaardag, of "nachtuil" als je de app tussen middernacht en 5 uur opent
 
-    private void showOwl(JSONObject data) {
-        TextView owl = findViewById(R.id.owl);
+    private void showBanner(JSONObject data) {
+        TextView banner = findViewById(R.id.banner);
         LocalDateTime now = LocalDateTime.now();
-        if (now.getHour() >= 5) {
-            owl.setVisibility(View.GONE);
+        if (Eggs.birthday(now.toLocalDate())) {
+            banner.setText("Gelukkige verjaardag, " + Eggs.NAME + "!");
+        } else if (now.getHour() < 5) {
+            Rooster.State st = data == null ? null : Rooster.state(data, now);
+            boolean lessonToday = st != null && st.next != null && st.next.from.toLocalDate().equals(now.toLocalDate());
+            banner.setText(lessonToday ? "Nachtuil! Je eerste les begint pas om " + st.next.start + ". Ga maar lekker slapen."
+                    : "Nachtuil! Vandaag heb je geen les, maar slapen mag ook.");
+        } else {
+            banner.setVisibility(View.GONE);
             return;
         }
-        Rooster.State st = data == null ? null : Rooster.state(data, now);
-        boolean lessonToday = st != null && st.next != null && st.next.from.toLocalDate().equals(now.toLocalDate());
-        owl.setText(lessonToday ? "Nachtuil! Je eerste les begint pas om " + st.next.start + ". Ga maar lekker slapen."
-                : "Nachtuil! Vandaag heb je geen les, maar slapen mag ook.");
-        owl.setVisibility(View.VISIBLE);
+        banner.setVisibility(View.VISIBLE);
     }
 
     private void showUpdate(Updates.Info update) {
@@ -140,13 +146,26 @@ public class MainActivity extends Activity {
         if (titleTaps >= 7) {
             titleTaps = 0;
             boolean on = Eggs.toggleBlueprint(this);
-            say(on ? "Je bent nu roosteringenieur! Je widget staat in blauwdruk." : "Blauwdruk uit. Gewoon weer student.");
-            showPreview();
-            Context app = getApplicationContext();
-            new Thread(() -> Rooster.update(app, false)).start(); // ook de widgets op het beginscherm
+            Toast.makeText(getApplicationContext(), on ? "Je bent nu roosteringenieur! De app staat in blauwdruk." : "Blauwdruk uit. Gewoon weer student.", Toast.LENGTH_LONG).show();
+            recreate(); // de app opnieuw opbouwen in het (gewone of geheime) thema; de widget op je beginscherm blijft gewoon
         } else if (titleTaps >= 3) {
             say("Nog " + (7 - titleTaps) + " keer tikken…");
         }
+    }
+
+    /** Geheim thema "blauwdruk": de app in wit op technisch blauw, zoals een bouwtekening. */
+    private void applyBlueprint() {
+        int blue = 0xFF1D4E89, light = 0xFFB9D3F5;
+        findViewById(R.id.app_root).setBackgroundColor(blue);
+        getWindow().setStatusBarColor(blue);
+        getWindow().setNavigationBarColor(blue);
+        getWindow().getDecorView().setSystemUiVisibility(0); // lichte iconen op de blauwe balken
+        for (int id : new int[]{R.id.title, R.id.secret, R.id.secret_text}) ((TextView) findViewById(id)).setTextColor(Color.WHITE);
+        for (int id : new int[]{R.id.intro, R.id.help, R.id.secret_sign}) ((TextView) findViewById(id)).setTextColor(light);
+        TextView pin = findViewById(R.id.pin);
+        pin.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        pin.setTextColor(blue);
+        ((TextView) findViewById(R.id.open)).setTextColor(Color.WHITE);
     }
 
     // ---- Easter egg: schudden laat de tandwielen draaien (hoe harder, hoe sneller)

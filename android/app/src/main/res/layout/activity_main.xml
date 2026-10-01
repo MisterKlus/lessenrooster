@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/app_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -16,9 +17,9 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- Easter egg "nachtuil": alleen als je de app tussen middernacht en 5 uur opent -->
+            <!-- Easter eggs: verjaardag, of "nachtuil" als je de app tussen middernacht en 5 uur opent -->
             <TextView
-                android:id="@+id/owl"
+                android:id="@+id/banner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -40,6 +41,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/intro"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
@@ -91,6 +93,7 @@
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/help"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -114,6 +117,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/secret_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
@@ -123,6 +127,7 @@
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/secret_sign"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"

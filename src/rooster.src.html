@@ -105,6 +105,22 @@ h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-
 .confetti{position:fixed;inset:0;z-index:70;overflow:hidden;pointer-events:none}
 .confetti i{position:absolute;top:-14px;width:7px;height:11px;border-radius:2px;opacity:.85;animation:confetti-fall var(--dur) cubic-bezier(.25,.6,.45,1) var(--delay) forwards}
 @keyframes confetti-fall{to{transform:translate(var(--dx),105vh) rotate(var(--rot));opacity:0}}
+/* Easter eggs (alleen op het rooster van Thomas, zie EGGS) */
+.eggbanner{margin:-8px 0 14px;padding:12px 16px;border-radius:12px;background:var(--blue-soft);color:var(--blue-ink);font-weight:600}
+.eggtitle{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;cursor:default}
+.eggsecret{padding:1600px 0 32px;text-align:center} /* ver onder het einde */
+.eggsecret b{display:block;color:var(--blue);font-size:24px}
+.eggsecret p{margin:6px 0 0;font-size:16px}
+.eggsecret small{display:block;margin-top:14px;color:var(--muted);font-size:15px}
+.gears{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;background:color-mix(in srgb,var(--bg) 95%,transparent);text-align:center}
+.gears canvas{width:min(100%,440px);height:240px}
+.gears b{font-size:20px}
+.gears span{color:var(--muted);font-size:14px}
+/* Geheim thema blauwdruk: wit op technisch blauw met een raster, zoals een bouwtekening */
+html:root[data-egg=blauwdruk]{color-scheme:dark;--ink:#fff;--muted:#b9d3f5;--faint:#9cbde6;--line:#4f7fbf;--bg:#1d4e89;--card:#215893;--chip:#2a63a0;--head:#235b96;--grid:#2c64a1;--hover:#2d68a8;--blue:#fff;--blue-ink:#fff;--blue-soft:#2d68a8;--pill-line:#6f9fd8;--today-bg:#2a64a2;--today-line:#9cc2f0;--today-ring:#2d68a8;--skip-bg:#24578f;--skip-ink:#9cbde6;--switch-off:#4f7fbf;--bar:rgba(29,78,137,.94);--shadow:0 14px 40px rgba(0,0,0,.25);--menu-shadow:0 15px 40px #0006}
+html:root[data-egg=blauwdruk] body{background-image:linear-gradient(#ffffff12 1px,transparent 1px),linear-gradient(90deg,#ffffff12 1px,transparent 1px);background-size:24px 24px}
+.static .eggbanner,.static .eggsecret{display:none!important}
+@media print{.eggbanner,.eggsecret,.gears{display:none!important}}
 
 /* Weekstatistiek, vakken, lesinfo, taken, samen vrij, examens */
 .weekstats{margin:12px 4px 0;color:var(--muted);font-size:12px;font-weight:600}
@@ -496,6 +512,7 @@ const PARENT=false; // true = alleen-bekijken versie voor de ouders
 const WEB=false; // true = versie op GitHub Pages (installeerbaar als app, werkt offline)
 const PERSON=__PERSON__; // van wie dit rooster is (id en voornaam)
 const personKey=key=>PERSON.id==='tymo'?key:key+'-'+PERSON.id; // Tymo houdt zijn bestaande opslagnamen
+const EGGS=__EGGS__; // easter eggs, alleen op het rooster van Thomas (src/build.js): {birthday:'MM-DD'} of null
 const DAY_START=510,DAY_END=1080; // 08:30 en 18:00
 let S=1.4; // pixels per minuut: zo gekozen dat de hele dag op het scherm past
 function fitScale(){
@@ -728,12 +745,15 @@ function maybeCelebrate(now){
  try{let key=personKey('lessenrooster-feest-')+isoDate(monday);if(localStorage.getItem(key))return;localStorage.setItem(key,'1')}catch(err){return}
  setTimeout(()=>{
   toast('Weekend! Deze week zit erop');
-  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  let box=document.createElement('div'),colors=Object.keys(subjects).map(colorFor);
-  box.className='confetti';box.setAttribute('aria-hidden','true');
-  for(let i=0;i<36;i++){let piece=document.createElement('i');piece.style.cssText=`left:${(Math.random()*100).toFixed(1)}%;background:${colors[i%colors.length]};--dx:${Math.round(Math.random()*80-40)}px;--rot:${Math.round(Math.random()*720-360)}deg;--dur:${(2.2+Math.random()*1.2).toFixed(2)}s;--delay:${(Math.random()*.6).toFixed(2)}s`;box.append(piece)}
-  document.body.append(box);setTimeout(()=>box.remove(),4500);
+  throwConfetti(36);
  },800);
+}
+function throwConfetti(count){
+ if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ let box=document.createElement('div'),colors=Object.keys(subjects).map(colorFor);
+ box.className='confetti';box.setAttribute('aria-hidden','true');
+ for(let i=0;i<count;i++){let piece=document.createElement('i');piece.style.cssText=`left:${(Math.random()*100).toFixed(1)}%;background:${colors[i%colors.length]};--dx:${Math.round(Math.random()*80-40)}px;--rot:${Math.round(Math.random()*720-360)}deg;--dur:${(2.2+Math.random()*1.2).toFixed(2)}s;--delay:${(Math.random()*.6).toFixed(2)}s`;box.append(piece)}
+ document.body.append(box);setTimeout(()=>box.remove(),4500);
 }
 
 // Rode lijn op het huidige tijdstip: in de weekweergave én in de lijst (gsm) van vandaag
@@ -741,6 +761,7 @@ function updateNow(){
  let now=new Date(),m=now.getHours()*60+now.getMinutes(),time=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
  renderNext(now);
  maybeCelebrate(now);
+ eggBanner(now);
  updateGreeting(now);
  document.querySelectorAll('.nowline').forEach(line=>{line.hidden=m<DAY_START||m>DAY_END;line.style.top=(m-DAY_START)*S+'px';line.dataset.time=time});
  document.querySelectorAll('.listnow').forEach(line=>line.remove());
@@ -1034,6 +1055,90 @@ function iconUrl(){return document.querySelector('link[rel=apple-touch-icon]').h
 if(!WEB)$('iconDownload').onclick=()=>{let link=document.createElement('a');link.href=iconUrl();link.download='Lessenrooster_icoon.png';document.body.appendChild(link);link.click();link.remove()};
 function toast(text){let el=document.createElement('div');el.className='toast';el.setAttribute('role','status');el.textContent=text;document.body.appendChild(el);setTimeout(()=>el.remove(),4000)}
 
+// Easter eggs (alleen als EGGS is ingevuld, dus op het rooster van Thomas; dezelfde zitten in zijn Android-app):
+// 7 keer op de titel tikken (blauwdruk), schudden (tandwielen), verjaardag, nachtuil en een geheime boodschap onderaan
+var eggState={taps:0,tapAt:0,shakes:0,shakeAt:0,gears:null};
+function eggToast(text){document.querySelectorAll('.toast').forEach(el=>el.remove());toast(text)}
+function setBlueprint(on){if(on)document.documentElement.dataset.egg='blauwdruk';else delete document.documentElement.dataset.egg}
+function eggTitleTap(){ // zoals de verborgen ontwikkelaarsopties van Android
+ let now=Date.now();eggState.taps=now-eggState.tapAt<1500?eggState.taps+1:1;eggState.tapAt=now;
+ if(eggState.taps>=7){
+  eggState.taps=0;let on=document.documentElement.dataset.egg!=='blauwdruk';setBlueprint(on);
+  try{if(on)localStorage.setItem(personKey('lessenrooster-blauwdruk'),'1');else localStorage.removeItem(personKey('lessenrooster-blauwdruk'))}catch(err){}
+  eggToast(on?'Je bent nu roosteringenieur! Je rooster staat in blauwdruk.':'Blauwdruk uit. Gewoon weer student.');
+ }else if(eggState.taps>=3)eggToast(`Nog ${7-eggState.taps} keer tikken…`);
+}
+function isBirthday(now){return !!EGGS&&EGGS.birthday===`${pad(now.getMonth()+1)}-${pad(now.getDate())}`}
+// Bovenaan: verjaardag, of "nachtuil" tussen middernacht en 5 uur (wordt elke minuut bijgewerkt)
+function eggBanner(now){
+ if(!EGGS)return;
+ let banner=$('eggBanner');
+ if(!banner){banner=document.createElement('p');banner.id='eggBanner';banner.className='eggbanner';document.querySelector('.top').after(banner)}
+ let text='';
+ if(isBirthday(now))text=`Gelukkige verjaardag, ${PERSON.name}!`;
+ else if(now.getHours()<5){
+  let first=allLessons.find(l=>l.start>now&&l.start.toDateString()===now.toDateString()&&!isSkipped(lessonId(l.w,l.e)));
+  text=first?`Nachtuil! Je eerste les begint pas om ${first.e.start}. Ga maar lekker slapen.`:'Nachtuil! Vandaag heb je geen les, maar slapen mag ook.';
+ }
+ banner.textContent=text;banner.hidden=!text;
+}
+// Schudden: tandwielen die draaien (hoe harder, hoe sneller; wrijving remt ze af), zoals in de app
+function onShake(event){
+ let a=event.accelerationIncludingGravity;if(!a||a.x==null)return;
+ let force=Math.hypot(a.x,a.y,a.z)-9.81,now=Date.now();if(force<=8)return;
+ if(!eggState.gears){
+  if(now-eggState.shakeAt<120)return; // één schok geeft meerdere metingen
+  eggState.shakes=now-eggState.shakeAt<900?eggState.shakes+1:1;eggState.shakeAt=now;
+  if(eggState.shakes<3)return; // echt schudden, niet per ongeluk
+  eggState.gears=showGears();
+ }
+ eggState.shakeAt=now;eggState.gears.kick(force*30);
+}
+function showGears(){
+ let box=document.createElement('div');box.className='gears';box.setAttribute('role','dialog');box.setAttribute('aria-label','Mechanische machines 1 in actie');
+ box.innerHTML='<canvas></canvas><b>Mechanische machines 1 in actie</b><span>Schud harder voor meer toeren</span>';
+ document.body.append(box);
+ let canvas=box.querySelector('canvas'),ctx=canvas.getContext('2d'),css=getComputedStyle(document.documentElement);
+ let colors=['--blue','--muted','--bg'].map(name=>css.getPropertyValue(name).trim()),angle=0,speed=0,last=0,frame=0;
+ const BIG=12,SMALL=8;
+ function gear(cx,cy,teeth,m,rotation,color,hole){
+  let pitch=m*teeth/2,outer=pitch+.9*m,root=pitch-1.1*m,step=2*Math.PI/teeth;
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(rotation);ctx.beginPath();
+  for(let i=0;i<teeth;i++)[[root,0],[root,.12],[outer,.3],[outer,.7],[root,.88]].forEach(([r,f],j)=>{let a=(i+f)*step;if(i||j)ctx.lineTo(r*Math.cos(a),r*Math.sin(a));else ctx.moveTo(r*Math.cos(a),r*Math.sin(a))});
+  ctx.closePath();ctx.fillStyle=color;ctx.fill();
+  ctx.beginPath();ctx.arc(0,0,hole,0,2*Math.PI);ctx.fillStyle=colors[2];ctx.fill();ctx.restore();
+ }
+ function draw(t){
+  let dpr=devicePixelRatio||1,w=canvas.clientWidth,h=canvas.clientHeight;
+  if(canvas.width!==Math.round(w*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
+  if(last){let dt=Math.min(.05,(t-last)/1000);angle=(angle+speed*dt)%360;speed*=Math.pow(.35,dt)}
+  last=t;
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  let m=Math.min(w/26,h/15),cx1=(w-22*m)/2+7*m,rad=angle*Math.PI/180;
+  gear(cx1,h/2,BIG,m,rad,colors[0],1.6*m);
+  gear(cx1+10*m,h/2,SMALL,m,Math.PI/SMALL-rad*BIG/SMALL,colors[1],1.2*m); // een halve tand verschoven: ze grijpen in elkaar
+  frame=requestAnimationFrame(draw);
+ }
+ frame=requestAnimationFrame(draw);
+ let check=setInterval(()=>{if(speed<8&&Date.now()-eggState.shakeAt>1500)hide()},500);
+ function hide(){cancelAnimationFrame(frame);clearInterval(check);box.remove();eggState.gears=null}
+ box.addEventListener('click',hide);
+ return {kick(force){speed=Math.min(speed+force,2400)}};
+}
+function initEggs(){
+ if(!EGGS)return;
+ try{setBlueprint(localStorage.getItem(personKey('lessenrooster-blauwdruk'))==='1')}catch(err){}
+ let h1=document.querySelector('h1');h1.classList.add('eggtitle');h1.addEventListener('click',eggTitleTap);
+ addEventListener('devicemotion',onShake);
+ if(!$('eggSecret')){ // ver onder het einde: alleen te vinden als je blijft doorscrollen
+  let secret=document.createElement('div');secret.id='eggSecret';secret.className='eggsecret';
+  secret.innerHTML='<b>Je hebt me gevonden!</b><p>Nog 4 easter eggs te gaan…</p><small>Groetjes Tymo Xxx</small>';
+  document.querySelector('main.shell').append(secret);
+ }
+ let now=new Date();eggBanner(now);
+ if(isBirthday(now))setTimeout(()=>throwConfetti(120),600);
+}
+
 // Keuzes meenemen naar een ander toestel via een link (of QR-code): #s=<overgeslagen lessen als bits in hex>&c=<kleuren>&t=<tijdstip>
 function shareUrl(){
  let url=location.href.split('#')[0];
@@ -1238,6 +1343,7 @@ if(!PARENT){
 
 if(WEB){importFromLink();addEventListener('hashchange',()=>{importFromLink();render()})}
 render();
+initEggs();
 if(!PARENT){
  $('backupMake').onclick=makeBackup;
  if(WEB)$('widgetCopy').onclick=async()=>{
