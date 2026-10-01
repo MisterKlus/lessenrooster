@@ -46,16 +46,16 @@ public class GearsView extends View {
     }
 
     private static Path gear(int teeth, float m) {
-        float pitch = m * teeth / 2f, outer = pitch + m, root = pitch - 1.25f * m;
+        float pitch = m * teeth / 2f, outer = pitch + 0.9f * m, root = pitch - 1.1f * m;
         double step = 2 * Math.PI / teeth;
         Path p = new Path();
         for (int i = 0; i < teeth; i++) {
-            double a = i * step; // tand gecentreerd op a + step/2
+            double a = i * step; // tand gecentreerd op a + step/2: brede voet, iets smallere top
             point(p, i == 0, root, a);
-            point(p, false, root, a + step * 0.2);
-            point(p, false, outer, a + step * 0.35);
-            point(p, false, outer, a + step * 0.65);
-            point(p, false, root, a + step * 0.8);
+            point(p, false, root, a + step * 0.12);
+            point(p, false, outer, a + step * 0.3);
+            point(p, false, outer, a + step * 0.7);
+            point(p, false, root, a + step * 0.88);
         }
         p.close();
         return p;

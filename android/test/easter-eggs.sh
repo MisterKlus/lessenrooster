@@ -44,6 +44,11 @@ for i in $(seq 1 20); do adb shell input swipe 160 520 160 120 150; done
 sleep 1
 adb exec-out screencap -p > "$OUT/geheim.png"
 
+# Nachtuil: klok op vrijdag 2 oktober 2026, 01:30 Belgische tijd
+adb shell date -u 100123302026.00 >/dev/null || true
+start_app 5
+adb exec-out screencap -p > "$OUT/nachtuil.png"
+
 # 8. Verjaardag: klok op 14 januari 2027, 09:00 Belgische tijd
 adb shell date -u 011408002027.00 >/dev/null || true
 start_app 3

@@ -16,6 +16,19 @@
             android:orientation="vertical"
             android:padding="24dp">
 
+            <!-- Easter egg "nachtuil": alleen als je de app tussen middernacht en 5 uur opent -->
+            <TextView
+                android:id="@+id/owl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/owl_bg"
+                android:padding="14dp"
+                android:textColor="@color/accent"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
             <!-- Easter egg: 7 keer tikken zet het geheime blauwdruk-thema aan of uit -->
             <TextView
                 android:id="@+id/title"

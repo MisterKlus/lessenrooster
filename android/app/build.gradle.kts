@@ -11,7 +11,7 @@ android {
         minSdk = 26
         targetSdk = 34
         // Elke build op GitHub krijgt een hoger nummer, zodat een nieuwe versie over de oude installeert
-        versionCode = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
+        versionCode = (System.getenv("VERSION_CODE") ?: System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt() // VERSION_CODE: alleen voor de meldingentest
         versionName = "1.$versionCode"
     }
 

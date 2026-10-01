@@ -54,10 +54,22 @@ jobs:
           printf '{"versionCode": %s, "versionName": "1.%s", "url": "https://github.com/MisterKlus/lessenrooster/releases/download/widget-app-thomas/lessenrooster-widget.apk"}\n' "$GITHUB_RUN_NUMBER" "$GITHUB_RUN_NUMBER" > versie.json
           gh release upload widget-app-thomas versie.json --clobber
 
+      - name: Oude versie bouwen (alleen voor de meldingentest, niet gepubliceerd)
+        working-directory: android
+        env:
+          KEYSTORE_FILE: ${{ runner.temp }}/widget.p12
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          VERSION_CODE: '1'
+        run: |
+          gradle assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk ../oud.apk
+
       - uses: actions/upload-artifact@v4
         with:
           name: apk
-          path: lessenrooster-widget.apk
+          path: |
+            lessenrooster-widget.apk
+            oud.apk
           retention-days: 3
 
   schermafbeelding:
@@ -102,6 +114,7 @@ jobs:
             adb exec-out screencap -p > tijdens-les.png
             bash android/test/widget-op-beginscherm.sh .
             bash android/test/easter-eggs.sh .
+            bash android/test/meldingen.sh .
 
       - uses: actions/upload-artifact@v4
         with:

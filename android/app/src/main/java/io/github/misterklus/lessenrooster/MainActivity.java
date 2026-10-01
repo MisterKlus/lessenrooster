@@ -90,6 +90,23 @@ public class MainActivity extends Activity {
         if (data == null && loading) ((TextView) widget.findViewById(R.id.message)).setText("Rooster ophalen…");
         box.removeAllViews();
         box.addView(widget);
+        showOwl(data);
+    }
+
+    // ---- Easter egg "nachtuil": de app openen tussen middernacht en 5 uur
+
+    private void showOwl(JSONObject data) {
+        TextView owl = findViewById(R.id.owl);
+        LocalDateTime now = LocalDateTime.now();
+        if (now.getHour() >= 5) {
+            owl.setVisibility(View.GONE);
+            return;
+        }
+        Rooster.State st = data == null ? null : Rooster.state(data, now);
+        boolean lessonToday = st != null && st.next != null && st.next.from.toLocalDate().equals(now.toLocalDate());
+        owl.setText(lessonToday ? "Nachtuil! Je eerste les begint pas om " + st.next.start + ". Ga maar lekker slapen."
+                : "Nachtuil! Vandaag heb je geen les, maar slapen mag ook.");
+        owl.setVisibility(View.VISIBLE);
     }
 
     private void showUpdate(Updates.Info update) {

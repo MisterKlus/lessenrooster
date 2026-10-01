@@ -12,6 +12,7 @@ import java.time.MonthDay;
  * - schudden: draaiende tandwielen (GearsView)
  * - verjaardag: felicitatie in de widget en confetti in de app (ConfettiView)
  * - ver onder het einde van de app: een boodschap van Tymo (activity_main.xml)
+ * - de app openen tussen middernacht en 5 uur: "nachtuil" (MainActivity)
  */
 final class Eggs {
     static final String NAME = "Thomas";
