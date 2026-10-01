@@ -213,6 +213,11 @@ final class Rooster {
         RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.widget);
         Intent open = new Intent(Intent.ACTION_VIEW, Uri.parse(c.getString(R.string.site_url)));
         v.setOnClickPendingIntent(R.id.root, PendingIntent.getActivity(c, 0, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
+        boolean blueprint = Eggs.blueprint(c);
+        if (blueprint) blueprint(v);
+        boolean birthday = Eggs.birthday(LocalDate.now());
+        v.setViewVisibility(R.id.birthday, birthday ? View.VISIBLE : View.GONE);
+        if (birthday) v.setTextViewText(R.id.birthday, "Gelukkige verjaardag, " + Eggs.NAME + "!");
         if (st == null || st.focus == null) {
             v.setViewVisibility(R.id.lesson, View.GONE);
             v.setViewVisibility(R.id.later, View.GONE);
@@ -227,11 +232,13 @@ final class Rooster {
         v.setTextViewText(R.id.label, st.label);
         v.setTextViewText(R.id.name, l.name);
         v.setTextViewText(R.id.meta, l.start + "–" + l.end + "\n" + l.room); // uur en lokaal elk op een regel: naast de klok is weinig plaats
+        int progress = blueprint ? R.id.progress_blueprint : R.id.progress;
+        v.setViewVisibility(blueprint ? R.id.progress : R.id.progress_blueprint, View.GONE);
         if (st.current != null) {
-            v.setViewVisibility(R.id.progress, View.VISIBLE);
-            v.setProgressBar(R.id.progress, 1000, (int) Math.round(Math.max(0, Math.min(1, st.progress)) * 1000), false);
+            v.setViewVisibility(progress, View.VISIBLE);
+            v.setProgressBar(progress, 1000, (int) Math.round(Math.max(0, Math.min(1, st.progress)) * 1000), false);
         } else {
-            v.setViewVisibility(R.id.progress, View.GONE);
+            v.setViewVisibility(progress, View.GONE);
         }
         if (st.countdownTo != null) {
             long left = st.countdownTo.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis();
@@ -248,6 +255,13 @@ final class Rooster {
         v.setViewVisibility(R.id.later, View.VISIBLE);
         v.setTextViewText(R.id.later, later);
         return v;
+    }
+
+    /** Geheim thema "blauwdruk" (easter egg: 7 keer op de titel in de app tikken): wit op technisch blauw. */
+    private static void blueprint(RemoteViews v) {
+        v.setInt(R.id.root, "setBackgroundResource", R.drawable.widget_bg_blueprint);
+        for (int id : new int[]{R.id.label, R.id.name, R.id.countdown, R.id.birthday}) v.setTextColor(id, Color.WHITE);
+        for (int id : new int[]{R.id.meta, R.id.later, R.id.message, R.id.countdown_caption}) v.setTextColor(id, 0xFFB9D3F5);
     }
 
     // ---- Meldingen bij een roosterwijziging (gevonden bij de nachtelijke update uit TimeEdit)

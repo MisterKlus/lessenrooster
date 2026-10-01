@@ -8,4 +8,5 @@
     <color name="track">#4D8A94A5</color>
     <color name="page_bg">#F5F7FC</color>
     <color name="icon_bg">#FFFFFF</color>
+    <color name="overlay">#F5F5F7FC</color>
 </resources>

@@ -10,6 +10,19 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Easter egg: alleen op Thomas' verjaardag (Eggs.java) -->
+    <TextView
+        android:id="@+id/birthday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/accent"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/lesson"
         android:layout_width="match_parent"
@@ -73,6 +86,17 @@
                 android:max="1000"
                 android:progress="400"
                 android:progressDrawable="@drawable/progress"
+                android:visibility="gone" />
+
+            <!-- Hetzelfde balkje voor het geheime blauwdruk-thema (wit op blauw) -->
+            <ProgressBar
+                android:id="@+id/progress_blueprint"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_marginTop="8dp"
+                android:max="1000"
+                android:progressDrawable="@drawable/progress_blueprint"
                 android:visibility="gone" />
         </LinearLayout>
 

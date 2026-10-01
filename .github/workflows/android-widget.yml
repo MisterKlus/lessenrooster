@@ -86,6 +86,7 @@ jobs:
             adb root || true
             adb shell setprop persist.sys.timezone Europe/Brussels || true
             adb install -r lessenrooster-widget.apk
+            adb shell pm grant io.github.misterklus.lessenrooster.thomas android.permission.POST_NOTIFICATIONS || true
             adb shell am start -W -n io.github.misterklus.lessenrooster.thomas/io.github.misterklus.lessenrooster.MainActivity
             sleep 25
             adb exec-out screencap -p > licht.png
@@ -100,6 +101,7 @@ jobs:
             sleep 20
             adb exec-out screencap -p > tijdens-les.png
             bash android/test/widget-op-beginscherm.sh .
+            bash android/test/easter-eggs.sh .
 
       - uses: actions/upload-artifact@v4
         with:

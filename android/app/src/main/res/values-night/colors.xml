@@ -6,4 +6,5 @@
     <color name="accent">#A07CF0</color>
     <color name="track">#668A94A5</color>
     <color name="page_bg">#0F1626</color>
+    <color name="overlay">#F50F1626</color>
 </resources>
