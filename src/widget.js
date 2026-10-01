@@ -36,6 +36,28 @@ async function loadData() {
   }
 }
 
+// Melding bij een roosterwijziging (gevonden bij de nachtelijke update uit TimeEdit): elke wijziging één keer,
+// niet voor lessen die je uitgevinkt hebt, en 's nachts pas om 7 uur. De tekst maakt src/build.js.
+async function notifyChanges(data) {
+  if (!data || !Array.isArray(data.changes) || !data.changes.length || typeof Notification === "undefined") return;
+  const fm = FileManager.local();
+  const file = fm.joinPath(fm.documentsDirectory(), "lessenrooster-meldingen-" + SITE.replace(/[^a-z0-9]+/gi, "-") + ".json");
+  let seen = {};
+  try { if (fm.fileExists(file)) seen = JSON.parse(fm.readString(file)); } catch (e) { seen = {}; }
+  const now = new Date(), hour = now.getHours();
+  let later = null;
+  if (hour < 7 || hour >= 22) { later = new Date(now); if (hour >= 22) later.setDate(later.getDate() + 1); later.setHours(7, 0, 0, 0); }
+  for (const c of data.changes) {
+    if (seen[c.id] || (c.lessons || []).some(id => SKIPSET.has(id))) continue;
+    const n = new Notification();
+    n.title = c.title; n.body = c.body; n.threadIdentifier = "lessenrooster"; n.openURL = SITE;
+    if (later) n.setTriggerDate(later);
+    try { await n.schedule(); seen[c.id] = now.getTime(); } catch (e) { console.log("Melding niet gelukt: " + e); }
+  }
+  for (const id of Object.keys(seen)) if (now - seen[id] > 14 * 864e5) delete seen[id]; // oude opruimen
+  fm.writeString(file, JSON.stringify(seen));
+}
+
 function at(date, time) {
   const [y, m, d] = date.split("-").map(Number), [h, mi] = time.split(":").map(Number);
   return new Date(y, m - 1, d, h, mi);
@@ -80,6 +102,7 @@ function progressRing(pct, size, label, sub) {
 
 const now = new Date();
 const data = await loadData();
+try { await notifyChanges(data); } catch (e) { console.log("Meldingen: " + e); } // mag de widget nooit tegenhouden
 const family = config.widgetFamily || "medium";
 const widget = new ListWidget();
 widget.backgroundColor = bg;

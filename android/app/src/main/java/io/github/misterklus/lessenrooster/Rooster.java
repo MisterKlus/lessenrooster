@@ -1,11 +1,17 @@
 package io.github.misterklus.lessenrooster;
 
+import android.Manifest;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -244,20 +250,61 @@ final class Rooster {
         return v;
     }
 
+    // ---- Meldingen bij een roosterwijziging (gevonden bij de nachtelijke update uit TimeEdit)
+
+    private static final String CHANNEL = "roosterwijzigingen";
+
+    /** Elke wijziging één keer melden; 's nachts (22–7 u) niet, dan volgt de melding bij de eerste update na 7 uur. */
+    static void notifyChanges(Context c, JSONObject data) {
+        JSONArray changes = data == null ? null : data.optJSONArray("changes");
+        if (changes == null || changes.length() == 0) return;
+        int hour = LocalTime.now().getHour();
+        if (hour < 7 || hour >= 22) return;
+        if (Build.VERSION.SDK_INT >= 33 && c.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return;
+        NotificationManager nm = c.getSystemService(NotificationManager.class);
+        nm.createNotificationChannel(new NotificationChannel(CHANNEL, "Roosterwijzigingen", NotificationManager.IMPORTANCE_DEFAULT));
+        SharedPreferences seen = c.getSharedPreferences("meldingen", Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = seen.edit();
+        long now = System.currentTimeMillis();
+        Intent open = new Intent(Intent.ACTION_VIEW, Uri.parse(c.getString(R.string.site_url)));
+        PendingIntent tap = PendingIntent.getActivity(c, 2, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        for (int i = 0; i < changes.length(); i++) {
+            JSONObject ch = changes.optJSONObject(i);
+            String id = ch == null ? "" : ch.optString("id");
+            if (id.isEmpty() || seen.contains(id)) continue;
+            Notification n = new Notification.Builder(c, CHANNEL)
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setColor(c.getColor(R.color.accent))
+                    .setContentTitle(ch.optString("title"))
+                    .setContentText(ch.optString("body"))
+                    .setStyle(new Notification.BigTextStyle().bigText(ch.optString("body")))
+                    .setContentIntent(tap)
+                    .setAutoCancel(true)
+                    .build();
+            nm.notify(id.hashCode(), n);
+            edit.putLong(id, now);
+        }
+        for (Map.Entry<String, ?> e : seen.getAll().entrySet()) { // oude opruimen
+            if (e.getValue() instanceof Long && now - (Long) e.getValue() > 14L * 864e5) edit.remove(e.getKey());
+        }
+        edit.apply();
+    }
+
     // ---- Bijwerken: nu tekenen en de volgende keer plannen
 
     static void update(Context c, boolean forceFetch) {
         AppWidgetManager manager = AppWidgetManager.getInstance(c);
         int[] ids = manager.getAppWidgetIds(new ComponentName(c, WidgetProvider.class));
-        if (ids.length == 0 && !forceFetch) {
+        File f = cacheFile(c);
+        boolean stale = !f.exists() || System.currentTimeMillis() - f.lastModified() > DATA_MAX_AGE;
+        if (forceFetch || (stale && ids.length > 0)) fetch(c);
+        JSONObject data = readCache(c);
+        notifyChanges(c, data);
+        if (ids.length == 0) { // geen widget op het beginscherm: niets meer plannen
             cancel(c);
             return;
         }
-        File f = cacheFile(c);
-        if (forceFetch || !f.exists() || System.currentTimeMillis() - f.lastModified() > DATA_MAX_AGE) fetch(c);
-        if (ids.length == 0) return;
         LocalDateTime now = LocalDateTime.now();
-        JSONObject data = readCache(c);
         State st = data == null ? null : state(data, now);
         manager.updateAppWidget(ids, fitted(c, st, data != null));
         // Nog geen rooster (geen internet bij de eerste keer): na 2 minuten opnieuw proberen

@@ -8,7 +8,7 @@
 // Daarom: aftellen met tekst die iOS zelf elke minuut bijwerkt, op het vergrendelscherm vaste uren
 // ("tot 11:45") die niet verouderen, en zo weinig mogelijk vragen om opnieuw te tekenen.
 
-const VERSION = "30 september 2026 om 11:11"; // ingevuld door src/build.js
+const VERSION = "1 oktober 2026 om 02:20"; // ingevuld door src/build.js
 const DATA_URL = SITE + "rooster.json?t=" + Date.now(); // altijd de verse versie, niet uit de cache
 const DATA_MAX_AGE = 60; // minuten: het rooster verandert hoogstens 's nachts, dus niet elke keer ophalen
 console.log("Lessenrooster-widget, versie " + VERSION);
@@ -34,6 +34,28 @@ async function loadData() {
   } catch (e) {
     return cached ? JSON.parse(fm.readString(cache)) : null;
   }
+}
+
+// Melding bij een roosterwijziging (gevonden bij de nachtelijke update uit TimeEdit): elke wijziging één keer,
+// niet voor lessen die je uitgevinkt hebt, en 's nachts pas om 7 uur. De tekst maakt src/build.js.
+async function notifyChanges(data) {
+  if (!data || !Array.isArray(data.changes) || !data.changes.length || typeof Notification === "undefined") return;
+  const fm = FileManager.local();
+  const file = fm.joinPath(fm.documentsDirectory(), "lessenrooster-meldingen-" + SITE.replace(/[^a-z0-9]+/gi, "-") + ".json");
+  let seen = {};
+  try { if (fm.fileExists(file)) seen = JSON.parse(fm.readString(file)); } catch (e) { seen = {}; }
+  const now = new Date(), hour = now.getHours();
+  let later = null;
+  if (hour < 7 || hour >= 22) { later = new Date(now); if (hour >= 22) later.setDate(later.getDate() + 1); later.setHours(7, 0, 0, 0); }
+  for (const c of data.changes) {
+    if (seen[c.id] || (c.lessons || []).some(id => SKIPSET.has(id))) continue;
+    const n = new Notification();
+    n.title = c.title; n.body = c.body; n.threadIdentifier = "lessenrooster"; n.openURL = SITE;
+    if (later) n.setTriggerDate(later);
+    try { await n.schedule(); seen[c.id] = now.getTime(); } catch (e) { console.log("Melding niet gelukt: " + e); }
+  }
+  for (const id of Object.keys(seen)) if (now - seen[id] > 14 * 864e5) delete seen[id]; // oude opruimen
+  fm.writeString(file, JSON.stringify(seen));
 }
 
 function at(date, time) {
@@ -80,6 +102,7 @@ function progressRing(pct, size, label, sub) {
 
 const now = new Date();
 const data = await loadData();
+try { await notifyChanges(data); } catch (e) { console.log("Meldingen: " + e); } // mag de widget nooit tegenhouden
 const family = config.widgetFamily || "medium";
 const widget = new ListWidget();
 widget.backgroundColor = bg;
