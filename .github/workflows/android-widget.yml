@@ -50,6 +50,9 @@ jobs:
           cp android/app/build/outputs/apk/release/app-release.apk lessenrooster-widget.apk
           gh release view widget-app-thomas >/dev/null 2>&1 || gh release create widget-app-thomas --title "Widget-app Thomas" --notes "Android-widget voor het lessenrooster van Thomas. Installeren: open https://misterklus.github.io/lessenrooster/thomas/ → tandwiel → Instellingen → Widget."
           gh release upload widget-app-thomas lessenrooster-widget.apk --clobber
+          # Pas na de app: hieraan ziet de app dat er een nieuwe versie is (versionCode = run-nummer, zie android/app/build.gradle.kts)
+          printf '{"versionCode": %s, "versionName": "1.%s", "url": "https://github.com/MisterKlus/lessenrooster/releases/download/widget-app-thomas/lessenrooster-widget.apk"}\n' "$GITHUB_RUN_NUMBER" "$GITHUB_RUN_NUMBER" > versie.json
+          gh release upload widget-app-thomas versie.json --clobber
 
       - uses: actions/upload-artifact@v4
         with:

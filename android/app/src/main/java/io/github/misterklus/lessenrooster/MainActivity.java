@@ -49,7 +49,8 @@ public class MainActivity extends Activity {
                 Rooster.fetch(app);
             }
             Rooster.update(app, false); // de widgets op het beginscherm meteen bijwerken
-            runOnUiThread(() -> { loading = false; showPreview(); });
+            Updates.Info update = Updates.newer(app); // nieuwe versie van de app?
+            runOnUiThread(() -> { loading = false; showPreview(); showUpdate(update); });
         }).start();
     }
 
@@ -62,6 +63,13 @@ public class MainActivity extends Activity {
         if (data == null && loading) ((TextView) widget.findViewById(R.id.message)).setText("Rooster ophalen…");
         box.removeAllViews();
         box.addView(widget);
+    }
+
+    private void showUpdate(Updates.Info update) {
+        if (isFinishing() || isDestroyed()) return;
+        View button = findViewById(R.id.update);
+        button.setVisibility(update == null ? View.GONE : View.VISIBLE);
+        if (update != null) button.setOnClickListener(v -> startActivity(Updates.download(update)));
     }
 
     private void pinWidget() {

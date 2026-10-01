@@ -115,7 +115,7 @@ final class Rooster {
         }
     }
 
-    private static String readAll(InputStream in) throws IOException {
+    static String readAll(InputStream in) throws IOException {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         byte[] b = new byte[8192];
         for (int n; (n = in.read(b)) > 0; ) buf.write(b, 0, n);
@@ -300,6 +300,7 @@ final class Rooster {
         if (forceFetch || (stale && ids.length > 0)) fetch(c);
         JSONObject data = readCache(c);
         notifyChanges(c, data);
+        Updates.checkAndNotify(c); // nieuwe versie van de app op GitHub? (hoogstens twee keer per dag)
         if (ids.length == 0) { // geen widget op het beginscherm: niets meer plannen
             cancel(c);
             return;
