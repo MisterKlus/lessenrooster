@@ -1,7 +1,224 @@
 {
- "updated": "2026-09-30T08:44:06.447Z",
+ "updated": "2026-10-03T06:32:40.973Z",
  "extraSubjects": [],
- "changes": [],
+ "changes": [
+  {
+   "kind": "changed",
+   "date": "2026-10-07",
+   "key": "cs",
+   "start": "08:30",
+   "end": "10:30",
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "was": {
+    "start": "08:30",
+    "end": "10:30",
+    "room": "DH.z1v01.04",
+    "old": "DB107"
+   },
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "changed",
+   "date": "2026-10-07",
+   "key": "cs",
+   "start": "10:45",
+   "end": "11:45",
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "was": {
+    "start": "10:45",
+    "end": "11:45",
+    "room": "DH.z1v01.04",
+    "old": "DB107"
+   },
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "cancelled",
+   "date": "2026-10-09",
+   "key": "cs",
+   "start": "10:45",
+   "end": "12:45",
+   "room": "DH.z1v01.21",
+   "old": "DA104",
+   "was": null,
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "changed",
+   "date": "2026-10-14",
+   "key": "cs",
+   "start": "08:30",
+   "end": "10:30",
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "was": {
+    "start": "08:30",
+    "end": "10:30",
+    "room": "DH.z1v01.04",
+    "old": "DB107"
+   },
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "changed",
+   "date": "2026-10-14",
+   "key": "cs",
+   "start": "10:45",
+   "end": "11:45",
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "was": {
+    "start": "10:45",
+    "end": "11:45",
+    "room": "DH.z1v01.04",
+    "old": "DB107"
+   },
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "cancelled",
+   "date": "2026-10-16",
+   "key": "cs",
+   "start": "10:45",
+   "end": "12:45",
+   "room": "DH.z1v01.21",
+   "old": "DA104",
+   "was": null,
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "changed",
+   "date": "2026-10-21",
+   "key": "cs",
+   "start": "08:30",
+   "end": "10:30",
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "was": {
+    "start": "08:30",
+    "end": "10:30",
+    "room": "DH.z1v01.04",
+    "old": "DB107"
+   },
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "changed",
+   "date": "2026-10-21",
+   "key": "cs",
+   "start": "10:45",
+   "end": "11:45",
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "was": {
+    "start": "10:45",
+    "end": "11:45",
+    "room": "DH.z1v01.04",
+    "old": "DB107"
+   },
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "cancelled",
+   "date": "2026-10-23",
+   "key": "cs",
+   "start": "10:45",
+   "end": "12:45",
+   "room": "DH.z1v01.21",
+   "old": "DA104",
+   "was": null,
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "changed",
+   "date": "2026-10-28",
+   "key": "cs",
+   "start": "08:30",
+   "end": "10:30",
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "was": {
+    "start": "08:30",
+    "end": "10:30",
+    "room": "DH.z1v01.04",
+    "old": "DB107"
+   },
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "changed",
+   "date": "2026-10-28",
+   "key": "cs",
+   "start": "10:45",
+   "end": "11:45",
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "was": {
+    "start": "10:45",
+    "end": "11:45",
+    "room": "DH.z1v01.04",
+    "old": "DB107"
+   },
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "cancelled",
+   "date": "2026-10-30",
+   "key": "cs",
+   "start": "10:45",
+   "end": "12:45",
+   "room": "DH.z1v01.21",
+   "old": "DA104",
+   "was": null,
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "new",
+   "date": "2026-10-08",
+   "key": "cs",
+   "start": "12:45",
+   "end": "14:45",
+   "room": "DH.z2v02.23",
+   "old": "DE206",
+   "was": null,
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "new",
+   "date": "2026-10-15",
+   "key": "cs",
+   "start": "12:45",
+   "end": "14:45",
+   "room": "DH.z2v02.23",
+   "old": "DE206",
+   "was": null,
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "new",
+   "date": "2026-10-22",
+   "key": "cs",
+   "start": "12:45",
+   "end": "14:45",
+   "room": "DH.z2v02.23",
+   "old": "DE206",
+   "was": null,
+   "detected": "2026-10-03T06:32:40.973Z"
+  },
+  {
+   "kind": "new",
+   "date": "2026-10-29",
+   "key": "cs",
+   "start": "12:45",
+   "end": "14:45",
+   "room": "DH.z2v02.23",
+   "old": "DE206",
+   "was": null,
+   "detected": "2026-10-03T06:32:40.973Z"
+  }
+ ],
  "lessons": [
   {
    "date": "2026-09-21",
@@ -206,18 +423,27 @@
    "start": "08:30",
    "end": "10:30",
    "key": "cs",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "teacher": "De Puydt Sander"
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "teacher": "Bervoets Wim"
   },
   {
    "date": "2026-10-07",
    "start": "10:45",
    "end": "11:45",
    "key": "cs",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "teacher": "De Puydt Sander"
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "teacher": "Bervoets Wim"
+  },
+  {
+   "date": "2026-10-08",
+   "start": "12:45",
+   "end": "14:45",
+   "key": "cs",
+   "room": "DH.z2v02.23",
+   "old": "DE206",
+   "teacher": "Bervoets Wim"
   },
   {
    "date": "2026-10-08",
@@ -245,15 +471,6 @@
    "room": "DH.z1v01.21",
    "old": "DA104",
    "teacher": "Beuls Jasper"
-  },
-  {
-   "date": "2026-10-09",
-   "start": "10:45",
-   "end": "12:45",
-   "key": "cs",
-   "room": "DH.z1v01.21",
-   "old": "DA104",
-   "teacher": "De Puydt Sander"
   },
   {
    "date": "2026-10-09",
@@ -296,18 +513,27 @@
    "start": "08:30",
    "end": "10:30",
    "key": "cs",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "teacher": "De Puydt Sander"
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "teacher": "Bervoets Wim"
   },
   {
    "date": "2026-10-14",
    "start": "10:45",
    "end": "11:45",
    "key": "cs",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "teacher": "De Puydt Sander"
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "teacher": "Bervoets Wim"
+  },
+  {
+   "date": "2026-10-15",
+   "start": "12:45",
+   "end": "14:45",
+   "key": "cs",
+   "room": "DH.z2v02.23",
+   "old": "DE206",
+   "teacher": "Bervoets Wim"
   },
   {
    "date": "2026-10-15",
@@ -335,15 +561,6 @@
    "room": "DH.z1v01.21",
    "old": "DA104",
    "teacher": "Beuls Jasper"
-  },
-  {
-   "date": "2026-10-16",
-   "start": "10:45",
-   "end": "12:45",
-   "key": "cs",
-   "room": "DH.z1v01.21",
-   "old": "DA104",
-   "teacher": "De Puydt Sander"
   },
   {
    "date": "2026-10-16",
@@ -386,18 +603,27 @@
    "start": "08:30",
    "end": "10:30",
    "key": "cs",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "teacher": "De Puydt Sander"
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "teacher": "Bervoets Wim"
   },
   {
    "date": "2026-10-21",
    "start": "10:45",
    "end": "11:45",
    "key": "cs",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "teacher": "De Puydt Sander"
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "teacher": "Bervoets Wim"
+  },
+  {
+   "date": "2026-10-22",
+   "start": "12:45",
+   "end": "14:45",
+   "key": "cs",
+   "room": "DH.z2v02.23",
+   "old": "DE206",
+   "teacher": "Bervoets Wim"
   },
   {
    "date": "2026-10-22",
@@ -425,15 +651,6 @@
    "room": "DH.z1v01.21",
    "old": "DA104",
    "teacher": "Beuls Jasper"
-  },
-  {
-   "date": "2026-10-23",
-   "start": "10:45",
-   "end": "12:45",
-   "key": "cs",
-   "room": "DH.z1v01.21",
-   "old": "DA104",
-   "teacher": "De Puydt Sander"
   },
   {
    "date": "2026-10-23",
@@ -476,18 +693,27 @@
    "start": "08:30",
    "end": "10:30",
    "key": "cs",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "teacher": "De Puydt Sander"
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "teacher": "Bervoets Wim"
   },
   {
    "date": "2026-10-28",
    "start": "10:45",
    "end": "11:45",
    "key": "cs",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "teacher": "De Puydt Sander"
+   "room": "DH.z1v02.12",
+   "old": "DB210",
+   "teacher": "Bervoets Wim"
+  },
+  {
+   "date": "2026-10-29",
+   "start": "12:45",
+   "end": "14:45",
+   "key": "cs",
+   "room": "DH.z2v02.23",
+   "old": "DE206",
+   "teacher": "Bervoets Wim"
   },
   {
    "date": "2026-10-29",
@@ -515,15 +741,6 @@
    "room": "DH.z1v01.21",
    "old": "DA104",
    "teacher": "Beuls Jasper"
-  },
-  {
-   "date": "2026-10-30",
-   "start": "10:45",
-   "end": "12:45",
-   "key": "cs",
-   "room": "DH.z1v01.21",
-   "old": "DA104",
-   "teacher": "De Puydt Sander"
   },
   {
    "date": "2026-10-30",
