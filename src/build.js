@@ -83,17 +83,25 @@ self.addEventListener('fetch',event=>{
 // Melding bij een roosterwijziging, voor de widgets (iPhone en Android tonen precies deze tekst).
 // id: elke wijziging één keer melden; lessons: de lesblokken (zoals in het rooster), om uitgevinkte lessen over te slaan.
 const DAY_NAMES=['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
-function changeNotice(c,subjects){
- const name=subjects[c.key]?.name||c.key,[y,m,d]=c.date.split('-').map(Number),weekday=new Date(Date.UTC(y,m-1,d)).getUTCDay();
- const day=`${DAY_NAMES[weekday][0].toUpperCase()+DAY_NAMES[weekday].slice(1)} ${d}/${m}`,monday=addDays(c.date,-((weekday+6)%7)),dayIndex=(weekday+6)%7;
- const lessons=[...new Set([c.start,c.was?.start].filter(Boolean))].map(start=>`${monday}|${dayIndex}|${start}|${c.key}`);
+// Wekelijks terugkerende wijzigingen (zelfde weekdag, uur, vak en lokaal) worden één melding: "Woensdag 7/10, 14/10 en 21/10 …"
+const weekdayOf=iso=>{const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d)).getUTCDay()};
+function changeNotices(changes,subjects){
+ const series=new Map();
+ for(const c of changes){const k=[c.kind,weekdayOf(c.date),c.key,c.start,c.end,c.room,c.was?.room||'',c.was?.start||''].join('|');if(!series.has(k))series.set(k,[]);series.get(k).push(c)}
+ return [...series.values()].map(list=>changeNotice(list.sort((a,b)=>a.date.localeCompare(b.date)),subjects));
+}
+function changeNotice(list,subjects){
+ const c=list[0],name=subjects[c.key]?.name||c.key,weekday=weekdayOf(c.date),dayIndex=(weekday+6)%7;
+ const dates=list.map(x=>{const [,m,d]=x.date.split('-').map(Number);return `${d}/${m}`});
+ const day=`${DAY_NAMES[weekday][0].toUpperCase()+DAY_NAMES[weekday].slice(1)} ${dates.length>1?dates.slice(0,-1).join(', ')+' en '+dates.at(-1):dates[0]}`;
+ const lessons=list.flatMap(x=>{const monday=addDays(x.date,-dayIndex);return [...new Set([x.start,x.was?.start].filter(Boolean))].map(start=>`${monday}|${dayIndex}|${start}|${x.key}`)});
  const otherTime=c.was&&(c.was.start!==c.start||c.was.end!==c.end),otherRoom=c.was&&c.was.room!==c.room;
  const notice=c.kind==='cancelled'?{title:`${name} gaat niet door`,body:`${day} om ${c.start}: deze les vervalt.`}
   :c.kind==='new'?{title:`Nieuwe les: ${name}`,body:`${day}, ${c.start}–${c.end} in ${c.room}.`}
   :otherTime&&otherRoom?{title:`${name} verplaatst`,body:`${day}: nu ${c.start}–${c.end} in ${c.room} (was ${c.was.start}–${c.was.end} in ${c.was.room}).`}
   :otherTime?{title:`Ander uur voor ${name}`,body:`${day}: nu ${c.start}–${c.end} (was ${c.was.start}–${c.was.end}).`}
   :{title:`Ander lokaal voor ${name}`,body:`${day} om ${c.start}: nu in ${c.room}${c.was?.room?` (was ${c.was.room})`:''}.`};
- return {id:[c.kind,c.date,c.key,c.start,c.room,c.detected].join('|'),...notice,lessons};
+ return {id:[c.kind,list.map(x=>x.date).join(','),c.key,c.start,c.room].join('|'),...notice,lessons};
 }
 
 // Agenda-abonnement (rooster.ics): voor Google Agenda en zijn widget op Android.
@@ -199,7 +207,7 @@ async function main(){
   fs.mkdirSync(out(dir),{recursive:true});
   writeManifestAndWorker(p);
   // Gegevens voor de widget (Scriptable): alle lessen met hetzelfde id als in het rooster
-  fs.writeFileSync(out(dir,'rooster.json'),JSON.stringify({updated:schedule.updated,subjects:Object.fromEntries(Object.entries(schedule.subjects).map(([k,v])=>[k,{name:v.name,short:v.short||v.name.split(/\s+/).map(w=>w[0]).join('').slice(0,4),color:v.color}])),lessons:schedule.weeks.flatMap(w=>w.events.map(e=>({id:`${w.start}|${e.day}|${e.start}|${e.key}`,date:addDays(w.start,e.day),start:e.start,end:e.end,key:e.key,room:e.room==='Online'?'Online':e.room,...(e.note?{note:e.note,tag:e.tag}:{}),...(e.exam?{exam:true}:{})}))),changes:schedule.changes.map(c=>changeNotice(c,schedule.subjects))}));
+  fs.writeFileSync(out(dir,'rooster.json'),JSON.stringify({updated:schedule.updated,subjects:Object.fromEntries(Object.entries(schedule.subjects).map(([k,v])=>[k,{name:v.name,short:v.short||v.name.split(/\s+/).map(w=>w[0]).join('').slice(0,4),color:v.color}])),lessons:schedule.weeks.flatMap(w=>w.events.map(e=>({id:`${w.start}|${e.day}|${e.start}|${e.key}`,date:addDays(w.start,e.day),start:e.start,end:e.end,key:e.key,room:e.room==='Online'?'Online':e.room,...(e.note?{note:e.note,tag:e.tag}:{}),...(e.exam?{exam:true}:{})}))),changes:changeNotices(schedule.changes,schedule.subjects)}));
   fs.writeFileSync(out(dir,'widget.js'),fs.readFileSync(path.join(src,'widget.js'),'utf8').replace('__VERSION__',updatedText(new Date().toISOString()))); // de eigenlijke widget, opgehaald door het opstartscript
   fs.writeFileSync(out(dir,'rooster.ics'),calendarIcs(p,schedule)); // agenda-abonnement, voor de widget van Google Agenda (Android)
   // 3. Pagina's

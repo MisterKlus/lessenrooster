@@ -708,7 +708,10 @@ function togetherHtml(w,i){return shownFriends().map(f=>{let free=freeTogether(w
 const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 // Roosterwijziging bij een les (nieuw lokaal of uur, nieuwe les). Al bekeken (de les één keer geopend)? Dan geen label meer, behalve met all.
 function changeId(c){return [c.kind,c.date,c.key,c.start,c.detected].join('|')}
-function changeFor(w,e,all){let date=isoDate(localDate(w.start,e.day));return changes.find(c=>c.kind!=='cancelled'&&c.date===date&&c.start===e.start&&c.key===e.key&&(all||!settings.seen[changeId(c)]))}
+// Een wijziging die elke week terugkomt (zelfde weekdag, uur, vak en lokaal) is één reeks: één keer openen is genoeg
+function seriesId(c){return ['reeks',c.kind,localDate(c.date).getDay(),c.key,c.start,c.room,c.was?.room||'',c.was?.start||''].join('|')}
+function changeSeen(c){return !!(settings.seen[changeId(c)]||settings.seen[seriesId(c)])}
+function changeFor(w,e,all){let date=isoDate(localDate(w.start,e.day));return changes.find(c=>c.kind!=='cancelled'&&c.date===date&&c.start===e.start&&c.key===e.key&&(all||!changeSeen(c)))}
 function cancelledOn(date){let iso=isoDate(date);return changes.filter(c=>c.kind==='cancelled'&&c.date===iso&&subjects[c.key])}
 function changeText(c,short){
  if(c.kind==='new')return short?'Nieuw':'Nieuwe les';
@@ -1487,7 +1490,9 @@ function openLesson(id){
  $('lessonSubject').dataset.subject=e.key;
  if(!PARENT){let input=$('lessonAttend');input.dataset.lesson=id;input.checked=!isSkipped(id);renderLessonTasks(id)}
  $('lessonDialog').showModal();
- if(change&&!settings.seen[changeId(change)]){settings.seen[changeId(change)]=change.date;save();render()} // gezien: het label verdwijnt uit het rooster
+ if(change&&!changeSeen(change)){ // gezien: het label verdwijnt uit het rooster, voor alle weken van deze reeks
+  let series=seriesId(change);settings.seen[series]=changes.filter(c=>seriesId(c)===series).reduce((last,c)=>c.date>last?c.date:last,change.date);save();render();
+ }
 }
 
 // Vakkenpagina

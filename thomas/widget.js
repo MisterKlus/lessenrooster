@@ -8,7 +8,7 @@
 // Daarom: aftellen met tekst die iOS zelf elke minuut bijwerkt, op het vergrendelscherm vaste uren
 // ("tot 11:45") die niet verouderen, en zo weinig mogelijk vragen om opnieuw te tekenen.
 
-const VERSION = "5 oktober 2026 om 14:36"; // ingevuld door src/build.js
+const VERSION = "5 oktober 2026 om 14:57"; // ingevuld door src/build.js
 const DATA_URL = SITE + "rooster.json?t=" + Date.now(); // altijd de verse versie, niet uit de cache
 const DATA_MAX_AGE = 60; // minuten: het rooster verandert hoogstens 's nachts, dus niet elke keer ophalen
 console.log("Lessenrooster-widget, versie " + VERSION);
@@ -57,7 +57,7 @@ async function notifyChanges(data) {
   let later = null;
   if (hour < 7 || hour >= 22) { later = new Date(now); if (hour >= 22) later.setDate(later.getDate() + 1); later.setHours(7, 0, 0, 0); }
   for (const c of data.changes) {
-    if (seen[c.id] || (c.lessons || []).some(id => isSkipped(id))) continue;
+    if (seen[c.id] || (c.lessons || []).length && c.lessons.every(id => isSkipped(id))) continue;
     const n = new Notification();
     n.title = c.title; n.body = c.body; n.threadIdentifier = "lessenrooster"; n.openURL = SITE;
     if (later) n.setTriggerDate(later);

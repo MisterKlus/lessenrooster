@@ -57,7 +57,7 @@ async function notifyChanges(data) {
   let later = null;
   if (hour < 7 || hour >= 22) { later = new Date(now); if (hour >= 22) later.setDate(later.getDate() + 1); later.setHours(7, 0, 0, 0); }
   for (const c of data.changes) {
-    if (seen[c.id] || (c.lessons || []).some(id => isSkipped(id))) continue;
+    if (seen[c.id] || (c.lessons || []).length && c.lessons.every(id => isSkipped(id))) continue;
     const n = new Notification();
     n.title = c.title; n.body = c.body; n.threadIdentifier = "lessenrooster"; n.openURL = SITE;
     if (later) n.setTriggerDate(later);
