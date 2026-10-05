@@ -599,10 +599,11 @@ const $=id=>document.getElementById(id);
 const embeddedNode=$('embeddedSettings');
 const instanceId=embeddedNode.dataset.instance||'original';
 const storeKey=(PARENT?'pxl-ouders-rooster-2026-v1-':`pxl-${PERSON.id}-rooster-2026-v1-`)+instanceId;
-let settings={colors:{},skipped:{},listView:false,tasks:{},links:{},friends:[],grades:{}};
-function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},skipped:o.skipped||{},listView:!!o.listView,tasks:o.tasks||{},links:o.links||{},friends:Array.isArray(o.friends)?o.friends:[],grades:o.grades||{}}}
+let settings={colors:{},skipped:{},listView:false,tasks:{},links:{},friends:[],grades:{},seen:{}};
+function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},skipped:o.skipped||{},listView:!!o.listView,tasks:o.tasks||{},links:o.links||{},friends:Array.isArray(o.friends)?o.friends:[],grades:o.grades||{},seen:o.seen&&typeof o.seen==='object'?o.seen:{}}}
 try{useSettings(JSON.parse(embeddedNode.textContent||'{}'))}catch(err){}
 try{let raw=localStorage.getItem(storeKey)||(!PARENT&&PERSON.id==='tymo'&&instanceId==='original'?localStorage.getItem('pxl-tymo-rooster-2026-v1'):null);if(raw)useSettings(JSON.parse(raw))}catch(err){}
+{let d=new Date(),today=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;for(let id in settings.seen)if(settings.seen[id]<today)delete settings.seen[id]} // bekeken wijzigingen van voorbije dagen vergeten
 function save(){try{localStorage.setItem(storeKey,JSON.stringify(settings))}catch(err){let hint=$('saveHint');if(hint)hint.textContent='Je browser bewaart wijzigingen in dit bestand niet automatisch.'}}
 function downloadCurrent(){
  const copy=document.documentElement.cloneNode(true);
@@ -670,7 +671,9 @@ function freeText(free){
 function togetherHtml(w,i){return shownFriends().map(f=>{let free=freeTogether(w,i,f);if(!free)return '';return `<div class="together">${free.length?`Samen vrij met ${escapeHtml(f.name)}: ${freeText(free)}`:`Geen vrij moment samen met ${escapeHtml(f.name)}`}</div>`}).join('')}
 // Roosterwijzigingen ("Gewijzigd", "Nieuwe les", "Vervalt"), vrije dagen en vakanties
 const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-function changeFor(w,e){let date=isoDate(localDate(w.start,e.day));return changes.find(c=>c.kind!=='cancelled'&&c.date===date&&c.start===e.start&&c.key===e.key)}
+// Roosterwijziging bij een les (nieuw lokaal of uur, nieuwe les). Al bekeken (de les één keer geopend)? Dan geen label meer, behalve met all.
+function changeId(c){return [c.kind,c.date,c.key,c.start,c.detected].join('|')}
+function changeFor(w,e,all){let date=isoDate(localDate(w.start,e.day));return changes.find(c=>c.kind!=='cancelled'&&c.date===date&&c.start===e.start&&c.key===e.key&&(all||!settings.seen[changeId(c)]))}
 function cancelledOn(date){let iso=isoDate(date);return changes.filter(c=>c.kind==='cancelled'&&c.date===iso&&subjects[c.key])}
 function changeText(c,short){
  if(c.kind==='new')return short?'Nieuw':'Nieuwe les';
@@ -1384,7 +1387,7 @@ $('single').addEventListener('touchend',event=>{if(touchX===null)return;let dx=e
 let currentLesson=null;
 function openLesson(id){
  let found=findLesson(id);if(!found)return;
- let {w,e}=found,s=subjects[e.key],date=localDate(w.start,e.day),change=changeFor(w,e),room=roomInfo(e),url=linkFor(e.key);
+ let {w,e}=found,s=subjects[e.key],date=localDate(w.start,e.day),change=changeFor(w,e,true),room=roomInfo(e),url=linkFor(e.key);
  currentLesson=id;
  $('lessonTitle').textContent=nameText(e.key)+(e.exam?' · examen':'');
  $('lessonMeta').textContent=`${days[e.day]} ${shortDate(date)} · ${e.start}–${e.end}${s.group?' · '+s.group:''}`;
@@ -1399,6 +1402,7 @@ function openLesson(id){
  $('lessonSubject').dataset.subject=e.key;
  if(!PARENT){let input=$('lessonAttend');input.dataset.lesson=id;input.checked=!settings.skipped[id];renderLessonTasks(id)}
  $('lessonDialog').showModal();
+ if(change&&!settings.seen[changeId(change)]){settings.seen[changeId(change)]=change.date;save();render()} // gezien: het label verdwijnt uit het rooster
 }
 
 // Vakkenpagina
