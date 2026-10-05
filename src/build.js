@@ -199,7 +199,7 @@ async function main(){
   fs.mkdirSync(out(dir),{recursive:true});
   writeManifestAndWorker(p);
   // Gegevens voor de widget (Scriptable): alle lessen met hetzelfde id als in het rooster
-  fs.writeFileSync(out(dir,'rooster.json'),JSON.stringify({updated:schedule.updated,subjects:Object.fromEntries(Object.entries(schedule.subjects).map(([k,v])=>[k,{name:v.name,short:v.short||v.name.split(/\s+/).map(w=>w[0]).join('').slice(0,4),color:v.color}])),lessons:schedule.weeks.flatMap(w=>w.events.map(e=>({id:`${w.start}|${e.day}|${e.start}|${e.key}`,date:addDays(w.start,e.day),start:e.start,end:e.end,key:e.key,room:e.room==='Online'?'Online':e.room,...(e.exam?{exam:true}:{})}))),changes:schedule.changes.map(c=>changeNotice(c,schedule.subjects))}));
+  fs.writeFileSync(out(dir,'rooster.json'),JSON.stringify({updated:schedule.updated,subjects:Object.fromEntries(Object.entries(schedule.subjects).map(([k,v])=>[k,{name:v.name,short:v.short||v.name.split(/\s+/).map(w=>w[0]).join('').slice(0,4),color:v.color}])),lessons:schedule.weeks.flatMap(w=>w.events.map(e=>({id:`${w.start}|${e.day}|${e.start}|${e.key}`,date:addDays(w.start,e.day),start:e.start,end:e.end,key:e.key,room:e.room==='Online'?'Online':e.room,...(e.note?{note:e.note,tag:e.tag}:{}),...(e.exam?{exam:true}:{})}))),changes:schedule.changes.map(c=>changeNotice(c,schedule.subjects))}));
   fs.writeFileSync(out(dir,'widget.js'),fs.readFileSync(path.join(src,'widget.js'),'utf8').replace('__VERSION__',updatedText(new Date().toISOString()))); // de eigenlijke widget, opgehaald door het opstartscript
   fs.writeFileSync(out(dir,'rooster.ics'),calendarIcs(p,schedule)); // agenda-abonnement, voor de widget van Google Agenda (Android)
   // 3. Pagina's

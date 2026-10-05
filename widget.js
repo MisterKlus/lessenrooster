@@ -8,7 +8,7 @@
 // Daarom: aftellen met tekst die iOS zelf elke minuut bijwerkt, op het vergrendelscherm vaste uren
 // ("tot 11:45") die niet verouderen, en zo weinig mogelijk vragen om opnieuw te tekenen.
 
-const VERSION = "5 oktober 2026 om 14:04"; // ingevuld door src/build.js
+const VERSION = "5 oktober 2026 om 14:08"; // ingevuld door src/build.js
 const DATA_URL = SITE + "rooster.json?t=" + Date.now(); // altijd de verse versie, niet uit de cache
 const DATA_MAX_AGE = 60; // minuten: het rooster verandert hoogstens 's nachts, dus niet elke keer ophalen
 console.log("Lessenrooster-widget, versie " + VERSION);
@@ -112,9 +112,10 @@ if (!data) {
   addText(widget, "Lessenrooster", 13, accent, true);
   addText(widget, "Nog geen verbinding. Open de widget later opnieuw.", 12, muted);
 } else {
+  // tagText: kort label uit een notitie in TimeEdit, bv. " · PE"
   const lessons = data.lessons
     .filter(l => !SKIPSET.has(l.id))
-    .map(l => ({ ...l, s: at(l.date, l.start), e: at(l.date, l.end), name: data.subjects[l.key]?.name || l.key, short: data.subjects[l.key]?.short || (data.subjects[l.key]?.name || l.key).slice(0, 4), color: data.subjects[l.key]?.color || "#7c4ddb" }))
+    .map(l => ({ ...l, s: at(l.date, l.start), e: at(l.date, l.end), name: data.subjects[l.key]?.name || l.key, tagText: l.tag ? " · " + l.tag : "", short:data.subjects[l.key]?.short || (data.subjects[l.key]?.name || l.key).slice(0, 4), color: data.subjects[l.key]?.color || "#7c4ddb" }))
     .sort((a, b) => a.s - b.s);
   const current = lessons.find(l => l.s <= now && now < l.e);
   const next = lessons.find(l => l.s > now);
@@ -132,7 +133,7 @@ if (!data) {
   const when = !focus ? null : current ? { prefix: "nog", date: current.e } : isToday ? { prefix: "over", date: next.s } : { text: next.s.getDate() + "/" + (next.s.getMonth() + 1) };
 
   if (family === "accessoryInline") {
-    widget.addText(focus ? (current ? "Nu " + focus.name + " · tot " + focus.end : (isToday ? "" : dayShort + " ") + focus.start + " " + focus.name + " · " + focus.room) : "Geen lessen gepland");
+    widget.addText(focus ? (current ? "Nu " + focus.name + focus.tagText + " · tot " + focus.end : (isToday ? "" : dayShort + " ") + focus.start + " " + focus.name + focus.tagText + " · " + focus.room) : "Geen lessen gepland");
   } else if (family === "accessoryCircular") {
     // Bovenaan het vak (kort), eronder het einduur of het beginuur: klopt ook als iOS de widget later hertekent
     const time = current ? "tot " + focus.end : focus ? (isToday ? "" : dayShort + " ") + focus.start : "";
@@ -142,7 +143,7 @@ if (!data) {
   } else if (family === "accessoryRectangular") {
     if (!focus) addText(widget, "Geen lessen gepland", 13, ink, true);
     else {
-      addText(widget, current ? "Nu · tot " + focus.end : isToday ? "Straks · " + focus.start + "–" + focus.end : label + " · " + focus.start, 12, ink, false, 1);
+      addText(widget, (current ? "Nu" + focus.tagText + " · tot " + focus.end : isToday ? "Straks" + focus.tagText + " · " + focus.start + "–" + focus.end : label + focus.tagText + " · " + focus.start), 12, ink, false, 1);
       addText(widget, focus.name, 14, ink, true);
       if (current) { widget.addSpacer(3); const img = widget.addImage(progressBar(pct, 130, Color.white())); img.imageSize = new Size(130, 4); }
       else addText(widget, focus.room, 12, ink);
@@ -164,7 +165,7 @@ if (!data) {
     const later = lessons.filter(l => l !== focus && l.s > focus.s && startOfDay(l.s).getTime() === day).slice(0, family === "large" ? 6 : 3);
     addText(side, later.length ? "Daarna" : "Daarna vrij", 12, muted, true);
     side.addSpacer(4);
-    for (const l of later) addText(side, l.start + "  " + l.name, 13, ink, false, 1);
+    for (const l of later) addText(side, l.start + "  " + l.name + l.tagText, 13, ink, false, 1);
   }
   // Opnieuw tekenen bij het begin of einde van een les, en tijdens een les elke 15 min voor het balkje.
   // Niet vaker: iOS geeft een widget maar een beperkt aantal beurten per dag en slaat er anders over.
@@ -174,7 +175,7 @@ if (!data) {
 
 function lessonBlock(parent, l, label, when, small, pct) {
   if (small) {
-    addText(parent, label, 12, accent, true);
+    addText(parent, label + l.tagText, 12, accent, true);
     parent.addSpacer(4);
     addText(parent, l.name, 15, ink, true, 2);
     parent.addSpacer(2);
@@ -190,7 +191,7 @@ function lessonBlock(parent, l, label, when, small, pct) {
   bar.size = new Size(4, 58); bar.cornerRadius = 2; bar.backgroundColor = new Color(l.color);
   line.addSpacer(8);
   const text = line.addStack(); text.layoutVertically();
-  addWhen(text, label + " · ", when, 12, accent);
+  addWhen(text, label + l.tagText + " · ", when, 12, accent);
   text.addSpacer(2);
   addText(text, l.name, 15, ink, true, 2);
   addText(text, l.start + "–" + l.end + " · " + l.room, 13, muted);

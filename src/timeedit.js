@@ -21,6 +21,8 @@ function toLocal(value){
  const p=Object.fromEntries(localParts.formatToParts(utc).map(x=>[x.type,x.value]));
  return {date:`${p.year}-${p.month}-${p.day}`,time:`${p.hour}:${p.minute}`};
 }
+// Kort label voor een notitie uit TimeEdit, op de les en in de iPhone-widget
+function noteTag(note){return /\bPE\b|permanente evaluatie/i.test(note)?'PE':/test|toets|quiz/i.test(note)?'Test':/verplicht/i.test(note)?'Verplicht':'Info'}
 function todayLocal(){return toLocal(new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z')).date}
 function isStillRelevant(change){return change.date>=todayLocal()&&Date.now()-new Date(change.detected)<CHANGE_DAYS*864e5}
 
@@ -128,7 +130,7 @@ function timeEdit(dir){
   if(!lessons.length)return null;
   const first=mondayOf(lessons[0].date),last=mondayOf(lessons.at(-1).date),weeks=[];
   for(let t=first;t<=last;t+=7*dayMs){
-   weeks.push({num:isoWeek(t),start:isoOf(t),end:isoOf(t+4*dayMs),events:lessons.filter(l=>mondayOf(l.date)===t).map(l=>({day:Math.round((toUtc(l.date)-t)/dayMs),start:l.start,end:l.end,key:l.key,room:l.room,old:l.old,teacher:l.teacher||'',...(l.note?{note:l.note}:{}),...(l.exam?{exam:true}:{})}))});
+   weeks.push({num:isoWeek(t),start:isoOf(t),end:isoOf(t+4*dayMs),events:lessons.filter(l=>mondayOf(l.date)===t).map(l=>({day:Math.round((toUtc(l.date)-t)/dayMs),start:l.start,end:l.end,key:l.key,room:l.room,old:l.old,teacher:l.teacher||'',...(l.note?{note:l.note,tag:noteTag(l.note)}:{}),...(l.exam?{exam:true}:{})}))});
   }
   return {subjects,weeks,updated:data.updated,firstDate:lessons[0].date,lastDate:lessons.at(-1).date,changes:(data.changes||[]).filter(isStillRelevant),holidays:config.holidays||[],semesters:config.semesters||[],weather:config.weather||null};
  }

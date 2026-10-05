@@ -686,9 +686,8 @@ function changeText(c,short){
  if(c.was.room!==c.room)parts.push(short?'nieuw lokaal':`was ${c.was.room==='Online'?'online':c.was.room}`);
  return short?parts.join(' + ').replace(/^./,x=>x.toUpperCase()):`Gewijzigd · ${parts.join(', ')}`;
 }
-// Extra regel uit TimeEdit (bv. "PE-test Uitbreiding Atrium"): kort label op de les, volledige tekst in de lijst en het lesvenster
-function noteLabel(note){return /\bPE\b|permanente evaluatie/i.test(note)?'PE':/test|toets|quiz/i.test(note)?'Test':/verplicht/i.test(note)?'Verplicht':'Info'}
-function noteChip(e){return e.note?`<span class="notechip" title="${escapeHtml(e.note)}">${noteLabel(e.note)}</span>`:''}
+// Extra regel uit TimeEdit (bv. "PE-test Uitbreiding Atrium"): kort label op de les (e.tag, zie src/timeedit.js), volledige tekst in de lijst en het lesvenster
+function noteChip(e){return e.note?`<span class="notechip" title="${escapeHtml(e.note)}">${e.tag||'Info'}</span>`:''}
 function changeBadge(c,short){return c?`<span class="chg">${changeText(c,short)}</span>`:''}
 function holidayOn(date){let iso=isoDate(date);return holidays.find(h=>h.start<=iso&&iso<=h.end)}
 function dayEnd(w,i){return w.events.filter(e=>e.day===i&&!isSkipped(lessonId(w,e))).reduce((max,e)=>e.end>max?e.end:max,'')}
