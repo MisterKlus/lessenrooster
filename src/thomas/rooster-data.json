@@ -1,7 +1,24 @@
 {
- "updated": "2026-09-30T08:00:37.893Z",
+ "updated": "2026-10-05T07:02:38.906Z",
  "extraSubjects": [],
- "changes": [],
+ "changes": [
+  {
+   "kind": "changed",
+   "date": "2026-10-20",
+   "key": "onderzoek",
+   "start": "12:45",
+   "end": "13:45",
+   "room": "DH.z2v02.26",
+   "old": "DE208",
+   "was": {
+    "start": "12:45",
+    "end": "13:45",
+    "room": "DH.z2v00.26",
+    "old": "DE008"
+   },
+   "detected": "2026-10-05T07:02:38.905Z"
+  }
+ ],
  "lessons": [
   {
    "date": "2026-09-28",
@@ -359,8 +376,8 @@
    "start": "12:45",
    "end": "13:45",
    "key": "onderzoek",
-   "room": "DH.z2v00.26",
-   "old": "DE008",
+   "room": "DH.z2v02.26",
+   "old": "DE208",
    "teacher": "Schepers Marleen"
   },
   {
