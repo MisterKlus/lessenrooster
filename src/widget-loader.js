@@ -1,11 +1,22 @@
 // Lessenrooster-widget voor Scriptable — opstartscript (gemaakt op __CREATED__)
 // Haalt de eigenlijke widget op van je rooster-site, zodat verbeteringen vanzelf binnenkomen.
 // Zonder internet gebruikt hij de laatst opgehaalde versie.
-// Vink je in je rooster lessen aan of uit? Kopieer het script dan opnieuw.
+// Vink je in je rooster lessen aan of uit? Tik dan in je rooster op "Stuur mijn vinkjes naar de widget".
 const SITE = "__SITE__";
-const SKIP = __SKIP__; // lessen die je niet volgt
+const SKIP = __SKIP__; // lessen die je niet volgt, op het moment van kopiëren
+const MADE = __MADE__; // tijdstip van kopiëren: een later doorgestuurde lijst gaat voor
 
 const fm = FileManager.local();
+// Vinkjes die je rooster doorstuurt (scriptable:///run/Lessenrooster?skip=[...]) worden hier bewaard
+const skipFile = fm.joinPath(fm.documentsDirectory(), "lessenrooster-vinkjes.json");
+const sent = args.queryParameters && args.queryParameters.skip;
+if (sent) {
+  try { JSON.parse(sent); fm.writeString(skipFile, sent); } catch (e) {}
+}
+let skip = SKIP;
+if (fm.fileExists(skipFile) && fm.modificationDate(skipFile).getTime() > MADE) {
+  try { skip = JSON.parse(fm.readString(skipFile)); } catch (e) {}
+}
 const cache = fm.joinPath(fm.documentsDirectory(), "lessenrooster-widget-code.js");
 const cached = fm.fileExists(cache);
 // In de widget hoogstens om de 6 uur ophalen (dan tekent hij sneller); in de app altijd de verse versie
@@ -22,9 +33,17 @@ if (!code) {
     if (cached) code = fm.readString(cache);
   }
 }
-if (code) {
+if (sent) {
+  // Geopend vanuit je rooster: kort bevestigen; de widget zelf neemt het bij de volgende update over
+  const a = new Alert();
+  a.title = "Widget bijgewerkt";
+  a.message = "Je widget toont nu alleen de lessen die je volgt. Je kunt terug naar je rooster.";
+  a.addAction("OK");
+  await a.present();
+  Script.complete();
+} else if (code) {
   const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-  await new AsyncFunction("SITE", "SKIP", code)(SITE, SKIP);
+  await new AsyncFunction("SITE", "SKIP", code)(SITE, skip);
 } else {
   const w = new ListWidget();
   w.addText("Lessenrooster: nog geen verbinding. Probeer het later opnieuw.");
