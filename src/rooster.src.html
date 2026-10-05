@@ -94,6 +94,8 @@ h1{font-size:clamp(30px,4vw,46px);line-height:1.12;margin:7px 0;letter-spacing:-
 .chg{display:inline-block;margin:3px 0 1px;padding:1px 7px;border-radius:8px;background:var(--chg-bg);color:var(--chg-ink);font-size:11px;font-weight:600;line-height:1.5;text-decoration:none}
 .listitem.changed{box-shadow:inset 0 0 0 2px var(--chg-line)}
 .event.changed{box-shadow:inset 0 0 0 2px var(--chg-line)}
+.subjfollow{display:flex;align-items:center;gap:8px;margin:2px 0 10px;font-weight:600}
+.subjfollow small{color:var(--muted);font-weight:500}
 .notechip{display:inline-block;margin:3px 4px 1px 0;padding:1px 7px;border-radius:8px;background:var(--blue-soft);color:var(--blue-ink);font-size:11px;font-weight:600;line-height:1.5}
 .event .notechip{align-self:flex-start;margin:2px 0;padding:0 5px;font-size:10px}
 .listitem .notetext{margin-top:2px;color:var(--muted);font-size:12px}
@@ -617,8 +619,16 @@ const $=id=>document.getElementById(id);
 const embeddedNode=$('embeddedSettings');
 const instanceId=embeddedNode.dataset.instance||'original';
 const storeKey=(PARENT?'pxl-ouders-rooster-2026-v1-':`pxl-${PERSON.id}-rooster-2026-v1-`)+instanceId;
-let settings={colors:{},skipped:{},listView:false,tasks:{},links:{},friends:[],grades:{},seen:{}};
-function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},skipped:o.skipped||{},listView:!!o.listView,tasks:o.tasks||{},links:o.links||{},friends:Array.isArray(o.friends)?o.friends:[],grades:o.grades||{},seen:o.seen&&typeof o.seen==='object'?o.seen:{}}}
+// Vinkjes per lesblok: blocks['dag|uur|vak'] = [{from:'maandag van die week',skip:true|false}, …], oplopend op from.
+// Een keuze geldt vanaf die week voor alle volgende weken, ook weken die TimeEdit later toevoegt.
+// blocks['vak|<vak>'] doet hetzelfde voor een heel vak ("Ik volg dit vak" op de vakkenpagina).
+function blocksFromSkipped(skipped){ // oude keuzes (per losse les) omzetten: telkens als de keuze wijzigt, een regel
+ let blocks={},state={};
+ for(const w of weeks)for(const e of w.events){let pattern=`${e.day}|${e.start}|${e.key}`,skip=!!skipped[lessonId(w,e)];if(skip!==(state[pattern]||false)){(blocks[pattern]??=[]).push({from:w.start,skip});state[pattern]=skip}}
+ return blocks;
+}
+let settings={colors:{},blocks:{},listView:false,tasks:{},links:{},friends:[],grades:{},seen:{}};
+function useSettings(o){if(o&&typeof o==='object')settings={colors:o.colors||{},blocks:o.blocks&&typeof o.blocks==='object'?o.blocks:o.skipped?blocksFromSkipped(o.skipped):{},listView:!!o.listView,tasks:o.tasks||{},links:o.links||{},friends:Array.isArray(o.friends)?o.friends:[],grades:o.grades||{},seen:o.seen&&typeof o.seen==='object'?o.seen:{}}}
 try{useSettings(JSON.parse(embeddedNode.textContent||'{}'))}catch(err){}
 try{let raw=localStorage.getItem(storeKey)||(!PARENT&&PERSON.id==='tymo'&&instanceId==='original'?localStorage.getItem('pxl-tymo-rooster-2026-v1'):null);if(raw)useSettings(JSON.parse(raw))}catch(err){}
 {let d=new Date(),today=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;for(let id in settings.seen)if(settings.seen[id]<today)delete settings.seen[id]} // bekeken wijzigingen van voorbije dagen vergeten
@@ -637,7 +647,14 @@ function downloadCurrent(){
 }
 
 function lessonId(w,e){return `${w.start}|${e.day}|${e.start}|${e.key}`}
-function isSkipped(id){return !PARENT&&!!settings.skipped[id]}
+function ruleAt(rules,week){let skip=null;for(const r of rules||[])if(r.from<=week)skip=r.skip;return skip}
+function isSkipped(id){if(PARENT)return false;let [week,day,start,key]=id.split('|');return ruleAt(settings.blocks['vak|'+key],week)===true||ruleAt(settings.blocks[`${day}|${start}|${key}`],week)===true}
+function setRule(pattern,week,skip){ // vanaf deze week; latere regels vervallen, overbodige regels weg
+ let rules=[...(settings.blocks[pattern]||[]).filter(r=>r.from<week),{from:week,skip}];
+ rules=rules.filter((r,i)=>i===0?r.skip:r.skip!==rules[i-1].skip);
+ if(rules.length)settings.blocks[pattern]=rules;else delete settings.blocks[pattern];
+}
+function thisMonday(){let d=new Date();return isoDate(new Date(d.getFullYear(),d.getMonth(),d.getDate()-(d.getDay()+6)%7))}
 function colorFor(key){let v=settings.colors[key];return /^#[0-9a-fA-F]{6}$/.test(v||'')?v:subjects[key].color}
 function styleFor(e,id){let skipped=isSkipped(id),color=skipped?'#8a94a5':colorFor(e.key);return `--accent:${color};--soft:${skipped?'#edf0f3':color+'20'}`}
 function roomHtml(e){return e.room==='Online'?'Online':`<strong>${e.room}</strong> (${e.old})`}
@@ -1193,7 +1210,7 @@ $('gearMenu').addEventListener('click',event=>{
  }
  if(action==='friends'){renderFriends();$('friendsDialog').showModal()}
  if(action==='download')downloadCurrent();
- if(action==='reset'&&confirm('Alle lessen weer op “Ik volg deze les” zetten?')){settings.skipped={};save();render()}
+ if(action==='reset'&&confirm('Alle lessen weer op “Ik volg deze les” zetten?')){settings.blocks={};save();render()}
 });
 document.addEventListener('click',event=>{if(!event.target.closest('.gearWrap'))setMenu(false)});
 function iconUrl(){return document.querySelector('link[rel=apple-touch-icon]').href}
@@ -1396,15 +1413,12 @@ function initEggs(){
  if(isBirthday(now))setTimeout(()=>throwConfetti(120),600);
 }
 
-// Keuzes meenemen naar een ander toestel via een link (of QR-code): #s=<overgeslagen lessen als bits in hex>&c=<kleuren>&t=<tijdstip>
+// Keuzes meenemen naar een ander toestel via een link (of QR-code): #b=<keuzes per lesblok>&c=<kleuren>&t=<tijdstip> (oude links: s=<bits>)
 function shareUrl(){
  let url=location.href.split('#')[0];
  if(PARENT)return url;
- let bits='',hex='',params=new URLSearchParams();
- for(let w of weeks)for(let e of w.events)bits+=settings.skipped[lessonId(w,e)]?'1':'0';
- for(let i=0;i<bits.length;i+=4)hex+=parseInt(bits.slice(i,i+4).padEnd(4,'0'),2).toString(16);
- hex=hex.replace(/0+$/,'');
- if(hex)params.set('s',hex);
+ let params=new URLSearchParams();
+ if(Object.keys(settings.blocks).length)params.set('b',JSON.stringify(settings.blocks));
  let colors=Object.entries(settings.colors).filter(([key,value])=>subjects[key]&&/^#[0-9a-f]{6}$/i.test(value)&&value.toLowerCase()!==subjects[key].color).map(([key,value])=>key+'-'+value.slice(1).toLowerCase());
  if(colors.length)params.set('c',colors.join('.'));
  params.set('t',Date.now().toString(36));
@@ -1415,10 +1429,11 @@ function importFromLink(){
  if(PARENT||!stamp)return;
  let doneKey=storeKey+'-import';
  try{if(localStorage.getItem(doneKey)===stamp)return}catch(err){}
- let hex=params.get('s')||'',i=0,skipped={},colors={};
- for(let w of weeks)for(let e of w.events){if(parseInt(hex[i>>2]||'0',16)&(8>>(i&3)))skipped[lessonId(w,e)]=true;i++}
+ let hex=params.get('s')||'',i=0,skipped={},colors={},blocks={};
+ try{let b=JSON.parse(params.get('b')||'null');if(b&&typeof b==='object')blocks=b}catch(err){}
+ if(hex){for(let w of weeks)for(let e of w.events){if(parseInt(hex[i>>2]||'0',16)&(8>>(i&3)))skipped[lessonId(w,e)]=true;i++}blocks=blocksFromSkipped(skipped)} // oude link
  (params.get('c')||'').split('.').forEach(pair=>{let [key,value]=pair.split('-');if(subjects[key]&&/^[0-9a-f]{6}$/i.test(value||''))colors[key]='#'+value.toLowerCase()});
- settings={...settings,skipped,colors};save();
+ settings={...settings,blocks,colors};save();
  try{localStorage.setItem(doneKey,stamp)}catch(err){}
  toast('Je vinkjes en kleuren van je andere toestel zijn overgenomen');
 }
@@ -1470,7 +1485,7 @@ function openLesson(id){
   url?row(icon('link'),`<a href="${escapeHtml(url)}" target="_blank" rel="noopener">Open ${escapeHtml(linkLabel(url))}</a>`):''
  ].join('');
  $('lessonSubject').dataset.subject=e.key;
- if(!PARENT){let input=$('lessonAttend');input.dataset.lesson=id;input.checked=!settings.skipped[id];renderLessonTasks(id)}
+ if(!PARENT){let input=$('lessonAttend');input.dataset.lesson=id;input.checked=!isSkipped(id);renderLessonTasks(id)}
  $('lessonDialog').showModal();
  if(change&&!settings.seen[changeId(change)]){settings.seen[changeId(change)]=change.date;save();render()} // gezien: het label verdwijnt uit het rooster
 }
@@ -1489,7 +1504,7 @@ function renderSubjects(){
   let weekLessons=w.events.filter(e=>e.key===key),thisWeek=weekLessons.filter(e=>!isSkipped(lessonId(w,e))),minutes=thisWeek.reduce((n,e)=>n+mins(e.end)-mins(e.start),0);
   let exam=followed.find(l=>l.e.exam&&l.end>now),openTasks=lessons.reduce((n,l)=>n+tasksFor(lessonId(l.w,l.e)).filter(t=>!t.done).length,0);
   let nextSkipped=next&&isSkipped(lessonId(next.w,next.e));
-  return `<section class="subj${subjectFocus?' single':''}" id="subj-${key}" style="--accent:${colorFor(key)}"><h3><i></i>${nameHtml(key)}${s.group?` <small>${s.group}</small>`:''}</h3><div class="subjgrid">`+
+  return `<section class="subj${subjectFocus?' single':''}" id="subj-${key}" style="--accent:${colorFor(key)}"><h3><i></i>${nameHtml(key)}${s.group?` <small>${s.group}</small>`:''}</h3>${PARENT?'':`<label class="subjfollow"><input type="checkbox" data-follow-subject="${key}"${ruleAt(settings.blocks['vak|'+key],thisMonday())===true?'':' checked'}> Ik volg dit vak <small>vanaf deze week</small></label>`}<div class="subjgrid">`+
    cell(next&&next.start<=now?'Nu bezig':'Volgende les',next?`${dayText(next.start,now)} ${next.e.start} · ${escapeHtml(roomText(next.e))}${nextSkipped?' · <i>je volgt deze les niet</i>':''}`:'geen meer gepland in dit rooster')+
    cell(`Week ${w.num}`,minutes?`${durationText(minutes*60000)} les (${thisWeek.length}×)`:weekLessons.length?`${weekLessons.length}× les, maar je volgt ze niet`:'geen les')+
    (teachers.length?cell(teachers.length>1?'Docenten':'Docent',escapeHtml(teachers.join(', '))):'')+
@@ -1594,12 +1609,16 @@ document.addEventListener('keydown',event=>{
 });
 
 if(!PARENT){
- function setAttendanceFromHere(id,attending){let found=findLesson(id);if(!found)return;let {w:startWeek,e:source}=found;for(let w of weeks){if(w.start<startWeek.start)continue;for(let e of w.events){if(e.key===source.key&&e.day===source.day&&e.start===source.start&&e.end===source.end)settings.skipped[lessonId(w,e)]=!attending}}save();render();widgetSyncTip()}
+ function setAttendanceFromHere(id,attending){
+  let [week,day,start,key]=id.split('|');
+  if(attending&&ruleAt(settings.blocks['vak|'+key],week)===true){toast(`Je volgt ${subjects[key].name} niet. Zet het weer aan bij Vakken.`);render();return}
+  setRule(`${day}|${start}|${key}`,week,!attending);save();render();widgetSyncTip();
+ }
  // Op een iPhone één keer per bezoek eraan herinneren dat de widget de nieuwe vinkjes nog niet kent
  function widgetSyncTip(){if(!WEB||widgetSyncTip.done||!/iPhone|iPad/.test(navigator.userAgent))return;widgetSyncTip.done=true;setTimeout(()=>toast('Tip: tandwiel → Instellingen → Widget → Stuur mijn vinkjes naar de widget'),500)}
  window.renderColors=function(){$('colorRows').innerHTML=Object.entries(subjects).map(([key,s])=>`<label class="colorRow"><span>${s.name}<small>${s.group}</small></span><input type="color" data-color="${key}" value="${colorFor(key)}" aria-label="Kleur voor ${s.name}"></label>`).join('')};
  $('resetColors').onclick=()=>{settings.colors={};save();renderColors();render()};
- document.addEventListener('change',event=>{let t=event.target;if(t.dataset.lesson)setAttendanceFromHere(t.dataset.lesson,t.checked);if(t.dataset.color){settings.colors[t.dataset.color]=t.value;save();render()}});
+ document.addEventListener('change',event=>{let t=event.target;if(t.dataset.lesson)setAttendanceFromHere(t.dataset.lesson,t.checked);if(t.dataset.followSubject){setRule('vak|'+t.dataset.followSubject,thisMonday(),!t.checked);save();render();widgetSyncTip()}if(t.dataset.color){settings.colors[t.dataset.color]=t.value;save();render()}});
 }
 
 if(WEB){importFromLink();addEventListener('hashchange',()=>{importFromLink();render()})}
@@ -1608,7 +1627,7 @@ initEggs();
 if(!PARENT){
  $('backupMake').onclick=makeBackup;
  // Lessen die je niet volgt, vanaf vandaag: voor de iPhone-widget
- let widgetSkip=()=>{let today=isoDate(new Date());return Object.keys(settings.skipped).filter(id=>{let f=settings.skipped[id]&&findLesson(id);return f&&isoDate(localDate(f.w.start,f.e.day))>=today})};
+ let widgetSkip=()=>({blocks:settings.blocks}); // de widget rekent zelf uit welke lessen je niet volgt (src/widget.js)
  if(WEB)$('widgetCopy').onclick=async()=>{
   let text=WIDGET_SCRIPT.replace('__SITE__',new URL('.',location.href).href).replace('__SKIP__',JSON.stringify(widgetSkip())).replace('__MADE__',String(Date.now())).replace('__CREATED__',new Date().toLocaleDateString('nl-BE'));
   try{await navigator.clipboard.writeText(text);toast('Script gekopieerd. Plak het in Scriptable.')}

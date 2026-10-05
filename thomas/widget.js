@@ -8,11 +8,20 @@
 // Daarom: aftellen met tekst die iOS zelf elke minuut bijwerkt, op het vergrendelscherm vaste uren
 // ("tot 11:45") die niet verouderen, en zo weinig mogelijk vragen om opnieuw te tekenen.
 
-const VERSION = "5 oktober 2026 om 14:25"; // ingevuld door src/build.js
+const VERSION = "5 oktober 2026 om 14:36"; // ingevuld door src/build.js
 const DATA_URL = SITE + "rooster.json?t=" + Date.now(); // altijd de verse versie, niet uit de cache
 const DATA_MAX_AGE = 60; // minuten: het rooster verandert hoogstens 's nachts, dus niet elke keer ophalen
 console.log("Lessenrooster-widget, versie " + VERSION);
-const SKIPSET = new Set(SKIP || []);
+// SKIP: je keuzes uit je rooster. Nieuw: {blocks} per lesblok en per vak (zoals in je rooster, ook voor latere weken);
+// oud opstartscript: een lijst losse lessen.
+const SKIPSET = new Set(Array.isArray(SKIP) ? SKIP : []);
+const BLOCKS = (SKIP && !Array.isArray(SKIP) && SKIP.blocks) || {};
+function ruleAt(rules, week) { let skip = null; for (const r of rules || []) if (r.from <= week) skip = r.skip; return skip; }
+function isSkipped(id) {
+  if (SKIPSET.has(id)) return true;
+  const [week, day, start, key] = id.split("|");
+  return ruleAt(BLOCKS["vak|" + key], week) === true || ruleAt(BLOCKS[day + "|" + start + "|" + key], week) === true;
+}
 
 const bg = Color.dynamic(new Color("#ffffff"), new Color("#182236"));
 const ink = Color.dynamic(new Color("#17223b"), new Color("#e6eaf4"));
@@ -48,7 +57,7 @@ async function notifyChanges(data) {
   let later = null;
   if (hour < 7 || hour >= 22) { later = new Date(now); if (hour >= 22) later.setDate(later.getDate() + 1); later.setHours(7, 0, 0, 0); }
   for (const c of data.changes) {
-    if (seen[c.id] || (c.lessons || []).some(id => SKIPSET.has(id))) continue;
+    if (seen[c.id] || (c.lessons || []).some(id => isSkipped(id))) continue;
     const n = new Notification();
     n.title = c.title; n.body = c.body; n.threadIdentifier = "lessenrooster"; n.openURL = SITE;
     if (later) n.setTriggerDate(later);
@@ -114,7 +123,7 @@ if (!data) {
 } else {
   // tagText: kort label uit een notitie in TimeEdit, bv. " · PE"
   const lessons = data.lessons
-    .filter(l => !SKIPSET.has(l.id))
+    .filter(l => !isSkipped(l.id))
     .map(l => ({ ...l, s: at(l.date, l.start), e: at(l.date, l.end), name: data.subjects[l.key]?.name || l.key, tagText: l.tag ? " · " + l.tag : "", short:data.subjects[l.key]?.short || (data.subjects[l.key]?.name || l.key).slice(0, 4), color: data.subjects[l.key]?.color || "#7c4ddb" }))
     .sort((a, b) => a.s - b.s);
   const current = lessons.find(l => l.s <= now && now < l.e);
