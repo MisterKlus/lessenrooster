@@ -95,7 +95,7 @@ function timeEdit(dir){
     subject=extra[code]||(extra[code]={key:code.toLowerCase(),codes:[code],name:title,group:'',color:config.extraColors[extraIndex++%config.extraColors.length]});
    }
    const exam=new RegExp(config.examPattern||'examen','i').test(`${ev.summary} ${ev.description}`); // examens krijgen een eigen stijl
-   feed.push({date:lesson.date,start:lesson.start,end:lesson.end,key:subject.key,room,old,teacher:lesson.teacher,...(exam?{exam:true}:{})});
+   feed.push({date:lesson.date,start:lesson.start,end:lesson.end,key:subject.key,room,old,teacher:lesson.teacher,...(lesson.notes?{note:lesson.notes}:{}),...(exam?{exam:true}:{})}); // note: extra regel uit TimeEdit, bv. "PE-test Uitbreiding Atrium"
   }
   if(!feed.length)throw new Error('Geen lessen gevonden in TimeEdit; bestaande gegevens blijven behouden');
 
@@ -128,7 +128,7 @@ function timeEdit(dir){
   if(!lessons.length)return null;
   const first=mondayOf(lessons[0].date),last=mondayOf(lessons.at(-1).date),weeks=[];
   for(let t=first;t<=last;t+=7*dayMs){
-   weeks.push({num:isoWeek(t),start:isoOf(t),end:isoOf(t+4*dayMs),events:lessons.filter(l=>mondayOf(l.date)===t).map(l=>({day:Math.round((toUtc(l.date)-t)/dayMs),start:l.start,end:l.end,key:l.key,room:l.room,old:l.old,teacher:l.teacher||'',...(l.exam?{exam:true}:{})}))});
+   weeks.push({num:isoWeek(t),start:isoOf(t),end:isoOf(t+4*dayMs),events:lessons.filter(l=>mondayOf(l.date)===t).map(l=>({day:Math.round((toUtc(l.date)-t)/dayMs),start:l.start,end:l.end,key:l.key,room:l.room,old:l.old,teacher:l.teacher||'',...(l.note?{note:l.note}:{}),...(l.exam?{exam:true}:{})}))});
   }
   return {subjects,weeks,updated:data.updated,firstDate:lessons[0].date,lastDate:lessons.at(-1).date,changes:(data.changes||[]).filter(isStillRelevant),holidays:config.holidays||[],semesters:config.semesters||[],weather:config.weather||null};
  }

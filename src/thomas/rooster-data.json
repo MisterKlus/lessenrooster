@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-05T07:02:38.906Z",
+ "updated": "2026-10-05T12:03:34.939Z",
  "extraSubjects": [],
  "changes": [
   {
@@ -135,7 +135,8 @@
    "key": "reken",
    "room": "DH.z1v00.30",
    "old": "DC001",
-   "teacher": "Ates Zekai"
+   "teacher": "Ates Zekai",
+   "note": "PE-test Uitbreiding Atrium"
   },
   {
    "date": "2026-10-05",
@@ -378,7 +379,8 @@
    "key": "onderzoek",
    "room": "DH.z2v02.26",
    "old": "DE208",
-   "teacher": "Schepers Marleen"
+   "teacher": "Schepers Marleen",
+   "note": "Verplicht 1EM sessie SDGʼs 12u45-13u45"
   },
   {
    "date": "2026-10-21",

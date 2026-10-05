@@ -116,7 +116,7 @@ function calendarIcs(p,schedule){
    `DTSTART;TZID=Europe/Brussels:${local(date,e.start)}`,`DTEND;TZID=Europe/Brussels:${local(date,e.end)}`,
    'SUMMARY:'+esc(schedule.subjects[e.key].name+(e.exam?' (examen)':'')),
    'LOCATION:'+esc(e.room+(e.old&&e.room!=='Online'?` (${e.old})`:'')),
-   ...(e.teacher?['DESCRIPTION:'+esc(e.teacher)]:[]),'END:VEVENT');
+   ...(e.teacher||e.note?['DESCRIPTION:'+esc([e.teacher,e.note].filter(Boolean).join('\n'))]:[]),'END:VEVENT'); // beschrijving: docent en notitie uit TimeEdit (bv. PE-test)
  }
  lines.push('END:VCALENDAR');
  return lines.map(fold).join('\r\n')+'\r\n';
