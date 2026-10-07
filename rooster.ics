@@ -417,7 +417,9 @@ DTSTART;TZID=Europe/Brussels:20261022T124500
 DTEND;TZID=Europe/Brussels:20261022T144500
 SUMMARY:C# Essentials
 LOCATION:DH.z2v02.23 (DE206)
-DESCRIPTION:Bervoets Wim
+DESCRIPTION:Bervoets Wim\nPE1: kennistoets over variabelen\, bewerkingen\
+ , condities en veelgebruikte functies · LockDown Browser vooraf installer
+ en · gesloten boek · 15 min
 END:VEVENT
 BEGIN:VEVENT
 UID:tymo-2026-10-22-1445-it@misterklus.github.io
@@ -507,7 +509,9 @@ DTSTART;TZID=Europe/Brussels:20261029T124500
 DTEND;TZID=Europe/Brussels:20261029T144500
 SUMMARY:C# Essentials
 LOCATION:DH.z2v02.23 (DE206)
-DESCRIPTION:Bervoets Wim
+DESCRIPTION:Bervoets Wim\nPE2: consoleapplicatie met variabelen\, control
+ e- en herhalingsstructuren\, veelgebruikte functies en methodes · Visual 
+ Studio 2026 klaar op je laptop · openboek (Blackboard-cursus) · 120 min
 END:VEVENT
 BEGIN:VEVENT
 UID:tymo-2026-10-29-1445-it@misterklus.github.io

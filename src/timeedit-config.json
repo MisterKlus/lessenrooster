@@ -7,6 +7,10 @@
   {"key": "data", "short": "Data", "codes": ["42PRO1030"], "title": "Data Expert", "name": "Data Expert", "group": "2PROA", "color": "#3a9580"},
   {"key": "pm", "short": "PM", "codes": ["42PRO1040"], "title": "Project management", "name": "Project Management", "group": "2PROB", "color": "#c46b80"}
  ],
+ "notes": [
+  {"date": "2026-10-22", "start": "12:45", "key": "cs", "tag": "PE", "text": "PE1: kennistoets over variabelen, bewerkingen, condities en veelgebruikte functies · LockDown Browser vooraf installeren · gesloten boek · 15 min"},
+  {"date": "2026-10-29", "start": "12:45", "key": "cs", "tag": "PE", "text": "PE2: consoleapplicatie met variabelen, controle- en herhalingsstructuren, veelgebruikte functies en methodes · Visual Studio 2026 klaar op je laptop · openboek (Blackboard-cursus) · 120 min"}
+ ],
  "exclude": [
   {"reason": "C#-monitoraat", "descriptionContains": "monitoraat"},
   {"reason": "Project management van een andere klasgroep (niet 2PROB)", "code": "42PRO1040", "teacher": "Das Ann"},

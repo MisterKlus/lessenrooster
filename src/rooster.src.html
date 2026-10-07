@@ -877,6 +877,8 @@ function countdownHtml(now){
  }
  let exam=allLessons.find(l=>l.e.exam&&l.start>now&&!isSkipped(lessonId(l.w,l.e)));
  if(exam){let n=Math.round((startOfDay(exam.start)-startOfDay(now))/864e5);if(n<=45)parts.push(`${subjects[exam.e.key].name}-examen ${n===0?'vandaag':n===1?'morgen':`over ${n} dagen`}`)}
+ let pe=allLessons.find(l=>l.e.tag==='PE'&&l.start>now&&!isSkipped(lessonId(l.w,l.e))); // permanente evaluatie (uit TimeEdit of eigen notitie)
+ if(pe){let n=Math.round((startOfDay(pe.start)-startOfDay(now))/864e5),label=(pe.e.note.match(/^PE ?\d+/i)||['PE'])[0];if(n<=21)parts.push(`${subjects[pe.e.key].name} ${label} ${n===0?'vandaag':n===1?'morgen':`over ${n} dagen`}`)}
  let next=holidays.find(h=>h.start>today);
  if(next){let n=Math.round((localDate(next.start)-startOfDay(now))/864e5);if(n<=60)parts.push(`${next.name} over ${n} ${n===1?'dag':'dagen'}`)}
  let top=[rainWarning(now)].filter(Boolean).join('<span aria-hidden="true"> · </span>');

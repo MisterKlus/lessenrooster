@@ -55,7 +55,9 @@ function detectChanges(before,after,windowStart){
 
 // TimeEdit-koppeling voor één persoon: dir bevat timeedit-config.json en rooster-data.json
 function timeEdit(dir){
- const config={...shared,...JSON.parse(fs.readFileSync(path.join(dir,'timeedit-config.json'),'utf8'))};
+ const own=JSON.parse(fs.readFileSync(path.join(dir,'timeedit-config.json'),'utf8')),config={...shared,...own};
+ // Eigen notities bij een les (bv. een PE uit Blackboard): alleen uit het eigen bestand, niet gedeeld
+ const manualNotes=new Map((own.notes||[]).map(n=>[`${n.date}|${n.start}|${n.key}`,n]));
  const dataFile=path.join(dir,'rooster-data.json');
 
  function findSubject(code,title){
@@ -126,11 +128,15 @@ function timeEdit(dir){
   const dayMs=864e5,toUtc=iso=>{const [y,m,d]=iso.split('-').map(Number);return Date.UTC(y,m-1,d)},isoOf=ms=>new Date(ms).toISOString().slice(0,10);
   const mondayOf=iso=>{const t=toUtc(iso),wd=(new Date(t).getUTCDay()+6)%7;return t-wd*dayMs};
   const isoWeek=monday=>{const thursday=monday+3*dayMs,jan4=Date.UTC(new Date(thursday).getUTCFullYear(),0,4),firstThursday=jan4+(3-(new Date(jan4).getUTCDay()+6)%7)*dayMs;return 1+Math.round((thursday-firstThursday)/(7*dayMs))};
-  const lessons=data.lessons.filter(l=>subjects[l.key]);
+  const lessons=data.lessons.filter(l=>subjects[l.key]).map(l=>{ // eigen notitie erbij (naast een notitie uit TimeEdit)
+   const own=manualNotes.get(`${l.date}|${l.start}|${l.key}`);
+   return own?{...l,note:[own.text,l.note].filter(Boolean).join(' · '),ownTag:own.tag}:l;
+  });
+  for(const [k] of manualNotes)if(!lessons.some(l=>`${l.date}|${l.start}|${l.key}`===k))console.warn('Let op: geen les gevonden voor eigen notitie',k);
   if(!lessons.length)return null;
   const first=mondayOf(lessons[0].date),last=mondayOf(lessons.at(-1).date),weeks=[];
   for(let t=first;t<=last;t+=7*dayMs){
-   weeks.push({num:isoWeek(t),start:isoOf(t),end:isoOf(t+4*dayMs),events:lessons.filter(l=>mondayOf(l.date)===t).map(l=>({day:Math.round((toUtc(l.date)-t)/dayMs),start:l.start,end:l.end,key:l.key,room:l.room,old:l.old,teacher:l.teacher||'',...(l.note?{note:l.note,tag:noteTag(l.note)}:{}),...(l.exam?{exam:true}:{})}))});
+   weeks.push({num:isoWeek(t),start:isoOf(t),end:isoOf(t+4*dayMs),events:lessons.filter(l=>mondayOf(l.date)===t).map(l=>({day:Math.round((toUtc(l.date)-t)/dayMs),start:l.start,end:l.end,key:l.key,room:l.room,old:l.old,teacher:l.teacher||'',...(l.note?{note:l.note,tag:l.ownTag||noteTag(l.note)}:{}),...(l.exam?{exam:true}:{})}))});
   }
   return {subjects,weeks,updated:data.updated,firstDate:lessons[0].date,lastDate:lessons.at(-1).date,changes:(data.changes||[]).filter(isStillRelevant),holidays:config.holidays||[],semesters:config.semesters||[],weather:config.weather||null};
  }
