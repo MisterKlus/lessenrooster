@@ -3,38 +3,6 @@
  "extraSubjects": [],
  "changes": [
   {
-   "kind": "changed",
-   "date": "2026-10-07",
-   "key": "cs",
-   "start": "08:30",
-   "end": "10:30",
-   "room": "DH.z1v02.12",
-   "old": "DB210",
-   "was": {
-    "start": "08:30",
-    "end": "10:30",
-    "room": "DH.z1v01.04",
-    "old": "DB107"
-   },
-   "detected": "2026-10-03T06:32:40.973Z"
-  },
-  {
-   "kind": "changed",
-   "date": "2026-10-07",
-   "key": "cs",
-   "start": "10:45",
-   "end": "11:45",
-   "room": "DH.z1v02.12",
-   "old": "DB210",
-   "was": {
-    "start": "10:45",
-    "end": "11:45",
-    "room": "DH.z1v01.04",
-    "old": "DB107"
-   },
-   "detected": "2026-10-03T06:32:40.973Z"
-  },
-  {
    "kind": "cancelled",
    "date": "2026-10-09",
    "key": "cs",
