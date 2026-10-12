@@ -1,24 +1,7 @@
 {
- "updated": "2026-10-05T12:03:34.939Z",
+ "updated": "2026-10-12T07:21:10.765Z",
  "extraSubjects": [],
- "changes": [
-  {
-   "kind": "changed",
-   "date": "2026-10-20",
-   "key": "onderzoek",
-   "start": "12:45",
-   "end": "13:45",
-   "room": "DH.z2v02.26",
-   "old": "DE208",
-   "was": {
-    "start": "12:45",
-    "end": "13:45",
-    "room": "DH.z2v00.26",
-    "old": "DE008"
-   },
-   "detected": "2026-10-05T07:02:38.905Z"
-  }
- ],
+ "changes": [],
  "lessons": [
   {
    "date": "2026-09-28",
@@ -510,6 +493,98 @@
   },
   {
    "date": "2026-10-30",
+   "start": "14:45",
+   "end": "17:00",
+   "key": "mech",
+   "room": "DH.z2v00.23",
+   "old": "DE006",
+   "teacher": "Claus Tom"
+  },
+  {
+   "date": "2026-11-09",
+   "start": "08:30",
+   "end": "12:00",
+   "key": "reken",
+   "room": "DH.z3v01.07",
+   "old": "DF107",
+   "teacher": "Ates Zekai",
+   "note": "Examen",
+   "exam": true
+  },
+  {
+   "date": "2026-11-09",
+   "start": "12:45",
+   "end": "14:45",
+   "key": "statica",
+   "room": "DH.z3v01.06",
+   "old": "DF106",
+   "teacher": "Stouten Ilona"
+  },
+  {
+   "date": "2026-11-09",
+   "start": "15:00",
+   "end": "17:00",
+   "key": "reken",
+   "room": "DH.z2v00.26",
+   "old": "DE008",
+   "teacher": "Ates Zekai"
+  },
+  {
+   "date": "2026-11-09",
+   "start": "17:00",
+   "end": "18:00",
+   "key": "reken",
+   "room": "DH.z2v00.26",
+   "old": "DE008",
+   "teacher": "Ates Zekai"
+  },
+  {
+   "date": "2026-11-10",
+   "start": "16:00",
+   "end": "18:00",
+   "key": "onderzoek",
+   "room": "DH.z3v01.01",
+   "old": "DF101",
+   "teacher": "Dierickx Hannelore"
+  },
+  {
+   "date": "2026-11-12",
+   "start": "08:30",
+   "end": "10:30",
+   "key": "skills",
+   "room": "DH.z3v01.01",
+   "old": "DF101",
+   "teacher": "Dierickx Hannelore"
+  },
+  {
+   "date": "2026-11-12",
+   "start": "10:45",
+   "end": "12:45",
+   "key": "auto",
+   "room": "DH.z2v01.42",
+   "old": "DE103",
+   "teacher": "Vandormael Wim"
+  },
+  {
+   "date": "2026-11-13",
+   "start": "08:30",
+   "end": "10:30",
+   "key": "mech",
+   "room": "DH.z2v00.23",
+   "old": "DE006",
+   "teacher": "Claus Tom"
+  },
+  {
+   "date": "2026-11-13",
+   "start": "10:45",
+   "end": "12:45",
+   "key": "sterkte",
+   "room": "DH.z2v00.23",
+   "old": "DE006",
+   "teacher": "Deckers Kristel"
+  },
+  {
+   "date": "2026-11-13",
    "start": "14:45",
    "end": "17:00",
    "key": "mech",
