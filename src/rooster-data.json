@@ -1,7 +1,30 @@
 {
- "updated": "2026-10-12T07:21:06.905Z",
+ "updated": "2026-10-13T07:42:17.035Z",
  "extraSubjects": [],
- "changes": [],
+ "changes": [
+  {
+   "kind": "cancelled",
+   "date": "2026-11-11",
+   "key": "cs",
+   "start": "08:30",
+   "end": "10:30",
+   "room": "DH.z1v01.04",
+   "old": "DB107",
+   "was": null,
+   "detected": "2026-10-13T07:42:17.035Z"
+  },
+  {
+   "kind": "cancelled",
+   "date": "2026-11-11",
+   "key": "cs",
+   "start": "10:45",
+   "end": "11:45",
+   "room": "DH.z1v01.04",
+   "old": "DB107",
+   "was": null,
+   "detected": "2026-10-13T07:42:17.035Z"
+  }
+ ],
  "lessons": [
   {
    "date": "2026-09-21",
@@ -560,24 +583,6 @@
    "room": "DH.z1v01.07",
    "old": "DB102",
    "teacher": "Bloemen Koen"
-  },
-  {
-   "date": "2026-11-11",
-   "start": "08:30",
-   "end": "10:30",
-   "key": "cs",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "teacher": "De Puydt Sander"
-  },
-  {
-   "date": "2026-11-11",
-   "start": "10:45",
-   "end": "11:45",
-   "key": "cs",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "teacher": "De Puydt Sander"
   },
   {
    "date": "2026-11-12",
