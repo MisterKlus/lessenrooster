@@ -1,7 +1,74 @@
 {
- "updated": "2026-10-12T07:21:10.765Z",
+ "updated": "2026-10-14T06:09:05.897Z",
  "extraSubjects": [],
- "changes": [],
+ "changes": [
+  {
+   "kind": "cancelled",
+   "date": "2026-10-15",
+   "key": "skills",
+   "start": "08:30",
+   "end": "10:30",
+   "room": "DH.z3v01.01",
+   "old": "DF101",
+   "was": null,
+   "detected": "2026-10-14T06:09:05.897Z"
+  },
+  {
+   "kind": "cancelled",
+   "date": "2026-10-19",
+   "key": "onderzoek",
+   "start": "16:00",
+   "end": "18:00",
+   "room": "DH.z3v01.06",
+   "old": "DF106",
+   "was": null,
+   "detected": "2026-10-14T06:09:05.897Z"
+  },
+  {
+   "kind": "cancelled",
+   "date": "2026-10-20",
+   "key": "onderzoek",
+   "start": "12:45",
+   "end": "13:45",
+   "room": "DH.z2v02.26",
+   "old": "DE208",
+   "was": null,
+   "detected": "2026-10-14T06:09:05.897Z"
+  },
+  {
+   "kind": "cancelled",
+   "date": "2026-10-26",
+   "key": "onderzoek",
+   "start": "16:00",
+   "end": "18:00",
+   "room": "DH.z3v01.06",
+   "old": "DF106",
+   "was": null,
+   "detected": "2026-10-14T06:09:05.897Z"
+  },
+  {
+   "kind": "cancelled",
+   "date": "2026-10-29",
+   "key": "skills",
+   "start": "08:30",
+   "end": "10:30",
+   "room": "DH.z3v01.01",
+   "old": "DF101",
+   "was": null,
+   "detected": "2026-10-14T06:09:05.897Z"
+  },
+  {
+   "kind": "new",
+   "date": "2026-10-28",
+   "key": "onderzoek",
+   "start": "16:00",
+   "end": "17:00",
+   "room": "DH.z2v02.26",
+   "old": "DE208",
+   "was": null,
+   "detected": "2026-10-14T06:09:05.897Z"
+  }
+ ],
  "lessons": [
   {
    "date": "2026-09-28",
@@ -258,15 +325,6 @@
   },
   {
    "date": "2026-10-15",
-   "start": "08:30",
-   "end": "10:30",
-   "key": "skills",
-   "room": "DH.z3v01.01",
-   "old": "DF101",
-   "teacher": "Dierickx Hannelore"
-  },
-  {
-   "date": "2026-10-15",
    "start": "10:45",
    "end": "12:45",
    "key": "auto",
@@ -347,25 +405,6 @@
    "teacher": "Ates Zekai"
   },
   {
-   "date": "2026-10-19",
-   "start": "16:00",
-   "end": "18:00",
-   "key": "onderzoek",
-   "room": "DH.z3v01.06",
-   "old": "DF106",
-   "teacher": "Dierickx Hannelore"
-  },
-  {
-   "date": "2026-10-20",
-   "start": "12:45",
-   "end": "13:45",
-   "key": "onderzoek",
-   "room": "DH.z2v02.26",
-   "old": "DE208",
-   "teacher": "Schepers Marleen",
-   "note": "Verplicht 1EM sessie SDGʼs 12u45-13u45"
-  },
-  {
    "date": "2026-10-21",
    "start": "13:45",
    "end": "15:45",
@@ -438,15 +477,6 @@
    "teacher": "Ates Zekai"
   },
   {
-   "date": "2026-10-26",
-   "start": "16:00",
-   "end": "18:00",
-   "key": "onderzoek",
-   "room": "DH.z3v01.06",
-   "old": "DF106",
-   "teacher": "Dierickx Hannelore"
-  },
-  {
    "date": "2026-10-28",
    "start": "08:30",
    "end": "10:30",
@@ -456,13 +486,14 @@
    "teacher": "Ates Zekai"
   },
   {
-   "date": "2026-10-29",
-   "start": "08:30",
-   "end": "10:30",
-   "key": "skills",
-   "room": "DH.z3v01.01",
-   "old": "DF101",
-   "teacher": "Dierickx Hannelore"
+   "date": "2026-10-28",
+   "start": "16:00",
+   "end": "17:00",
+   "key": "onderzoek",
+   "room": "DH.z2v02.26",
+   "old": "DE208",
+   "teacher": "Schepers Marleen",
+   "note": "Verplicht 1EM sessie SDGʼs 12u45-13u45"
   },
   {
    "date": "2026-10-29",
