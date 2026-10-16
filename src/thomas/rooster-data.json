@@ -4,17 +4,6 @@
  "changes": [
   {
    "kind": "cancelled",
-   "date": "2026-10-15",
-   "key": "skills",
-   "start": "08:30",
-   "end": "10:30",
-   "room": "DH.z3v01.01",
-   "old": "DF101",
-   "was": null,
-   "detected": "2026-10-14T06:09:05.897Z"
-  },
-  {
-   "kind": "cancelled",
    "date": "2026-10-19",
    "key": "onderzoek",
    "start": "16:00",
