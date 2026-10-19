@@ -9,7 +9,12 @@
  ],
  "notes": [
   {"date": "2026-10-22", "start": "12:45", "key": "cs", "tag": "PE", "text": "PE1: kennistoets over variabelen, bewerkingen, condities en veelgebruikte functies · LockDown Browser vooraf installeren · gesloten boek · 15 min"},
-  {"date": "2026-10-29", "start": "12:45", "key": "cs", "tag": "PE", "text": "PE2: consoleapplicatie met variabelen, controle- en herhalingsstructuren, veelgebruikte functies en methodes · Visual Studio 2026 klaar op je laptop · openboek (Blackboard-cursus) · 120 min"}
+  {"date": "2026-10-29", "start": "12:45", "key": "cs", "tag": "PE", "text": "PE2: consoleapplicatie met variabelen, controle- en herhalingsstructuren, veelgebruikte functies en methodes · Visual Studio 2026 klaar op je laptop · openboek (Blackboard-cursus) · 120 min"},
+  {"date": "2026-10-26", "key": "data", "tag": "PE", "text": "PE1: Oracle Objects"},
+  {"date": "2026-12-14", "key": "data", "tag": "PE", "text": "PE2: PL/SQL"},
+  {"date": "2026-10-29", "key": "it", "tag": "PE", "text": "PE1 · ½ uur"},
+  {"date": "2026-12-03", "key": "it", "tag": "PE", "text": "PE2 · ½ uur"},
+  {"date": "2027-01-07", "key": "it", "tag": "PE", "text": "PE3 · ½ uur"}
  ],
  "exclude": [
   {"reason": "C#-monitoraat", "descriptionContains": "monitoraat"},
