@@ -1,18 +1,7 @@
 {
- "updated": "2026-10-19T06:12:48.942Z",
+ "updated": "2026-10-20T06:00:24.533Z",
  "extraSubjects": [],
  "changes": [
-  {
-   "kind": "cancelled",
-   "date": "2026-10-19",
-   "key": "onderzoek",
-   "start": "16:00",
-   "end": "18:00",
-   "room": "DH.z3v01.06",
-   "old": "DF106",
-   "was": null,
-   "detected": "2026-10-14T06:09:05.897Z"
-  },
   {
    "kind": "cancelled",
    "date": "2026-10-20",
@@ -56,6 +45,22 @@
    "old": "DE208",
    "was": null,
    "detected": "2026-10-14T06:09:05.897Z"
+  },
+  {
+   "kind": "changed",
+   "date": "2026-11-09",
+   "key": "reken",
+   "start": "08:30",
+   "end": "12:00",
+   "room": "DH.z1v00.30",
+   "old": "DC001",
+   "was": {
+    "start": "08:30",
+    "end": "12:00",
+    "room": "DH.z3v01.07",
+    "old": "DF107"
+   },
+   "detected": "2026-10-20T06:00:24.532Z"
   }
  ],
  "lessons": [
@@ -525,10 +530,10 @@
    "start": "08:30",
    "end": "12:00",
    "key": "reken",
-   "room": "DH.z3v01.07",
-   "old": "DF107",
+   "room": "DH.z1v00.30",
+   "old": "DC001",
    "teacher": "Ates Zekai",
-   "note": "Examen",
+   "note": "Stouten Ilona Examen (Uitbreiding Atrium)",
    "exam": true
   },
   {
@@ -692,7 +697,7 @@
    "room": "DH.z1v00.30",
    "old": "DC001",
    "teacher": "Claus Tom",
-   "note": "PE-test Uitbreiding Atrium"
+   "note": "Deckers Kristel PE-test Uitbreiding Atrium"
   },
   {
    "date": "2026-11-20",
@@ -702,7 +707,7 @@
    "room": "DH.z1v00.30",
    "old": "DC001",
    "teacher": "Claus Tom",
-   "note": "PE-test Uitbreiding Atrium"
+   "note": "Deckers Kristel PE-test Uitbreiding Atrium"
   },
   {
    "date": "2026-11-20",
