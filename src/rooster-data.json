@@ -1,30 +1,7 @@
 {
  "updated": "2026-10-19T06:12:44.239Z",
  "extraSubjects": [],
- "changes": [
-  {
-   "kind": "cancelled",
-   "date": "2026-11-11",
-   "key": "cs",
-   "start": "08:30",
-   "end": "10:30",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "was": null,
-   "detected": "2026-10-13T07:42:17.035Z"
-  },
-  {
-   "kind": "cancelled",
-   "date": "2026-11-11",
-   "key": "cs",
-   "start": "10:45",
-   "end": "11:45",
-   "room": "DH.z1v01.04",
-   "old": "DB107",
-   "was": null,
-   "detected": "2026-10-13T07:42:17.035Z"
-  }
- ],
+ "changes": [],
  "lessons": [
   {
    "date": "2026-09-21",

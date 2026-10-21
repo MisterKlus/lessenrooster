@@ -4,17 +4,6 @@
  "changes": [
   {
    "kind": "cancelled",
-   "date": "2026-10-20",
-   "key": "onderzoek",
-   "start": "12:45",
-   "end": "13:45",
-   "room": "DH.z2v02.26",
-   "old": "DE208",
-   "was": null,
-   "detected": "2026-10-14T06:09:05.897Z"
-  },
-  {
-   "kind": "cancelled",
    "date": "2026-10-26",
    "key": "onderzoek",
    "start": "16:00",
