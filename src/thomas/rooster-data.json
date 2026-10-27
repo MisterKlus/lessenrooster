@@ -1,24 +1,7 @@
 {
  "updated": "2026-10-26T06:13:24.955Z",
  "extraSubjects": [],
- "changes": [
-  {
-   "kind": "changed",
-   "date": "2026-11-09",
-   "key": "reken",
-   "start": "08:30",
-   "end": "12:00",
-   "room": "DH.z1v00.30",
-   "old": "DC001",
-   "was": {
-    "start": "08:30",
-    "end": "12:00",
-    "room": "DH.z3v01.07",
-    "old": "DF107"
-   },
-   "detected": "2026-10-20T06:00:24.532Z"
-  }
- ],
+ "changes": [],
  "lessons": [
   {
    "date": "2026-09-28",
