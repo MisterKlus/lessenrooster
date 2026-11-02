@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-29T07:05:28.748Z",
+ "updated": "2026-11-02T07:40:51.514Z",
  "extraSubjects": [],
  "changes": [],
  "lessons": [
@@ -749,6 +749,105 @@
   },
   {
    "date": "2026-11-27",
+   "start": "14:45",
+   "end": "17:00",
+   "key": "mech",
+   "room": "DH.z2v00.23",
+   "old": "DE006",
+   "teacher": "Claus Tom"
+  },
+  {
+   "date": "2026-11-30",
+   "start": "08:30",
+   "end": "09:30",
+   "key": "auto",
+   "room": "DH.z2v01.42",
+   "old": "DE103",
+   "teacher": "Vandormael Wim"
+  },
+  {
+   "date": "2026-11-30",
+   "start": "09:30",
+   "end": "10:30",
+   "key": "reken",
+   "room": "DH.z3v01.07",
+   "old": "DF107",
+   "teacher": "Ates Zekai"
+  },
+  {
+   "date": "2026-11-30",
+   "start": "10:45",
+   "end": "12:45",
+   "key": "statica",
+   "room": "DH.z2v01.21",
+   "old": "DD106",
+   "teacher": "Stouten Ilona"
+  },
+  {
+   "date": "2026-11-30",
+   "start": "13:45",
+   "end": "15:45",
+   "key": "reken",
+   "room": "DH.z2v00.26",
+   "old": "DE008",
+   "teacher": "Ates Zekai"
+  },
+  {
+   "date": "2026-11-30",
+   "start": "16:00",
+   "end": "18:00",
+   "key": "onderzoek",
+   "room": "DH.z3v01.06",
+   "old": "DF106",
+   "teacher": "Dierickx Hannelore"
+  },
+  {
+   "date": "2026-12-02",
+   "start": "08:30",
+   "end": "10:30",
+   "key": "reken",
+   "room": "DH.z3v02.04",
+   "old": "DF203",
+   "teacher": "Ates Zekai"
+  },
+  {
+   "date": "2026-12-03",
+   "start": "08:30",
+   "end": "10:30",
+   "key": "skills",
+   "room": "DH.z3v01.01",
+   "old": "DF101",
+   "teacher": "Dierickx Hannelore"
+  },
+  {
+   "date": "2026-12-03",
+   "start": "10:45",
+   "end": "12:45",
+   "key": "auto",
+   "room": "DH.z2v01.42",
+   "old": "DE103",
+   "teacher": "Vandormael Wim"
+  },
+  {
+   "date": "2026-12-04",
+   "start": "08:30",
+   "end": "10:30",
+   "key": "mech",
+   "room": "DH.z2v00.23",
+   "old": "DE006",
+   "teacher": "Claus Tom"
+  },
+  {
+   "date": "2026-12-04",
+   "start": "10:45",
+   "end": "12:45",
+   "key": "sterkte",
+   "room": "DH.z2v00.23",
+   "old": "DE006",
+   "teacher": "Deckers Kristel"
+  },
+  {
+   "date": "2026-12-04",
    "start": "14:45",
    "end": "17:00",
    "key": "mech",

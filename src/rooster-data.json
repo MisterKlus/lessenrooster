@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-26T06:13:14.226Z",
+ "updated": "2026-11-02T07:40:40.893Z",
  "extraSubjects": [],
  "changes": [],
  "lessons": [
@@ -761,6 +761,87 @@
   },
   {
    "date": "2026-11-27",
+   "start": "10:45",
+   "end": "12:45",
+   "key": "cs",
+   "room": "DH.z1v01.21",
+   "old": "DA104",
+   "teacher": "De Puydt Sander"
+  },
+  {
+   "date": "2026-11-30",
+   "start": "08:30",
+   "end": "10:30",
+   "key": "pm",
+   "room": "DH.z1v01.04",
+   "old": "DB107",
+   "teacher": "Castermans Jan"
+  },
+  {
+   "date": "2026-11-30",
+   "start": "10:45",
+   "end": "12:45",
+   "key": "web",
+   "room": "DH.z1v02.11",
+   "old": "DB211",
+   "teacher": "Beuls Jasper"
+  },
+  {
+   "date": "2026-11-30",
+   "start": "13:45",
+   "end": "15:45",
+   "key": "data",
+   "room": "DH.z1v01.07",
+   "old": "DB102",
+   "teacher": "Bloemen Koen"
+  },
+  {
+   "date": "2026-12-02",
+   "start": "08:30",
+   "end": "10:30",
+   "key": "cs",
+   "room": "DH.z1v01.04",
+   "old": "DB107",
+   "teacher": "De Puydt Sander"
+  },
+  {
+   "date": "2026-12-02",
+   "start": "10:45",
+   "end": "11:45",
+   "key": "cs",
+   "room": "DH.z1v01.04",
+   "old": "DB107",
+   "teacher": "De Puydt Sander"
+  },
+  {
+   "date": "2026-12-03",
+   "start": "14:45",
+   "end": "15:45",
+   "key": "it",
+   "room": "DH.z1v01.05",
+   "old": "DB105",
+   "teacher": "Gerits Liesanne"
+  },
+  {
+   "date": "2026-12-03",
+   "start": "16:00",
+   "end": "18:00",
+   "key": "it",
+   "room": "DH.z1v01.05",
+   "old": "DB105",
+   "teacher": "Gerits Liesanne"
+  },
+  {
+   "date": "2026-12-04",
+   "start": "08:30",
+   "end": "10:30",
+   "key": "web",
+   "room": "DH.z1v01.21",
+   "old": "DA104",
+   "teacher": "Beuls Jasper"
+  },
+  {
+   "date": "2026-12-04",
    "start": "10:45",
    "end": "12:45",
    "key": "cs",
