@@ -13,7 +13,7 @@ const src=__dirname,root=path.join(src,'..');
 // met vakken en lessen in src/<id>/ en een eigen TimeEdit-link (geheim TIMEEDIT_URL_<ID>).
 const PEOPLE=[
  {id:'tymo',name:'Tymo',main:true,styles:true,program:'Graduaat Programmeren',note:'Weggelaten: het C#-monitoraat, Project management van andere klasgroepen dan 2PROB en Data Expert op dinsdag.'},
- {id:'thomas',name:'Thomas',program:'Elektromechanica',androidApp:'https://github.com/MisterKlus/lessenrooster/releases/download/widget-app-thomas/lessenrooster-widget.apk',eggs:{birthday:'01-14',plc:'auto',quiz:'reken'},note:'Het toont je vakken van het eerste en het tweede jaar, zoals gekozen in TimeEdit.'},
+ {id:'thomas',name:'Thomas',program:'Elektromechanica',androidApp:'https://github.com/MisterKlus/lessenrooster/releases/download/widget-app-thomas/lessenrooster-widget.apk',eggs:{birthday:'01-14',plc:'auto',quiz:['reken','reken2']},note:'Het toont je vakken van het eerste en het tweede jaar, zoals gekozen in TimeEdit.'},
 ];
 const siteDir=p=>p.main?'':p.id; // map op de site
 const srcDir=p=>p.main?src:path.join(src,p.id);

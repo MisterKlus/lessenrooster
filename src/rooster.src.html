@@ -1324,7 +1324,7 @@ function eggClick(event){
 function eggPressStart(event){
  if(event.button>0)return;
  let lesson=event.target.closest('[data-open]');
- let kind=event.target.closest('h1')?'kast':lesson&&lessonKey(lesson)===EGGS.quiz?'som':null;
+ let kind=event.target.closest('h1')?'kast':lesson&&[].concat(EGGS.quiz).includes(lessonKey(lesson))?'som':null;
  if(!kind)return;
  clearTimeout(eggState.pressTimer);eggState.pressAt=[event.clientX,event.clientY];
  eggState.pressTimer=setTimeout(()=>{
