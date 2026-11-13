@@ -1,7 +1,30 @@
 {
- "updated": "2026-11-09T07:58:19.651Z",
+ "updated": "2026-11-13T07:57:13.642Z",
  "extraSubjects": [],
- "changes": [],
+ "changes": [
+  {
+   "kind": "cancelled",
+   "date": "2026-11-26",
+   "key": "auto",
+   "start": "10:45",
+   "end": "12:45",
+   "room": "DH.z2v01.42",
+   "old": "DE103",
+   "was": null,
+   "detected": "2026-11-13T07:57:13.642Z"
+  },
+  {
+   "kind": "new",
+   "date": "2026-11-18",
+   "key": "auto",
+   "start": "16:00",
+   "end": "18:00",
+   "room": "DH.z3v02.05",
+   "old": "DF204",
+   "was": null,
+   "detected": "2026-11-13T07:57:13.642Z"
+  }
+ ],
  "lessons": [
   {
    "date": "2026-09-28",
@@ -611,6 +634,15 @@
    "teacher": "Ates Zekai"
   },
   {
+   "date": "2026-11-18",
+   "start": "16:00",
+   "end": "18:00",
+   "key": "auto",
+   "room": "DH.z3v02.05",
+   "old": "DF204",
+   "teacher": "Vandormael Wim"
+  },
+  {
    "date": "2026-11-19",
    "start": "08:30",
    "end": "10:30",
@@ -719,15 +751,6 @@
    "room": "DH.z3v01.01",
    "old": "DF101",
    "teacher": "Dierickx Hannelore"
-  },
-  {
-   "date": "2026-11-26",
-   "start": "10:45",
-   "end": "12:45",
-   "key": "auto",
-   "room": "DH.z2v01.42",
-   "old": "DE103",
-   "teacher": "Vandormael Wim"
   },
   {
    "date": "2026-11-27",
