@@ -12,17 +12,6 @@
    "old": "DE103",
    "was": null,
    "detected": "2026-11-13T07:57:13.642Z"
-  },
-  {
-   "kind": "new",
-   "date": "2026-11-18",
-   "key": "auto",
-   "start": "16:00",
-   "end": "18:00",
-   "room": "DH.z3v02.05",
-   "old": "DF204",
-   "was": null,
-   "detected": "2026-11-13T07:57:13.642Z"
   }
  ],
  "lessons": [
