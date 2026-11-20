@@ -1,19 +1,7 @@
 {
  "updated": "2026-11-16T07:58:29.585Z",
  "extraSubjects": [],
- "changes": [
-  {
-   "kind": "cancelled",
-   "date": "2026-11-26",
-   "key": "auto",
-   "start": "10:45",
-   "end": "12:45",
-   "room": "DH.z2v01.42",
-   "old": "DE103",
-   "was": null,
-   "detected": "2026-11-13T07:57:13.642Z"
-  }
- ],
+ "changes": [],
  "lessons": [
   {
    "date": "2026-09-28",
